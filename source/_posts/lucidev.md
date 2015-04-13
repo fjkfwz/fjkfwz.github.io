@@ -1,5 +1,5 @@
 title: Openwrt开发与Luci介绍
-date: 
+date: 2014-12-4
 categories: Openwrt开发笔记
 tags: [Openwrt,开发,LUCI]
 description:

@@ -1,5 +1,5 @@
 title: Openwrt编译进阶
-date: 
+date: 2014-8-16
 categories: Openwrt开发笔记
 tags: [Openwrt,编译] 
 description:

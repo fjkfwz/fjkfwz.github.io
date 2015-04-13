@@ -1,5 +1,5 @@
 title: 夏季产品设计总结
-date: 
+date: 2014-8-10
 categories: 产品设计
 tags: [UX,UI,设计,产品,心得]
 description:

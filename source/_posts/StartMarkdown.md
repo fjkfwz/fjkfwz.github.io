@@ -1,5 +1,5 @@
 title: Markdown语法初步
-date:
+date: 2014-7-20
 categories: Markdown笔记
 tags: [Markdown,笔记,入门]
 description: 这是一篇关于Markdown入门的学习笔记，主要内容包括：（1）Markdown基本语法 （2）Markdown写作工具 

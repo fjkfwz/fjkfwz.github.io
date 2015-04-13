@@ -1,5 +1,5 @@
 title: 利用PHP SSH2扩展实现远程控制Openwrt
-date:
+date: 2014-8-12
 categories: Openwrt开发笔记
 tags: [Openwrt,PHP,SSH,远程]
 description:

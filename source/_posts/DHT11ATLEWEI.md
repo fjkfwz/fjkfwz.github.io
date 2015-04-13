@@ -1,5 +1,5 @@
 title: 微信公众平台实时监控室内温度和湿度
-date:
+date: 2014-7-23
 categories: Arduino开发记录
 tags: [微信公众平台,温度,湿度,传感器,DHT11,Arduino,乐联网,物联网]
 description: 这是一个记录软硬件结合的物联网项目，目的是打造微信实时监控室内环境，由于传感器简陋，这篇文章只介绍温度和湿度的监控，使用的是DHT11温湿度传感器，主机为Arduino UNO+W5100 Ethernet/SD扩展版，路由器为HG255D Pandorabox by lintel,物联网服务由乐联网提供，本篇文章主要内容有（1）DHT11硬件基础（2）Arduino读取DHT11的温湿度数据（3）LCD1602_I2C硬件基础及在LCD模块上显示DHT11获取的温湿度数据（4）将数据上传到乐联网（5）微信查询传感器数据

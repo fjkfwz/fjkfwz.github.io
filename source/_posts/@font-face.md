@@ -1,5 +1,5 @@
 title: 在网页中插入特殊字体,浅谈@font-face
-date: 
+date: 2014-7-26
 categories: 前端设计
 tags: [字体,前端]
 description: 本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face插入特殊字体（3）中文在线@font-face——有字库（4）修改hexo主题字体

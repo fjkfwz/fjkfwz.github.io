@@ -1,5 +1,5 @@
 title: 互联网产品定律
-date: 
+date: 2014-8-8
 categories: 产品设计
 tags: [互联网,产品,定律]
 description:
