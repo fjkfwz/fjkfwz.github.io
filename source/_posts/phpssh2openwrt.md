@@ -93,7 +93,7 @@ SSH2连接有两种方式，分别是用户名密码，ssh密钥形式。
 ?> 	
 ```
 连接结果
-	Authentication Successful!
+	``Authentication Successful!``
 
 ##SSH密钥
 通过SSH密钥连接函数
@@ -102,7 +102,8 @@ SSH2连接有两种方式，分别是用户名密码，ssh密钥形式。
 
 SSH使用密钥登录，不仅安全，而且更方便。sshd在~/.ssh/authorized_keys中加入公钥即可。
 而OpenWrt使用dropbear作为服务端， ~/.ssh/authorized_keys 并不生效。其实，dropbear的公钥存储文件是600权限的` /etc/dropbear/authorized_keys` 文件，只需将公钥加入此文件即可。至于其它，与sshd类似。
-ssh key可以由secureCRT->Tools->Create Public Key生成，加密算法选择RSA，通行短语对应ssh2_auth_pubkey_file()中的$passphrase,可以不填写，$pubkeyfile , $privkeyfile为公钥和私钥的存放位置，将$pubkeyfile中的内容复制到Openwrt路径`/etc/dropbear/authorized_keys`中，并确保权限为0644。
+ssh key可以由secureCRT->Tools->Create Public Key生成，加密算法选择RSA，通行短语对应ssh2_auth_pubkey_file()中的\$passphrase,可以不填写，\$pubkeyfile , \$privkeyfile为公钥和私钥的存放位置，将$pubkeyfile中的内容复制到Openwrt路径`/etc/dropbear/authorized_keys`中，并确保权限为0644。
+
 ```
 <?php
 	$connection = ssh2_connect('192.168.1.1', 22, array('hostkey'=>'ssh-rsa'));
@@ -153,13 +154,15 @@ print_r($auth_methods);
 	bool ssh2_scp_recv ( resource $session, string $remote_file, string $local_file )
 
 Ps: 接收文件时，后面文件名可以为空，如：
+
 ```
 <?php
 $connection = ssh2_connect('192.168.1.1', 22);
 ssh2_auth_password($connection, 'root', 'admin');
 ssh2_scp_recv($connection, '/remote/filename', '/local/filename');
 ?>
-``` 
+
+```
 
 
 ###本地文件复制到远程服务器
@@ -167,6 +170,7 @@ ssh2_scp_recv($connection, '/remote/filename', '/local/filename');
 	bool ssh2_scp_send ( resource $session, string $local_file, string $remote_file [, int $create_mode] )
 
 Ps:发送文件时，后面的文件名不能为空，如：
+
 ```
 <?php
 $connection = ssh2_connect('192.168.1.1', 22);
@@ -174,8 +178,10 @@ ssh2_auth_password($connection, 'root', 'admin');
 ssh2_scp_send($connection, '/local/filename', '/remote/filename', 0644);
 ?>
 ```
+
 ##执行远程服务器上的命令并取返回值
 	resource ssh2_exec( resource $session, string $command [, string $pty [, array $env [, int $width [, int $height [, int $width_height_type]]]]] )
+
 ```
 <?php
 	$connection = ssh2_connect('192.168.1.1', 22, array('hostkey'=>'ssh-rsa'));
