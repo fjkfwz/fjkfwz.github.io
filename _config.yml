@@ -88,18 +88,11 @@ Plugins:
 
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
-
-###Deploy to github
-
-## Deploy to gitcafe
 deploy:
-  type: git
-  repository: git@gitcafe.com:fjkfwz/fjkfwz.git
-  branch: gitcafe-pages
-#  type: git
-#  repository: git@github.com:fjkfwz/fjkfwz.github.io.git
-#  branch: master
-
+   type: git
+   repo: 
+      github: https://github.com/fjkfwz/fjkfwz.github.io.git,master
+      gitcafe: https://gitcafe.com/fjkfwz/fjkfwz.git,gitcafe-pages    
 #Feed Atom
 feed:
   type: atom
