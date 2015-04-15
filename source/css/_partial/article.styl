@@ -38,6 +38,7 @@
   line-height: 35px;
   margin-bottom: 20px;
   font-size: 28px;
+  font-weight: bold;
   color: #333;
   -webkit-transition: color 0.3s;
   -moz-transition: color 0.3s;
@@ -116,18 +117,19 @@
     }
   }
   h2{
+      font-size: 22px;
     margin-top: 10px;
     font-weight: bold;
     color: #574C4C;
-    border-bottom: 1px solid #ddd;
   }
   h3{
+      font-size: 20px;
     margin-top: 5px;
     font-weight: bold;
     color: #574C4C;
-    border-bottom: 1px solid #ddd;
   }
 h4,h5,h6{
+    font-size: 20px;
     font-weight: bold;
     color: #574C4C;
   }
@@ -152,21 +154,20 @@ h4,h5,h6{
     border-bottom: 1px solid #FFF;
   }
   pre {
-    font-size: 1 / 0.9em;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 0.8;
     margin-top: 10px;
     padding: 5px 15px;
     overflow-x: auto;
     background: #f6f6f6;
     color: #657b83;
-    font-size: 10px;
     border: 1px solid #ccc;
     font-family: Menlo,Monaco,"Andale Mono","lucida console","Courier New",monospace;
   }
   table{
     width:100%;
     border: 1px solid #dedede;
-    margin: 15px 0;
+    margin: 20px 0;
     border-collapse:collapse;
     tr,td{
       height:35px;
@@ -183,7 +184,7 @@ h4,h5,h6{
     }
     td,th{
       border: 1px solid #dedede;
-      padding: 0 10px;
+      padding: 0 20px;
     }
   }
   figure{
@@ -277,3 +278,79 @@ h4,h5,h6{
     float: right;
   }
 }
+.article-entry
+  @extend $base-style
+  color: color-default
+  padding: 0 article-padding
+  p, table
+    font-family: Helvetica Neue, Helvetica,Microsoft YaHei, WenQuanYi Micro Hei,Arial, sans-serif
+    font-seri: Georgia, serif
+    font-mono: Monaco, Menlo, Consolas, Courier New, monospace
+    font-size: 1.2em
+    line-height: line-height
+    margin: line-height 0
+  h1, h2, h3, h4, h5, h6
+    font-family: Helvetica Neue, Helvetica,Microsoft YaHei, WenQuanYi Micro Hei,Arial, sans-serif
+    font-weight: bold
+    line-height: line-height-title
+    margin: line-height-title 0
+
+p, table
+    font-family: Helvetica Neue, Helvetica,Microsoft YaHei, WenQuanYi Micro Hei,Arial, sans-serif
+    font-seri: Georgia, serif
+    font-mono: Monaco, Menlo, Consolas, Courier New, monospace
+    font-size: 1.2em
+    line-height: line-height
+    margin: line-height 0
+
+.copyright {
+  display: block;
+  padding: 10px 20px;
+  margin: 35px 0 25px;
+  line-height: 24px;
+  font-size: 14px;
+  background-color: #FFFF33;
+}
+.copyright .claim {
+  font-size: 15px;
+  font-weight: 600;
+  zoom: 1;
+}
+.copyright .claim:before,
+.copyright .claim:after {
+  content: "";
+  display: table;
+}
+.copyright .claim:after {
+  clear: both;
+}
+.copyright em,
+.post-nav em {
+  font-style: normal;
+  color: #808080;
+}
+.copyright a:hover,
+.post-nav a:hover {
+  color: #c40000;
+  text-decoration: none;
+}    
+
+//toc
+.toc-article
+  background color-toc-bg
+  margin 2em 0 0 0.5em
+  padding 1em
+  strong
+    padding 0.3em 0
+
+#toc
+  line-height 1em
+  font-size 1.0em
+  float right // 如果想在左边，则把这里改成left即可
+  .toc
+    padding 0
+    li
+      list-style-type none
+
+  .toc-child 
+    padding-left 0.7em

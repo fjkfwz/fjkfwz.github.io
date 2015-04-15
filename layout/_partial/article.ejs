@@ -24,7 +24,16 @@
       <% if (post.excerpt && index){ %>
         <%- post.excerpt %>
       <% } else { %>
+      <!-- 文章目录开始 -->
+    <% if (!index){ %>
+        <div id="toc" class="toc-article">
+            <strong class="toc-title"><%= __('目录') %></strong>
+        <%- toc(page.content) %>
+        </div>
+    <% } %>
+    <!-- 文章目录开始 -->
         <%- post.content %>
+        <%- partial('post/copyright') %>
       <% } %>
     </div>
     <% if (index){ %>
@@ -36,6 +45,7 @@
           <a <% if (!theme.excerpt_link){ %>class="hidden"<% } %> href="<%- url_for(post.path) %>#more"><%= theme.excerpt_link %> >></a>
         </p>
       <% } %>
+
       <div class="clearfix"></div>
     </div>
     <% } %>

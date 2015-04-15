@@ -1,20 +1,24 @@
 # Header
 menu:
-  主页: /
-  所有文章: /archives
-  # 随笔: /tags/随笔
+  #主页: /
+  #所有文章: /archives
+  进化黑洞: /tag/进化
+  底层代码: /tag/社会
+  设计涟漪: /tag/设计
+  沿途见识: /tags/随笔
+  #instagram: /instagram
 
 # SubNav
 subnav:
-  github: "#"
-  weibo: "#"
-  rss: "#"
-  zhihu: "#"
+  github: "https://github.com/fjkfwz"
+  weibo: "http://weibo.com/andymckees"
+  rss: "/atom.xml"
+  zhihu: "http://www.zhihu.com/people/rice-lyn"
   #douban: "#"
-  #mail: "#"
-  #facebook: "#"
-  #google: "#"
-  #twitter: "#"
+  mail: "fjkfwz@gmail.com"
+  facebook: "https://www.facebook.com/mckee.andy1"
+  google: "https://plus.google.com/u/1/115513142719872189331/posts"
+  twitter: "https://twitter.com/AndyMckees"
   #linkedin: "#"
 
 rss: /atom.xml
@@ -25,16 +29,16 @@ fancybox: true
 mathjax: true
 
 # Miscellaneous
-google_analytics: ''
+google_analytics: 'UA-61785167-1'
 favicon: /favicon.png
 
 #你的头像url
-avatar: ""
+avatar: "/img/Mario.PNG"
 #是否开启分享
-share: true
+share: false
 #是否开启多说评论，填写你在多说申请的项目名称 duoshuo: duoshuo-key
 #若使用disqus，请在博客config文件中填写disqus_shortname，并关闭多说评论
-duoshuo: true
+duoshuo: ture
 #是否开启云标签
 tagcloud: true
 
@@ -43,12 +47,13 @@ tagcloud: true
 #friends: false
 #开启——
 friends:
-  奥巴马的博客: http://localhost:4000/
-  卡卡的美丽传说: http://localhost:4000/
-  本泽马的博客: http://localhost:4000/
-  吉格斯的博客: http://localhost:4000/
-  习大大大不同: http://localhost:4000/
-  托蒂的博客: http://localhost:4000/
+  ibrother: http://ibrother.me
+  Crexyer's Blog: http://www.crexyer.com
+  Jeremy's Memo: http://www.j-cn.me
+  乌拉拉: http://wulala.in
+  cnfeat: http://cnfeat.com
+  V2EX: http://www.v2ex.com
+  小影志: http://c7sky.com/
 
 #是否开启“关于我”。
 #不开启——
