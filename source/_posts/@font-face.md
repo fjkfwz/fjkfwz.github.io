@@ -4,7 +4,7 @@ categories: 前端设计
 tags: [字体,前端]
 description: 本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face插入特殊字体（3）中文在线@font-face——有字库（4）修改hexo主题字体
 ---
-**摘要**：*本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face插入特殊字体（3）中文在线@font-face——有字库（4）修改hexo主题字体*
+**摘要**：本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face插入特殊字体（3）中文在线@font-face——有字库（4）修改hexo主题字体
 <!--more-->
 自从在hexo上安装了pacmen主题之后，就一直对pacman主题`header`上的`textlogo`和`footer`上`intro_line`的字体很感兴趣，因为我的电脑和手机上并没有安装该字体，但是无论是在任何终端上，浏览的体验都是一致的，然后查找了一些资料，发现这是`CSS3`中的一个功能模块`@font-face`，主要用于实现网页字体多样性。
 

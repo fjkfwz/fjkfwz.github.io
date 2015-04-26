@@ -4,7 +4,7 @@ categories: Openwrt开发笔记
 tags: [Openwrt,编译] 
 description:
 ---
-**摘要**：* 这篇文章是Openwrt编译的学习笔记包括（1）Openwrt基础入门（2）Openwrt基础进阶（3）集成软件*
+**摘要**：这篇文章是Openwrt编译的学习笔记包括（1）Openwrt基础入门（2）Openwrt基础进阶（3）集成软件
 <!--more-->
 ***
 之前总喜欢在在写文章之前写一大段自己的光荣事迹，后来发现看别人这样写的文章是一件很蛋疼的事，毕竟这是一篇技术类文章，不是小学生日记。
