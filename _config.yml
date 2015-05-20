@@ -1,12 +1,12 @@
 menu:
   home: /
-  #categories: /categories
+  categories: /categories
   archives: /archives
   tags: /tags
-  #about: /about
+  about: /about
 
 # Place your favicon.ico to /source directory.
-favicon: /favicon.ico
+favicon: /favicon.png
 
 # Set default keywords (Use a comma to separate)
 keywords: "Hexo,next"
@@ -19,10 +19,10 @@ rss:
 # Icon fonts
 # Place your font into next/source/fonts, specify directory-name and font-name here
 # Avialable: default | linecons | fifty-shades | feather
-icon_font: default
+#icon_font: default
 #icon_font: fifty-shades
 #icon_font: feather
-#icon_font: linecons
+icon_font: linecons
 
 # Code Highlight theme
 # Available value: normal | night | night eighties | night blue | night bright
@@ -31,7 +31,7 @@ highlight_theme: normal
 
 
 # MathJax Support
-mathjax:
+mathjax: ture
 
 
 # Schemes
