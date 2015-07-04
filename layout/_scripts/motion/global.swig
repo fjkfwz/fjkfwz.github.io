@@ -40,6 +40,7 @@
         sidebarContentMotion();
       })
       .on('sidebar.isHiding', function () {});
+      sidebarShowMotion();
 
     function LogoAndMenuMotion() {
       $.Velocity.RunSequence([

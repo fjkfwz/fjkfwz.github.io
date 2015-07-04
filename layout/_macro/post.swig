@@ -124,11 +124,6 @@
           </div>
         </div>
       {% endif %}
-
-      {% set isLast = loop.index % page.per_page === 0 %}
-      {% if is_home() and not isLast %}
-        <div class="post-eof"></div>
-      {% endif %}
     </div>
   </div>
 
