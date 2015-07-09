@@ -40,9 +40,12 @@
         sidebarContentMotion();
       })
       .on('sidebar.isHiding', function () {});
-      sidebarShowMotion();
 
-    function LogoAndMenuMotion() {
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
       $.Velocity.RunSequence([
         { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
         { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
