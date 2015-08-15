@@ -1,0 +1,1151 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="Diff,Openwrt,Patch," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> Openwrt Patch制作及打补丁 // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Openwrt Patch制作及打补丁
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-07-09
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Openwrt开发笔记/">Openwrt开发笔记</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/09/Openwrt-Patches/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/09/Openwrt-Patches/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：Patch是天才程序员、Perl的发明者Larry Wall发明的，它应高效地交流程序源代码之需求而生，随着以Linux为代表的开发源代码运行的蓬勃发展，patch这个概念已经成为开放源代码发起者、贡献者和参与者的集体无意识的一部分。patch只包含了对源代码修改的部分，这对于开放源代码社区的协同开发模式具有重要意义，意味的软件新版本的 发布和对软件的缺陷或改进可以以更小的文件发布，可以减少网络的传输量，方便软件维护者的管理工作。<br><a id="more"></a></p>
+<hr>
+<p>patch是用来查找文件之间差异的GNU diff命令的一个接口；diff有很多选项，但是该命令最常用的用途是用来生成一个文件，该文件中列出了内容发生改变的行，显示两个原始文件、修改过的行以及由于内容没有变化而忽略掉的行。patch典型地用于把一个目录下的源代码文件更新到新的版本，从而就避免了下载整个新的源代码档案的必要。下载一个有效的patch仅仅需要下载发生变化的那些代码行就可以了。 patch最初源自十年前，那时网络带宽的限制促进了patch的发展，然而和当时的很多Unix工具一样，直到现在，patch还在广泛应用。</p>
+<p>在Dr.Dobb之旅的2月份的程序员杂志中，Larry Wall对早期的patch做了一些很有趣的说明：</p>
+<blockquote>
+<p>DDJ:顺便问一下，patch和diff哪个出现的早？<br>LW:从很长一段时间来说，diff出现地比较早。我想diff大约比patch早10年出现，一回想起来，我就纳闷为什么没有人早些想到使用patch呢？ 但是我想我知道这中间的原因。这很大程度上是心理因素使然。当开发出diff时，程序员增加了一个e选项，我想就是这个选项的原因，该选项后来滋生为一个 ed脚本，因此大家都会对自己说，”嗯，如果我想自动使用diff，那么我就使用这个选项。”因此从来都没有人编写一个计算机程序来获取其它格式的输出并使用这些结果。或者是那些设计diff的人员，或者是那些使用diff格式而受益的人员太沉迷其中了，因为你可以对那些已经修改过的内容使用diff操作并让其正常工作都是很容易的。 </p>
+</blockquote>
+<hr>
+<h1 id="diff和patch的用法">diff和patch的用法</h1><p>diff和patch是一对工具，在数学上来说，diff是对两个集合的差运算，patch是对两个集合的和运算。 diff比较两个文件或文件集合的差异，并记录下来，生成一个diff文件，这也是我们常说的patch文件，即补丁文件。 patch能将diff文件运用于 原来的两个集合之一，从而得到另一个集合。举个例子来说文件A和文件B,经过diff之后生成了补丁文件C,那么着个过程相当于 <code>A-B=C</code>,那么patch的过程就是<code>B+C=A</code> 或<code>A-C=B</code>。因此我们只要能得到A, B, C三个文件中的任何两个，就能用diff和patch这对工具生成另外一个文件。<br>这就是diff和patch的妙处。下面分别介绍一下两个工具的用法:</p>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/path.png" alt="Path"></p>
+<h2 id="diff的用法">diff的用法</h2><p>diff后面可以接两个文件名或两个目录名。如果是一个目录名加一个文件名，那么只作用在那么个目录下的同名文件。<br>如果是两个目录的话，作用于该目录下的所有文件，不递归。如果我们希望递归执行，需要使用-r参数。<br>命令<code>diff A B &gt; C</code>,一般A是原始文件，B是修改后的文件，C称为A的补丁文件。不加任何参数生成的diff文件格式是一种简单的格式，这种格式只标出了不一样的行数和内容。我们需要一种更详细的格式，可以标识出不同之处的上下文环境，这样更有利于提高patch命令的识别能力。这个时候可以用-c开关。</p>
+<h2 id="diff的语法">diff的语法</h2><p>1、diff</p>
+<pre><code>－－－－－－－－－－－－－－－－－－－－
+NAME
+       diff - find differences between <span class="constant">two</span> <span class="built_in">files</span>
+SYNOPSIS
+       diff [options] <span class="built_in">from</span>-<span class="built_in">file</span> <span class="built_in">to</span>-<span class="built_in">file</span>
+－－－－－－－－－－－－－－－－－－－－
+</code></pre><p>语法格式：diff [选项] 源文件（夹） 目的文件（夹）<br>常用选项：<br>-r 是一个递归选项，设置了这个选项，diff会将两个不同版本源代码目录中的所有对应文件全部都进行一次比较，包括子目录文件。<br>-N 选项确保补丁文件将正确地处理已经创建或删除文件的情况。<br>-u 选项以统一格式创建补丁文件，这种格式比缺省格式更紧凑些。</p>
+<h2 id="patch的用法">patch的用法</h2><p>patch用于根据原文件和补丁文件生成目标文件。还是拿上个例子来说<br>patch A C 就能得到B, 这一步叫做对A打上了B的名字为C的补丁。<br>之一步之后，你的文件A就变成了文件B。如果你打完补丁之后想恢复到A怎么办呢？<br>patch -R B C 就可以重新还原到A了。<br>所以不用担心会失去A的问题。<br>其实patch在具体使用的时候是不用指定原文件的，因为补丁文件中都已经记载了原文件的路径和名称。patch足够聪明可以认出来。但是有时候会有点小问题。比如一般对两个目录diff的时候可能已经包含了原目录的名字，但是我们打补丁的时候会进入到目录中再使用patch,着个时候就需要你告诉patch命令怎么处理补丁文件中的路径。可以利用-pn开关，告诉patch命令忽略的路径分隔符的个数。举例如下：<br>A文件在 DIR_A下，修改后的B文件在DIR_B下，一般DIR_A和DIR_B在同一级目录。我们为了对整个目录下的所有文件一次性diff,我们一般会到DIR_A和DIR_B的父目录下执行以下命令</p>
+<pre><code>diff -rc DIR_A DIR_B &gt; <span class="keyword">C</span>
+</code></pre><p>这个时候补丁文件C中会记录了原始文件的路径为 DIR_A/A<br>现在另一个用户得到了A文件和C文件，其中A文件所在的目录也是DIR_A。 一般，他会比较喜欢在DIR_A目录下面进行patch操作，它会执行<br><code>patch &lt; C</code><br>但是这个时候patch分析C文件中的记录，认为原始文件是./DIR_A/A，但实际上是./A，此时patch会找不到原始文件。为了避免这种情况我们可以使用-p1参数如下</p>
+<pre><code><span class="keyword">patch</span> -p1 &lt; C
+</code></pre><p>此时，patch会忽略掉第1个”/”之前的内容，认为原始文件是 ./A，这样就正确了。使用patch<br>patch附带有一个很好的帮助，其中罗列了很多选项，但是99%的时间只要两个选项就能满足我们的需要：</p>
+<pre><code><span class="keyword">patch</span> -p1 &lt; [patchfile]
+<span class="keyword">patch</span> -R &lt; [patchfile] (used to undo a <span class="keyword">patch</span>)
+</code></pre><p>-p1选项代表patchfile中 文件名左边目录的层数，顶层目录在不同的机器上有所不同。要使用这个选项，就要把你的patch放在要被打补丁的目录下，然后在这个目录中运行<code>path -p1 &lt; [patchfile]</code>。</p>
+<h2 id="注意">注意</h2><p>最后有以下几点注意：<br>　　1.一次打多个patch的话，一般这些patch有先后顺序，得按次序打才行。<br>　　2.在patch之前不要对原文件进行任何修改<br>　　3.如果patch中记录的原始文件和你得到的原始文件版本不匹配(很容易出现)，那么你可以尝试使用patch, 如果幸运的话，可以成功。大部分情况下，会有不匹配的情况，此时patch会生成rej文件，记录失败的地方，你可以手工修改。</p>
+<hr>
+<h1 id="diff_pppd_patch">diff pppd patch</h1><p>目录为：<br>目录1 /trunk/build_dir/target-mips_r2_uClibc-0.9.33.2/ppp-default/<br>目录2 /trunk/package/ppp</p>
+<p>目录1需要进行一次编译后才会有，且不能运行make clean，不然会被删除。至于为什么要编译之后再制作patch而不是直接用ppp-2.4.5的源码，我是这样想的，在我们制作自己的patch之前，在目录2下面的patch文件夹已经有很多高手们制作的其他patch，制作自己的patch要以他们的为基础，编译过一次的是已经打好了这些补丁的,如果直接用源码修改后制作patch，就等于忽略了其他的patch，这样可能导致自己的patch到后面把别的patch更改的内容给修改了，导致不必要的错误。</p>
+<p>步骤（在Ubuntu12.04LTS下）：<br>1.首先到目录1下将文件夹ppp-2.4.5复制一份，命名为ppp-2.4.5.old不做任何修改。</p>
+<p>2.修改ppp-2.4.5文件夹下该修改的地方，举个例子，比如431-syncppp.patch里面有这样一段</p>
+<pre><code>--- ppp-<span class="number">2.4</span>.<span class="number">5.0</span><span class="regexp">/pppd/</span>chap-<span class="keyword">new</span>.c  表示旧文件
++++ ppp-<span class="number">2.4</span>.<span class="number">5</span><span class="regexp">/pppd/</span>chap-<span class="keyword">new</span>.c   表示修改了的新文件
+</code></pre><p><img src="http://www.right.com.cn/forum/forum.php?mod=attachment&amp;aid=NjAyNTR8MTMzZGU2MTV8MTQzNjUwODQ4OHwwfDEwMjgyMA%3D%3D&amp;noupdate=yes" alt="diff"><br>@@那一行的意思是在 ppp-2.4.5/pppd/chap-new.c 文件中从第37行开始算起的后六行中插入绿色的内容（绿色的加号表示要增加内容，同理，减号表示删除），如果该文件不是已经存在的文件，则会自动创建一个文件。当然每个人的trunk版本不同可能导致行数和和位置的不同，但需要增加的内容是一样的，这也是我们自己修改文件后自己生成patch的原因。</p>
+<p>修改好ppp-2.4.5里面需要修改的内容就可以生成自己的patch了。</p>
+<p>3.生成patch<br>调出终端，cd到ppp-2.4.5所在目录，运行下面的命令：</p>
+<pre><code>diff -Naur ppp-<span class="number">2.4</span>.5.old<span class="regexp">/pppd/</span>* ppp-<span class="number">2.4</span>.5<span class="regexp">/pppd/</span>* &gt;&gt; <span class="number">600</span>-syncppp.patch
+</code></pre><p>最终就得到了自己的patch，patch的名称无所谓，但要保证它要在其他patch执行完成后再执行，因此编号（即开头的数字比如600，789等等）要是所在patches文件夹下最大的才行。<br>最后来到目录2即/trunk/package/ppp目录下，将得到的patch文件放入patches文件夹即可。<br>最后还要将<code>trunk/package/ppp</code>下的Makefile要将第37行(我的是37行）改为</p>
+<pre><code><span class="label">DEPENDS:</span>=+kmod-ppp +libpthread
+</code></pre><p>不然编译会出错。<br>   注意：执行make clean将会清空 <code>目录1  /trunk/build_dir/target-mips_r2_uClibc-0.9.33.2/</code>下的所有内容，生成patch后请及时转移到不会被误删文件夹下。</p>
+<h1 id="管理工具quilt">管理工具quilt</h1><p>配置完Openwrt后，首次编译时会在编译过程中下载各种源码包，而且解压这些源码包并打上patch。需要对源码进行修改时，可直接修改源码并重新编译，但clean后再次编译时会再次解压源码包，以至所做的修改全部丢失。</p>
+<p>安装quilt工具：</p>
+<pre><code>apt-<span class="keyword">get</span> intall quilt
+</code></pre><p>为了让quilt创建适合OpenWrt格式的patch，需要在本地home目录下创建quilt的配置文件.quiltrc，该配<br>置文件包含diff和patch的选项。使用如下命令可创建quilt的配置文件：</p>
+<pre><code>cat&gt; ~/.quiltrc &lt;&lt;EOF
+<span class="variable">QUILT_DIFF_ARGS=</span><span class="string">"--no-timestamps--no-index -pab --color=auto"</span>
+<span class="variable">QUILT_REFRESH_ARGS=</span><span class="string">"--no-timestamps--no-index -pab"</span>
+<span class="variable">QUILT_PATCH_OPTS=</span><span class="string">"--unified"</span>
+<span class="variable">QUILT_DIFF_OPTS=</span><span class="string">"-p"</span>
+<span class="variable">EDITOR=</span><span class="string">"vim"</span>
+EOF
+</code></pre><p>EDITOR指定编辑时所用的编辑器，该处使用vim。</p>
+<h2 id="package的patch方法">package的patch方法</h2><p>package的patch生成方法以修改tftp-hpa为例进行介绍，修改内容为在tftp的main函数中加入一条打印<br>信息。（进行该操作之前，需要在make menuconfig时选择tftp-hpa包）</p>
+<hr>
+<h3 id="pactch生成步骤">pactch生成步骤</h3><p>1.准备tftp-hpa源码</p>
+<pre><code>make <span class="keyword">package</span><span class="regexp">/feeds/</span>packages<span class="regexp">/tftp-hpa/</span>{clean,prepare} V=s QUILT=<span class="number">1</span>
+</code></pre><p>此命令会解压tftp-hpa的源码包并准备patch文件（如果有），通过打印信息可获取解压到的目录路径。</p>
+<p>2.进入tftp-hpa源码目录</p>
+<pre><code><span class="title">cd</span> build_dir/target-mips_r2_uClibc-<span class="number">0.9.33.2</span>/tftp-hpa-<span class="number">0</span>.<span class="number">48</span>
+</code></pre><p>3.安装所有已有patch</p>
+<pre><code>quilt push -<span class="literal">a</span>
+</code></pre><p>4.创建新patch</p>
+<pre><code>quilt <span class="keyword">new</span> <span class="number">001</span>-main_test.patch
+</code></pre><p>patch文件名以数字开头，“-”后为patch的描述信息<br>开头的数字必须比已有patch的数字都大，使用命令quilt series查看已有patch的列表</p>
+<p>5.修改源码文件</p>
+<pre><code>quilt <span class="keyword">edit</span> tftp/main.c
+</code></pre><p>该命令将使用在.quiltrc中定义的编辑器打开main.c文件，在main函数中增加一条打印信息。<br>如果还有其他文件需要修改，可继续用此命令进行修改</p>
+<p>6.查看修改内容</p>
+<pre><code><span class="title">quilt</span> diff
+</code></pre><p>7.更新修改到patch文件</p>
+<pre><code>quilt <span class="keyword">refresh</span>
+</code></pre><p>此命令会将更新的修改保存到当前目录的<code>patches/001-main_test</code>.patch(如果没有patches目录会自动创建)。</p>
+<p>8.返回到buildroot目录</p>
+<pre><code><span class="built_in">cd</span> ../../../
+</code></pre><p>9.保存patch文件到buildroot</p>
+<pre><code>makepackage<span class="regexp">/feeds/</span>packages<span class="regexp">/tftp-hpa/u</span>pdate V=s
+</code></pre><p>10.重新编译tftp-hpa包以测试修改</p>
+<pre><code>make <span class="keyword">package</span><span class="regexp">/feeds/</span>packages<span class="regexp">/tftp-hpa/</span>{clean,<span class="keyword">compile</span>} <span class="keyword">package</span><span class="regexp">/index V=s</span>
+</code></pre><p>11.如果有问题，需要编辑patch文件</p>
+<hr>
+<h3 id="编辑已有patch文件">编辑已有patch文件</h3><p>当需要对patch进行修改时，可使用以下步骤：<br>1.准备tftp-hpa源码</p>
+<pre><code>make <span class="keyword">package</span><span class="regexp">/feeds/</span>packages<span class="regexp">/tftp-hpa/</span>{clean,prepare} V=s QUILT=<span class="number">1</span>
+</code></pre><p>2.进入tftp-hpa源码目录</p>
+<pre><code><span class="title">cd</span> build_dir/ /target-mips_r2_uClibc-<span class="number">0.9.33.2</span>/tftp-hpa-<span class="number">0</span>.<span class="number">48</span>
+</code></pre><p>3.列出可用的patch</p>
+<pre><code><span class="title">quilt</span> series
+</code></pre><p>4.准备要修改的patch</p>
+<pre><code>quilt <span class="keyword">push</span> <span class="number">001</span>-main_test.patch
+</code></pre><p>此命令会按patch编号顺序打补丁，直到指定的patch（包含）<br>如果当前应用的patch编号已经超过了指定的patch编号，将会按相反顺序移除patch直到指定的patch</p>
+<p>5.编辑源码文件</p>
+<pre><code>quilt <span class="keyword">edit</span> tftp/main.c
+</code></pre><p>6.检查patch中包含的所修改的文件</p>
+<pre><code>quilt <span class="built_in">files</span>
+</code></pre><p>7.查看修改内容</p>
+<pre><code><span class="title">quilt</span> diff
+</code></pre><p>8.保存修改到patch</p>
+<pre><code>quilt <span class="keyword">refresh</span>
+</code></pre><p>9.返回buildroot目录</p>
+<pre><code><span class="built_in">cd</span> ../../../
+</code></pre><p>10.保存patch文件到buildroot</p>
+<pre><code>make <span class="keyword">package</span><span class="regexp">/feeds/</span>packages<span class="regexp">/tftp-hpa/u</span>pdate V=s
+</code></pre><p>11.重新编译tftp-hpa包以测试修改</p>
+<pre><code>make <span class="keyword">package</span><span class="regexp">/feeds/</span>packages<span class="regexp">/tftp-hpa/</span>{clean,<span class="keyword">compile</span>} <span class="keyword">package</span><span class="regexp">/index V=s</span>
+</code></pre><h2 id="platform_patch生成步骤">platform patch生成步骤</h2><p>platform形式的patch生成步骤如下（源码修改mach-ap121.c）:<br>1.准备内核源码树，使用如下命令</p>
+<pre><code>make target/linux/{clean,prepare} <span class="variable">V=</span>s <span class="variable">QUILT=</span><span class="number">1</span>
+</code></pre><p>2.进入kernel源码树目录</p>
+<pre><code>对attitudead justment版本，kernel源码树所在目录为`build_dir/linux-<span class="keyword">*</span>/linux-3.<span class="keyword">*</span>`
+</code></pre><p>对本文使用的trunk版本，使用如下命令进入kernel源码树<br>    cd build_dir/target-mips_r2_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.10.10</p>
+<p>3.安装所有已有patch</p>
+<pre><code>quilt push -<span class="literal">a</span>
+</code></pre><p>4.创建新patch</p>
+<pre><code>quilt <span class="built_in">new</span> <span class="built_in">platform</span>/<span class="number">910</span>-MIPS-ath79-ap121-reset-gpio-change.patch
+</code></pre><p>patch文件名以数字开头，“-”后为patch的描述信息<br>开头的数字必须比已有patch的数字都大，使用命令quilt series查看已有patch的列表<br>新建platform的patch时需要在patch名前添加“platform/”前缀</p>
+<p>5.修改源码文件</p>
+<pre><code>quilt <span class="keyword">edit</span> <span class="keyword">arch</span>/mips/ath79/mach-ap121.c
+</code></pre><p>该命令将使用在.quiltrc中定义的编辑器打开mach-ap121.c文件，修改对复位GPIO的定义。<br>如果还有其他文件需要修改，可继续用此命令进行修改</p>
+<p>6.查看修改内容</p>
+<pre><code><span class="title">quilt</span> diff
+</code></pre><p>7.更新修改到patch文件</p>
+<pre><code>quilt <span class="keyword">refresh</span>
+</code></pre><p>此命令会将更新的修改保存到当前目录的<code>patches/platform/910-MIPS-ath79-ap121-reset-gpio-change.patch</code></p>
+<p>8.返回到buildroot目录</p>
+<p>cd ../../../../</p>
+<p>9.保存patch文件到buildroot</p>
+<pre><code>make target/linux/<span class="keyword">update</span> V=<span class="literal">s</span>
+</code></pre><p>此命令会将<code>910-MIPS-ath79-ap121-reset-gpio-change.patch</code>保存到<code>target/linux/ar71xx/patches-3.10/</code></p>
+<h3 id="generic_patch生成步骤">generic patch生成步骤</h3><p>generic形式的patch生成步骤如下（源码修改m25p80.c）:<br>1.准备内核源码树，使用如下命令</p>
+<pre><code>make target/linux/{clean,prepare} <span class="variable">V=</span>s <span class="variable">QUILT=</span><span class="number">1</span>
+</code></pre><p>2.进入kernel源码树目录<br>对attitude adjustment版本，kernel源码树所在目录为<code>build_dir/linux-*/linux-3.*</code><br>对本文使用的trunk版本，使用如下命令进入kernel源码树</p>
+<pre><code><span class="title">cd</span> build_dir/target-mips_r2_uClibc-<span class="number">0.9.33.2</span>/linux-ar71xx_generic/linux-<span class="number">3</span>.<span class="number">10</span>.<span class="number">10</span>
+</code></pre><p>3.安装所有已有patch</p>
+<pre><code>quilt push -<span class="literal">a</span>
+</code></pre><p>4.创建新patch</p>
+<pre><code>quilt <span class="built_in">new</span> <span class="number">998</span>-mtd-m25p80-<span class="built_in">add</span>-support-<span class="keyword">for</span>-spansion-s25fl164k1-flash.patch
+</code></pre><p>patch文件名以数字开头，“-”后为patch的描述信息<br>开头的数字必须比已有patch的数字都大，使用命令quilt series查看已有patch的列表<br>新建generic的patch时需要在patch名前添加“generic/”前缀</p>
+<p>5.修改源码文件</p>
+<pre><code>quilt <span class="keyword">edit</span> driver/mtd/devices/m25p80.c
+</code></pre><p>该命令将使用在.quiltrc中定义的编辑器打开m25p80.c文件，增加对s25fl164k1的声明。<br>如果还有其他文件需要修改，可继续用此命令进行修改</p>
+<p>6.查看修改内容</p>
+<pre><code><span class="title">quilt</span> diff
+</code></pre><p>7.更新修改到patch文件</p>
+<pre><code>quilt <span class="keyword">refresh</span>
+</code></pre><p>此命令会将更新的修改保存到当前目录的patches/generic/998-mtd-m25p80-add-support-for-spansion-s25fl164k1-flash.patch。</p>
+<p>8.返回到buildroot目录</p>
+<pre><code>cd ..<span class="regexp">/../</span>..<span class="regexp">/../</span>
+</code></pre><p>9.保存patch文件到buildroot</p>
+<pre><code>make target/linux/<span class="keyword">update</span> V=<span class="literal">s</span>
+</code></pre><p>此命令会将<code>998-mtd-m25p80-add-support-for-spansion-s25fl164k1-flash.patch</code>保存到<code>target/linux/generic/patches-3.10/</code></p>
+<h3 id="更新patches">更新patches</h3><p>当已打补丁的package（或者kernel）更新到新版本时，patch现有补丁时可能不会顺利，出现一些不确定性。<br>可以通过make的refresh target重建整个patch。<br>对package，使用类似如下的命令：</p>
+<pre><code>make <span class="keyword">package</span><span class="regexp">/feeds/</span>packages<span class="regexp">/tftp-hpa/</span>refresh V=s
+</code></pre><p>对kernel，使用如下命令：</p>
+<pre><code>make <span class="literal">target</span>/linux/<span class="literal">refresh</span> <span class="constant">V</span>=s
+</code></pre><h2 id="迭代修改patch">迭代修改patch</h2><p>进行新的修改时，可能会对patch进行多次修改。为了加快开发速度，可以在保持源码树的情况下进行修改操作。</p>
+<p>1.准备源码树<br>2.进入源码目录<br>3.应用所要打的patch<br>4.编辑源码文件，更新patch<br>5.应用所有patch（quilt push -a）<br>6.返回buildroot目录，运行命令make package/feeds/packages/tftp-hpa/{compile,install}或make target/linux/{compile,install}（对kernel）<br>7.测试固件<br>8.如果需要进一步修改，返回第二步<br>9,使用命令make package/feeds/packages/tftp-hpa/update或make target/linux/update（对kernel）将patches拷贝到buildroot</p>
+<hr>
+<h1 id="Openwrt新设备支持">Openwrt新设备支持</h1><p>以TL-MR10U为例,TL-MR10U可直接刷WR703N固件, 不过USB 不能供电,网络, LED正常，所以需要修复下</p>
+<h2 id="准备工作">准备工作</h2><p>编译过bin, 有完整的<code>.config</code>和<code>toolchain</code><br>1.建立开发 branch</p>
+<pre><code>~/openwrt$ git checkout -<span class="tag">b</span> add-tl-mr10u-support
+</code></pre><p>2.清理tmp目录，直接删除</p>
+<pre><code>~<span class="regexp">/openwrt$ rm -rvf tmp/</span>
+</code></pre><p>3.修改 OpenWrt 代码<br>进入设备硬件目录:</p>
+<pre><code>~/openwrt$ cd <span class="keyword">target</span>/linux/ar71xx
+</code></pre><p>修改以下文件, 里面涉及到 TL-MR10U 固件中设备ID的部分, 是 0x00100101, 这个值从 tp-link 官方网站下载的固件中可以获得</p>
+<pre><code>base-files/etc/diag<span class="class">.sh</span>
+base-files/etc/uci-defaults/<span class="number">02</span>_network
+base-files/lib/ar71xx<span class="class">.sh</span>
+base-files/lib/upgrade/platform<span class="class">.sh</span>
+config-<span class="number">3.8</span>
+generic/profiles/tp-link<span class="class">.mk</span>
+image/Makefile
+新建文件: files/arch/mips/ath79/mach-tl-mr10u<span class="class">.c</span>
+内容参考 TL-WR703N 设备的文件 mach-tl-wr703n<span class="class">.c</span>, 修改所有出现 wr703n, WR703N 等等大小写混合的部分。
+</code></pre><p>4.添加 Linux patch<br>这里就完成了OpenWrt的设备支持代码，为了支持我们的设备, Linux代码树的部分文件也需要做改动</p>
+<p>回退到根目录 <code>~/openwrt</code></p>
+<p>5.清理并准备patch树:</p>
+<pre><code>~<span class="regexp">/openwrt$ make target/linux/</span>{clean,prepare}
+<span class="comment"># 后面可加 V=s QUILT=1 参数, 表示静默无输出</span>
+</code></pre><p>进入内核代码目录(其中版本号可能与你的不一致):</p>
+<pre><code><span class="built_in">cd</span> ~/openwrt$ <span class="built_in">cd</span> build_dir/target-mips_r2_uClibc-<span class="number">0.9</span>.<span class="number">33.2</span>/linux-ar71xx_generic/linux-<span class="number">3.8</span>.<span class="number">12</span>/
+</code></pre><p>这里就是内核代码树了, 里面的代码是已经打过所有 patch 的, 可以用 quilt push 检查看是不是这样:</p>
+<pre><code>$ quilt push
+File series fully applied, <span class="operator">ends</span> <span class="keyword">at</span> patch <span class="built_in">platform</span>/<span class="number">902</span>-unaligned_access_hacks.patch
+</code></pre><p>这条输入也告诉我们, 当前最顶的 patch 是 platform/902</p>
+<p>为TL-MR10U新建个 patch:</p>
+<pre><code>$ quilt <span class="built_in">new</span> <span class="built_in">platform</span>/<span class="number">920</span>-<span class="built_in">add</span>-tl-mr10u-support.patch
+</code></pre><p>选择的数字需要大于刚才的那个 902, 然后 quilt 会自动把这个patch设置为当前patch,所有的改动都针对这个 patch</p>
+<p>6.然后就是增加代码了</p>
+<pre><code>$ quilt <span class="keyword">edit</span> <span class="keyword">arch</span>/mips/ath79/Kconfig
+$ quilt <span class="keyword">edit</span> <span class="keyword">arch</span>/mips/ath79/Makefile
+$ quilt <span class="keyword">edit</span> <span class="keyword">arch</span>/mips/ath79/machtypes.<span class="literal">h</span>
+</code></pre><p>参考这些文件里其他硬件的配置, 基本上说copy TL-WR703N 的就可以了，保证不重不漏</p>
+<p>然后验证下修改的内容:</p>
+<pre><code><span class="variable">$ </span>quilt diff <span class="comment"># 查看 diff</span>
+<span class="variable">$ </span>quilt refresh <span class="comment"># 保存所有 diff 到 patch 文件</span>
+</code></pre><p>这个时候我们的 patch 文件还在 build_dir 里, 大概位置是 patches/platform/ 下. 需要同步到 OpenWrt 代码树.</p>
+<p>7.退回到顶层工作目录, 执行:<br>~/openwrt$ make target/linux/update V=s<br>同步完成后, patch 文件会出现在 target/linux/ar71xx/patches-3.8/ 下.</p>
+<p>8.固件工具代码修改<br>OpenWrt 包含一个 TP-LINK 固件小工具, tools/firmware-utils/src/mktplinkfw.c , 里面包含 TP-LINK 固件 bin 文件的结构和 md5 hash 验证算法，修改内容参考 WR703N</p>
+<p>这里应该已经完成了所有操作. 可以编译了</p>
+<p>9.再次记得, 删除 tmp 目录</p>
+<pre><code>~/openwrt<span class="char">$ </span>rm -rvf tmp/
+~/openwrt<span class="char">$ </span>make menuconfig
+</code></pre><hr>
+<h2 id="参考">参考</h2><p>-主要参考OpenWrt的官网对patch的相关开发说明<br>openwrt.org（Documentation-&gt;Developing-&gt;patches）。<br>-Linux初学者Patch使用指南<br><a href="http://harrymao.bokee.com/3354544.html" target="_blank" rel="external">http://harrymao.bokee.com/3354544.html</a><br>-Add New Profile To OpenWrt<br><a href="http://andelf.diandian.com/post/2013-05-22/40050677370" target="_blank" rel="external">http://andelf.diandian.com/post/2013-05-22/40050677370</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Diff/"> #Diff </a>
+          
+            <a href="/tags/Openwrt/"> #Openwrt </a>
+          
+            <a href="/tags/Patch/"> #Patch </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/10/Openwrt-File-System/">Openwrt文件系统</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/08/Openwrt-New-Makefile/">Openwrt Makefile写作格式</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/07/09/Openwrt-Patches/"
+               data-title="Openwrt Patch制作及打补丁" data-url="http://masukio.tk/2015/07/09/Openwrt-Patches/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#diff和patch的用法"><span class="nav-number">1.</span> <span class="nav-text">diff和patch的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#diff的用法"><span class="nav-number">1.1.</span> <span class="nav-text">diff的用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#diff的语法"><span class="nav-number">1.2.</span> <span class="nav-text">diff的语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#patch的用法"><span class="nav-number">1.3.</span> <span class="nav-text">patch的用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意"><span class="nav-number">1.4.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#diff_pppd_patch"><span class="nav-number">2.</span> <span class="nav-text">diff pppd patch</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#管理工具quilt"><span class="nav-number">3.</span> <span class="nav-text">管理工具quilt</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#package的patch方法"><span class="nav-number">3.1.</span> <span class="nav-text">package的patch方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pactch生成步骤"><span class="nav-number">3.1.1.</span> <span class="nav-text">pactch生成步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑已有patch文件"><span class="nav-number">3.1.2.</span> <span class="nav-text">编辑已有patch文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#platform_patch生成步骤"><span class="nav-number">3.2.</span> <span class="nav-text">platform patch生成步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#generic_patch生成步骤"><span class="nav-number">3.2.1.</span> <span class="nav-text">generic patch生成步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新patches"><span class="nav-number">3.2.2.</span> <span class="nav-text">更新patches</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代修改patch"><span class="nav-number">3.3.</span> <span class="nav-text">迭代修改patch</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Openwrt新设备支持"><span class="nav-number">4.</span> <span class="nav-text">Openwrt新设备支持</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">4.1.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.2.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>

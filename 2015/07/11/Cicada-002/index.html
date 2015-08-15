@@ -1,0 +1,1306 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="Android,K-9 Mail," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> Program Cicada#002：K-9 Mail源码分析 // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Program Cicada#002：K-9 Mail源码分析
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-07-11
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Cicada/">Cicada</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/11/Cicada-002/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/11/Cicada-002/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：K-9 Mail是Android平台上使用Java语言开发的专业的开源邮件客户端，系统设计、代码实现、注释良好，支持MS Exchange Server，邮件会话和推送，有着健壮的开发者社区，本文分析其技术架构以及主要的代码实现以便打包成库供后期开发使用。<br><a id="more"></a></p>
+<h1 id="实现层级">实现层级</h1><p>K-9 Mail将的主要的用于邮件会话的实体类打包成类库，其主要的实体类包括<code>com.fsck.k9.mail</code>提供用于通讯过程需要的类和用于对邮件提供面向编程思想进行邮件内容封装的实体类<code>com.fsck.k9.mail.internet</code></p>
+<p>上层包括用于实现用户数据持久化和用于充当用户UI信息控制的Activity的相关操作，其包名为<code>com.fsck.k9</code>类其中两个重要的类包括<code>Account</code>、<code>K9</code>，二者通过<code>SharedPreference</code>类来持久化数据</p>
+<p>K9类继承自’android.app.Application’,其主要的作用用于设置、获取客户端应用全局的配置性数据，包括获取邮件的频率、全局的主题设置、消息的推送、预览邮件内容的设置，其方法提供给其他任何的类使用</p>
+<p>Account类对应的是MVC模型中的<code>Model</code>类，它接收来自包括<code>Activity，Service，Broadcast 和 Receiver</code>等等机制传递过来的用户请求，其除了封装相应的用户信息，还被设计用于保存账户的各种设置，包括用于账户身份认证的Identity，字体设计FontSizes，通知设置NotificationSetting和邮件收发地址、草稿箱、在各种网络状态下是否启用数据的压缩，是否进行邮件加密等</p>
+<h1 id="Library类">Library类</h1><h2 id="com-fsck-k9-mail">com.fsck.k9.mail</h2><p><code>com.fsck.k9.mail</code>中的核心类包括<code>Address</code>、<code>Folder</code>、<code>Message</code>、<code>Store</code></p>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/class.png" alt="K9mail中主要的类"></p>
+<h3 id="Address">Address</h3><p>Address类实现了E-Mail的地址的封装，其将获取收件人发件人，邮件目标地址的信息并将其拼接成固定数据格式的String流</p>
+<h3 id="Store类">Store类</h3><p><code>Store</code>类为抽象类，相当于远程或本地的Store代理其包括4个子类<code>imap</code>、<code>pop3</code>、<code>webdav</code>分别用于访问IMAP,POP3，WebDav服务器和本地SQLite数据可，Store类根据用户Account设置的属性值<code>mStoreUri</code>来创建对应的Store子类方法</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Store store = sStores.<span class="keyword">get</span>(uri);</span><br><span class="line">       <span class="keyword">if</span> (store == <span class="literal">null</span>) &#123;</span><br><span class="line">           <span class="keyword">if</span> (uri.startsWith(<span class="string">"imap"</span>)) &#123;</span><br><span class="line">               store = <span class="keyword">new</span> ImapStore(storeConfig,</span><br><span class="line">                       <span class="keyword">new</span> DefaultTrustedSocketFactory(context),</span><br><span class="line">                       (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (uri.startsWith(<span class="string">"pop3"</span>)) &#123;</span><br><span class="line">               store = <span class="keyword">new</span> Pop3Store(storeConfig,</span><br><span class="line">                       <span class="keyword">new</span> DefaultTrustedSocketFactory(context));</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (uri.startsWith(<span class="string">"webdav"</span>)) &#123;</span><br><span class="line">               store = <span class="keyword">new</span> WebDavStore(storeConfig);</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span> (store != <span class="literal">null</span>) &#123;</span><br><span class="line">               sStores.put(uri, store);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> (store == <span class="literal">null</span>) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> MessagingException(<span class="string">"Unable to locate an applicable Store for "</span> + uri);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> store;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>对外通过提供接口MessagingController类来调用库中Store类来实现对底层的同一封装，在创建EMail账户，与WebDav通信也会调用其Store类，然后调用Store类并通过RemoteStore对邮件进行路由从而对不同的通信协议进行处理</p>
+<h3 id="Message">Message</h3><p>Message实现了对邮件内容的封装，有一个子类MimeMessage继承自Message，其安照<code>metadata in RFC 822 and RFC 2045 style headers.</code>规定的数据结构来拼装数据，即以OO的方式通过Adress类封装邮件地址，Body类来完成对邮件主体数据的封装从而封装整个邮件数据，K9 Mail在其4个Store类中以内部类的形式提供了MImeMessage的子类，包括`ImapMessage，LocalMessage，Pop3Message和WebDavMessage）来操作每一种类型Store中的邮件</p>
+<h4 id="MIME邮件的构成">MIME邮件的构成</h4><blockquote>
+<p>MIME的全称是”Multipurpose Internet Mail Extensions”，中译为”多用途互联网邮件扩展”，指的是一系列的电子邮件技术规范，主要包括RFC 2045、RFC 2046、RFC 2047、RFC 4288、RFC 4289和RFC 2077。</p>
+</blockquote>
+<p>顾名思义，MIME是对传统电子邮件的一个扩展，现在已经成为电子邮件实际上的标准。</p>
+<p>传统的电子邮件是1982年定下技术规范的，文件是RFC 822。</p>
+<p>它的一个重要特点，就是规定电子邮件只能使用ASCII字符。这导致了三个结果：1）非英语字符都不能在电子邮件中使用；2）电子邮件中不能插入二进制文件（如图片）；3）电子邮件不能有附件。</p>
+<p>这实际上无法接受的，因此到了1992年，工程师们决定扩展电子邮件的技术规范，提出一系列补充规范，这就是MIME的由来。</p>
+<p>下面是一封传统的电子邮件。</p>
+<pre><code><span class="string">From:</span> <span class="string">"Tommy Lee"</span> &lt;lee<span class="annotation">@example</span>.com&gt;
+<span class="string">To:</span> <span class="string">"Jack Zhang"</span> &lt;zhang<span class="annotation">@example</span>.com&gt;
+<span class="string">Subject:</span> Test
+<span class="string">Date:</span> Wed, <span class="number">17</span> May <span class="number">2000</span> <span class="number">19</span>:<span class="number">08</span>:<span class="number">29</span> -<span class="number">0400</span>
+Message-<span class="string">ID:</span> &lt;NDBBIAKOPKHFGPLCODIGIEKBCHAA.lee<span class="annotation">@example</span>.com&gt;
+Hello World.
+</code></pre><p>从上面可以看出，这封信的发信人地址是<code>lee@example</code>.com，收信人地址是<code>hang@example.com</code>，邮件主题是Test，发送时间是2000年5月17日，邮件内容是<code>&quot;Hello World.&quot;</code>。</p>
+<p>在结构上，这封信分为三个部分：首先是信件头，然后是一个空行，最后是信件内容。收信人的客户端软件只会显示最后一部分，要查看全信，必须使用”查看原始邮件”功能。</p>
+<p>MIME对传统电子邮件的扩展，表现在它在信件头部分添加了几条语句，主要有三条。<br>第一条是：</p>
+<pre><code><span class="attribute">MIME-Version</span>: <span class="string">1.0</span>
+</code></pre><p>这条语句是必须的，而且1.0这个版本值是不变的，即使MIME本身已经升级了好几次。<br>有了这条语句，收信端就知道这封信使用了MIME规范。<br>第二条语句是：</p>
+<pre><code>Content-Type: <span class="type">text</span>/plain; charset=<span class="string">"ISO-8859-1"</span>
+</code></pre><p>这一行是极端重要的，它表明传递的信息类型和采用的编码。<br>Content-Type表明信息类型，缺省值为” text/plain”。它包含了主要类型（primary type）和次要类型（subtype）两个部分，两者之间用”/“分割。主要类型有9种，分别是<code>application</code>、<code>audio</code>、<code>example</code>、<code>image</code>、<code>message</code>、<code>model</code>、<code>multipart</code>、<code>text</code>、<code>video</code>。<br>每一种主要类型下面又有许多种次要类型，常见的有：</p>
+<pre><code>text/plain：纯文本，文件扩展名<span class="class">.txt</span>
+text/html：HTML文本，文件扩展名.htm和<span class="class">.html</span>
+image/jpeg：jpeg格式的图片，文件扩展名<span class="class">.jpg</span>
+image/gif：GIF格式的图片，文件扩展名<span class="class">.gif</span>
+audio/x-wave：WAVE格式的音频，文件扩展名<span class="class">.wav</span>
+audio/mpeg：MP3格式的音频，文件扩展名<span class="class">.mp3</span>
+video/mpeg：MPEG格式的视频，文件扩展名<span class="class">.mpg</span>
+application/zip：PK-ZIP格式的压缩文件，文件扩展名.zip
+</code></pre><p>详细的Content-Type列表，可以查看这里和这里。<br>如果信息的主要类型是”text”，那么还必须指明编码类型”charset”，缺省值是ASCII，其他可能值有”ISO-8859-1”、”UTF-8”、”GB2312”等等。<br>整个Content-Type这一行，不仅使用在电子邮件，后来也被移植到了HTTP协议中，所以现在只要是在网上传播的HTTP信息，都带有Content-Type头，以表明信息类型。<br>前面已经说过，电子邮件的传统格式不支持非ASCII编码和二进制数据。因此MIME规定了第三条语句：</p>
+<pre><code><span class="attribute">Content-transfer-encoding</span>: <span class="string">base64</span>
+</code></pre><p>这条语句指明了编码转换的方式。Content-transfer-encoding的值有5种,”7bit”、”8bit”、”binary”、”quoted-printable”和”base64”,其中”7bit”是缺省值，即不用转化的ASCII字符。</p>
+<h5 id="MIME消息">MIME消息</h5><p>总体来说，MIME消息由消息头和消息体两大部分组成。现在我们关注的是MIME邮件，因此在以下的讨论中姑且称“消息”为“邮件”。邮件头中不允许出现空行。有一些邮件不能被邮件客户端软件识别，显示的是原始码，就是因为首行是空行。</p>
+<h6 id="邮件头">邮件头</h6><p>邮件头包含了发件人、收件人、主题、时间、MIME版本、邮件内容的类型等重要信息。每条信息称为一个域，由域名后加“: ”和信息内容构成，可以是一行，较长的也可以占用多行。域的首行必须“顶头”写，即左边不能有空白字符（空格和制表符）；续行则必须以空白字符打头，且第一个空白字符不是信息本身固有的，解码时要过滤掉。</p>
+<p>邮件体包含邮件的内容，它的类型由邮件头的“Content-Type”域指出。常见的简单类型有text/plain(纯文本)和text/html(超文本)。邮件体被分为多个段，每个段又包含段头和段体两部分，这两部分之间也以空行分隔。常见的multipart类型有三种：multipart/mixed, multipart/related和multipart/alternative。从它们的名称，不难推知这些类型各自的含义和用处。它们之间的层次关系可归纳为下图所示：</p>
+<p>可以看出，如果在邮件中要添加附件，必须定义multipart/mixed段；如果存在内嵌资源，至少要定义multipart/related段；如果纯文本与超文本共存，至少要定义multipart/alternative段。什么是“至少”？举个例子说，如果只有纯文本与超文本正文，那么在邮件头中将类型扩大化，定义为multipart/related，甚至multipart/mixed，都是允许的。</p>
+<p>multipart诸类型的共同特征是，在段头指定“boundary”参数字符串，段体内的每个子段以此串定界。所有的子段都以“—”+boundary行开始，父段则以“—”+boundary+“—”行结束。段与段之间也以空行分隔。在邮件体是multipart类型的情况下，邮件体的开始部分(第一个“—”+boundary行之前)可以有一些附加的文本行，相当于注释，解码时应忽略。段间也可以有一些附加的文本行，不会显示出来，如果有兴趣，不妨验证一下。<br>结合boundary定界和multipart层次关系图，。</p>
+<p>在邮件头中，有很多从RFC 822沿用的域名，MIME也增加了一些。常见的标准域名和含义如下</p>
+<table>
+<thead>
+<tr>
+<th>域名</th>
+<th style="text-align:left">含义</th>
+<th style="text-align:center">添加者</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Received</td>
+<td style="text-align:left">传输路径</td>
+<td style="text-align:center">各级邮件服务器</td>
+</tr>
+<tr>
+<td>Return-Path</td>
+<td style="text-align:left">回复地址</td>
+<td style="text-align:center">目标邮件服务器</td>
+</tr>
+<tr>
+<td>Delivered-To</td>
+<td style="text-align:left">发送地址</td>
+<td style="text-align:center">目标邮件服务器</td>
+</tr>
+<tr>
+<td>Reply-To</td>
+<td style="text-align:left">回复地址</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>From</td>
+<td style="text-align:left">发件人地址</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>To</td>
+<td style="text-align:left">收件人地址</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>Cc</td>
+<td style="text-align:left">抄送地址</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>Bcc</td>
+<td style="text-align:left">暗送地址</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>Date</td>
+<td style="text-align:left">日期和时间</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>Subject</td>
+<td style="text-align:left">主题</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>Message-ID</td>
+<td style="text-align:left">消息ID</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>MIME-Version</td>
+<td style="text-align:left">MIME版本</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>Content-Type</td>
+<td style="text-align:left">内容的类型</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+<tr>
+<td>Content-Transfer-Encoding</td>
+<td style="text-align:left">内容的传输编码方式</td>
+<td style="text-align:center">邮件的创建者</td>
+</tr>
+</tbody>
+</table>
+<p>非标准的、自定义域名都以X-开头，例如X-Mailer, X-MSMail-Priority等，通常在接收和发送邮件的是同一程序时才能理解它们的意义。<br>在段头中，大致有如下一些域</p>
+<table>
+<thead>
+<tr>
+<th>域名</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content-Type</td>
+<td style="text-align:center">段体的类型</td>
+</tr>
+<tr>
+<td>Content-Transfer-Encoding</td>
+<td style="text-align:center">段体的传输编码方式</td>
+</tr>
+<tr>
+<td>Content-Disposition</td>
+<td style="text-align:center">段体的安排方式</td>
+</tr>
+<tr>
+<td>Content-ID</td>
+<td style="text-align:center">段体的ID</td>
+</tr>
+<tr>
+<td>Content-Location</td>
+<td style="text-align:center">段体的位置(路径)</td>
+</tr>
+<tr>
+<td>Content-Base</td>
+<td style="text-align:center">段体的基位置</td>
+</tr>
+</tbody>
+</table>
+<p>有的域除了值之外，还带有参数。值与参数、参数与参数之间以“;”分隔。参数名与参数值之间以“=”分隔。如例3的28-29行，Content-Type域的值为“multipart/alternative”，此外有一个参数boundary，值为”——=_NextPart_002_007C_01C3115F.80DFC5E0”。又如例3的第176行，Content-Disposition域的值为“attachment”，此外有一个参数filename，值为“readme.doc”。</p>
+<p>Content-Type都是“主类型/子类型”的形式。主类型有text, image, audio, video, application, multipart, message等，分别表示文本、图片、音频、视频、应用、分段、消息等。每个主类型都可能有多个子类型，如text类型就包含plain, html, xml, css等子类型。以X-开头的主类型和子类型，同样表示自定义的类型，未向IANA正式注册，但大多已经约定成俗了。如application/x-zip-compressed是ZIP文件类型。在Windows中，注册表的“HKEY_CLASSES_ROOT/MIME/Database/Content Type”内列举了除multipart之外大部分已知的Content-Type。</p>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/邮件body.png" alt="邮件body的三种组成及它们之间的关系"></p>
+<p>关于参数的形式，RFC里有很多补充规定，有的允许带几个参数，较为常见的有</p>
+<table>
+<thead>
+<tr>
+<th>主类型</th>
+<th style="text-align:left">参数名</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td style="text-align:left">charset</td>
+<td style="text-align:center">字符集</td>
+</tr>
+<tr>
+<td>image</td>
+<td style="text-align:left">name</td>
+<td style="text-align:center">名称</td>
+</tr>
+<tr>
+<td>application</td>
+<td style="text-align:left">name</td>
+<td style="text-align:center">名称</td>
+</tr>
+<tr>
+<td>multipart</td>
+<td style="text-align:left">boundary</td>
+<td style="text-align:center">边界</td>
+</tr>
+</tbody>
+</table>
+<p>其中字符集也能在Windows注册表的“HKEY_CLASSES_ROOT/MIME/Database/Charset”内见到。</p>
+<p>Content-Transfer-Encoding共有Base64, Quoted-printable, 7bit, 8bit, Binary等几种。其中7bit是缺省的编码方式。电子邮件源码最初设计为全部是可打印的ASCII码的形式。非ASCII码的文本或数据要编码成要求的格式，如上面的三个例子。Base64, Quoted-Printable是在非英语国家使用最广使的编码方式。Binary方式只具有象征意义，而没有任何实用价值。<br>Base64将输入的字符串或一段数据编码成只含有<code>{&#39;A&#39;-&#39;Z&#39;, &#39;a&#39;-&#39;z&#39;, &#39;0&#39;-&#39;9&#39;, &#39;+&#39;, &#39;/&#39;}</code>这64个字符的串，’=’用于填充。其编码的方法是，将输入数据流每次取6 bit，用此6 bit的值(0-63)作为索引去查表，输出相应字符。这样，每3个字节将编码为4个字符(3×8 → 4×6)；不满4个字符的以’=’填充。</p>
+<p>有的场合，以“=?charset?B?xxxxxxxx?=”表示xxxxxxxx是Base64编码，且原文的字符集是charset。如<br>Quoted-printable根据输入的字符串或字节范围进行编码，若是不需编码的字符，直接输出；若需要编码，则先输出’=’，后面跟着以2个字符表示的十六进制字节值。有的场合，以“=?charset?Q?xxxxxxxx?=”表示xxxxxxxx是Quoted-printable编码，且原文的字符集是charset。在段体内则直接编码，适当时机换行，换行前额外输出一个’=’。</p>
+<p>近年来，国内多数邮件服务器已经支持8bit方式，因此只在国内传输的邮件，特别是在邮件头中，可直接使用8bit编码，对汉字不做处理。如果邮件要出国，还是老老实实地按Base64或Quoted-printable编码才行。</p>
+<p>内嵌资源也是MIME的一个发光点，它能使邮件内容变得生动活泼、丰富多彩。可在邮件的multipart/related框架内定义一些与正文关联的图片、动画、声音甚至CSS样式和脚本的段。通常在HTML正文内，使用超级链接与内嵌资源相联系。</p>
+<pre><code><span class="subst">&lt;</span>BODY background<span class="subst">=</span>cid:<span class="number">007901</span>c3111c$<span class="number">72</span>b978a0$<span class="number">0100007</span>f@bluesky bgColor<span class="subst">=</span><span class="variable">#ffffff</span><span class="subst">&gt;</span>
+它指出用一个Content<span class="attribute">-ID</span>为<span class="number">007901</span>c3111c$<span class="number">72</span>b978a0$<span class="number">0100007</span>f@bluesky的图片作为背景(cid:xxxxxxxx也是一种超级链接)。而<span class="number">64</span><span class="subst">-</span><span class="number">169</span>行恰好就是这样一个内嵌资源。
+除了用Content<span class="attribute">-ID</span>进行联系外，还有另外一种常用形式：用普通超级连接和Content<span class="attribute">-Location</span>。例如：
+在HTML正文中，
+<span class="attribute">...</span> <span class="attribute">...</span>  <span class="attribute">...</span> <span class="attribute">...</span>
+<span class="subst">&lt;</span>IMG SRC<span class="subst">=</span><span class="string">"http://www.dangdang.com/images/all/anti_joyo_dm_book.gif"</span><span class="subst">&gt;</span>
+<span class="attribute">...</span> <span class="attribute">...</span>  <span class="attribute">...</span> <span class="attribute">...</span>
+<span class="subst">&lt;</span>IMG SRC<span class="subst">=</span><span class="string">"http://www.dangdang.com/dd2001/getimage_small.asp?id=486341"</span><span class="subst">&gt;</span>
+<span class="attribute">...</span> <span class="attribute">...</span>  <span class="attribute">...</span> <span class="attribute">...</span>
+对应的内嵌资源为
+Content<span class="attribute">-Type</span>: image/gif; name<span class="subst">=</span><span class="string">"anti_joyo_dm_book.gif"</span>
+Content<span class="attribute">-Transfer</span><span class="attribute">-Encoding</span>: base64
+Content<span class="attribute">-Location</span>: http:<span class="comment">//www.dangdang.com/images/all/anti_joyo_dm_book.gif</span>
+<span class="attribute">...</span> <span class="attribute">...</span> <span class="attribute">...</span> <span class="attribute">...</span>
+Content<span class="attribute">-Type</span>: application/octet<span class="attribute">-stream</span>; name<span class="subst">=</span><span class="string">"getimage_small.asp?id=486341"</span>
+Content<span class="attribute">-Transfer</span><span class="attribute">-Encoding</span>: base64
+Content<span class="attribute">-Location</span>: http:<span class="comment">//www.dangdang.com/dd2001/getimage_small.asp?id=486341</span>
+<span class="attribute">...</span> <span class="attribute">...</span> <span class="attribute">...</span> <span class="attribute">...</span>
+另外，
+Content<span class="attribute">-Location</span>: http:<span class="comment">//www.dangdang.com/images/all/anti_joyo_dm_book.gif</span>
+与
+Content<span class="attribute">-Location</span>: anti_joyo_dm_book<span class="built_in">.</span>gif
+Content<span class="attribute">-Base</span>: http:<span class="comment">//www.dangdang.com/images/all/</span>
+是等效的。
+</code></pre><h3 id="Folder">Folder</h3><p>Folder用于处理邮件文件夹的封装，Folder也是一个抽象类，k9 mail也同时在Store中对应提供4种类型的即`ImapFolder,Pop3Folder,LocalFolder和WebDavFolder，用于将数据封装成文件夹的格式</p>
+<h3 id="Filter">Filter</h3><p>包<code>com.fask.k9.mail.filter</code>，Android数据流的加解密库包括Base64的加解密，二进制流的加解密，十进制的加解密其用于做数据流的解析，数据的打包封装，将编码过的邮件的网络数据流解密成具有可读性的String流</p>
+<h3 id="Power">Power</h3><p>包<code>com.fsck.k9.mail.power</code>中的TaccingPowerManager用于调控系统的资源管理，跟踪Wakelock,对线程唤醒进行调度，从而安排邮件的获取，更新Notification</p>
+<h3 id="SSL">SSL</h3><p>包<code>com.fsck.k9.mail.ssl</code>，Android SSL加密库用于支持加密的邮件服务器，对邮件客户端到服务器端的通信进行</p>
+<h3 id="Transport">Transport</h3><p>包<code>com.fsck.k9.mail.transport</code>用于提供邮件底层的网络连接，包括认证设置（验证用户名，密码和客户端证书），并提供未加密的SMTP连接和TLS隧道数据连接的SMTP通讯，SSL加密的SMTP通讯，其连接遵循SMTP邮件通讯协议</p>
+<h2 id="K9包">K9包</h2><p>K9和Account均使用<code>SharedPreferences</code>，<code>SharedPreferences</code>是平台下除SQLite外的另一种方便的数据持久化方式，是Android平台下最简单的外部数据读写方法，适用于保存不同用户的个性化设置信息</p>
+<p>一个账户通过一个UUID定义，可以通过<code>mUuid</code>的属性来区分两个账户的设置信息。Account类实现了接口<code>BaseAcount</code>，这个接口定义了基础的用户信息，能够获取、设置EMail账户及获取其信息</p>
+<h1 id="业务实现流程">业务实现流程</h1><h2 id="接收邮件">接收邮件</h2><p>k9mail可以通过IMAP和POP3两种方式来从服务器端读取邮件，它设计和实现上的亮点包括</p>
+<pre><code><span class="number">1</span>.实现了用一个同一个流程无缝融合IMAP,POP3和WebDav三种不同的账户类型，其从服务器端接收邮件的流程和代码是相同的
+<span class="number">2</span>.通过抽象的方式实现获取邮件过程与账户类型无关，但没有增加不同获取方式之间代码的耦合度，通过代码将不同类型的账户类型路由到不同的Store子类，包括IMAP，POP3和WebDav，从而实现代码的松耦合。
+<span class="number">3</span>.接收邮件时，通过<span class="escape">``</span>类来实现邮件结构的判断，从数据流的头信息，从而区分邮件数据流的块大小，先接收小邮件，后接收大邮件，接收的小邮件直接返回给UI线程进行更新，而将耗时任务转移到后台进行数据的接收工作，同时可以根据用户的设置判断自动接收邮件。判断邮件大小的区分可以通过Account用户自定义属性<span class="escape">`M</span>aximumAutoToDownload<span class="escape">`通</span>过<span class="escape">`S</span>haredPreference<span class="escape">`储</span>存到XML的Key-Value数据结构中。
+<span class="number">4</span>.同时在接收邮件的过程中将进行服务器端与客户端直接的操作，包括客户端与服务器端邮件信息的同步
+</code></pre><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/LoadMessage.png" alt=""></p>
+<p>接收邮件的实现流程如下：</p>
+<h3 id="启动后台进程">启动后台进程</h3><p>用户点击<code>MessageListFragment</code>底栏<code>FooterView</code>选择<code>ManualSearch</code>时</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onItemClick</span><span class="params">(AdapterView&lt;?&gt; parent, View view, <span class="keyword">int</span> position, <span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (view == mFooterView) &#123;</span><br><span class="line">           <span class="keyword">if</span> (mCurrentFolder != <span class="keyword">null</span> &amp;&amp; !mSearch.isManualSearch()) &#123;</span><br><span class="line"></span><br><span class="line">               mController.loadMoreMessages(mAccount, mFolderName, <span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+<p>Activity会调用MessagingController的loadMoreMessages加载当前账户文件夹的下一批邮件</p>
+<pre><code>mController.loadMoreMessages(mAccount, mFolderName, <span class="literal">null</span>);
+</code></pre><p>在<code>loadMoreMessages</code>方法中，调用 <code>synchronizeMailbox()</code>来加载更多的邮件</p>
+<pre><code>synchronizeMailbox<span class="list">(<span class="keyword">account</span>, folder, listener, null)</span><span class="comment">;</span>
+</code></pre><p>synchronizeMailbox方法在后台开启一个线程，并运行<code>synchronizeMailboxSynchronous()</code>方法来完成加载邮件，通知界面数据更新的操作<br><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">synchronizeMailbox</span><span class="params">(<span class="keyword">final</span> Account account, <span class="keyword">final</span> String folder, <span class="keyword">final</span> MessagingListener listener, <span class="keyword">final</span> Folder providedRemoteFolder)</span> </span>&#123;</span><br><span class="line">       putBackground(<span class="string">"synchronizeMailbox"</span>, listener, <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">           <span class="annotation">@Override</span></span><br><span class="line">           <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               synchronizeMailboxSynchronous(account, folder, listener, providedRemoteFolder);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>synchronizeMailboxSynchronous()方法通知界面监听器Listener来更新状态<br><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (MessagingListener <span class="keyword">l</span> : getListeners(listener)) &#123;</span><br><span class="line">            <span class="keyword">l</span>.synchronizeMailboxStarted(account, folder);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/*</span><br><span class="line">         * We don't ever sync the Outbox or errors folder</span><br><span class="line">         */</span></span><br><span class="line">        <span class="keyword">if</span> (folder.equals(account.getOutboxFolderName()) || folder.equals(account.getErrorFolderName())) &#123;</span><br><span class="line">            <span class="keyword">for</span> (MessagingListener <span class="keyword">l</span> : getListeners(listener)) &#123;</span><br><span class="line">                <span class="keyword">l</span>.synchronizeMailboxFinished(account, folder, 0, 0);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Messaging同步文件夹">Messaging同步文件夹</h3><p>通知所用MessagingListern开始同步文件夹</p>
+<pre><code><span class="keyword">l</span>.synchronizeMailboxStarted(account, folder);
+</code></pre><p>如果是发件箱是<code>发件箱Outbox或者错误的文件夹errors folder</code>则调用界面同步完成并返回</p>
+<pre><code><span class="keyword">l</span>.synchronizeMailboxFinished(account, folder, 0, 0);
+</code></pre><h3 id="取得远程Store">取得远程Store</h3><p>从SQLite中获取本地邮件获得本地邮件信息<code>Folder.OPEN_MODE_RW</code>更新最新的UID<code>updateLastUid()</code>保存到一个HashMap中，根据Account对象<code>account.getRemoteStore()</code>取得远程Store（Pop3Store,ImapStore,WebDavStore）及其文件夹<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">final LocalStore <span class="built_in">local</span>Store = account.getLocalStore();</span><br><span class="line">           tLocalFolder = <span class="built_in">local</span>Store.getFolder(folder);</span><br><span class="line">           final LocalFolder <span class="built_in">local</span>Folder = tLocalFolder;</span><br><span class="line">           <span class="built_in">local</span>Folder.open(Folder.OPEN_MODE_RW);</span><br><span class="line">           <span class="built_in">local</span>Folder.updateLastUid();</span><br><span class="line">           List&lt;? extends Message&gt; <span class="built_in">local</span>Messages = <span class="built_in">local</span>Folder.getMessages(null);</span><br><span class="line">           Map&lt;String, Message&gt; <span class="built_in">local</span>UidMap = new HashMap&lt;String, Message&gt;();</span><br><span class="line">           <span class="keyword">for</span> (Message message : <span class="built_in">local</span>Messages) &#123;</span><br><span class="line">               <span class="built_in">local</span>UidMap.put(message.getUid(), message);</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span> (providedRemoteFolder != null) &#123;</span><br><span class="line">               remoteFolder = providedRemoteFolder;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               Store remoteStore = account.getRemoteStore();</span><br><span class="line">               remoteFolder = remoteStore.getFolder(folder);</span><br><span class="line">               <span class="keyword">if</span> (! verifyOrCreateRemoteSpecialFolder(account, folder, remoteFolder, listener)) &#123;</span><br><span class="line">                   <span class="built_in">return</span>;</span><br><span class="line">               &#125;</span><br></pre></td></tr></table></figure></p>
+<p>从文件夹中获取远程邮件，判断远程邮件夹是否为为HashMap中确定是否下载这个远程邮件，把下一批下载到本地的邮件收集到一个ArrayList<message>中.</message></p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">remoteFolder.<span class="built_in">open</span>(Folder.OPEN_MODE_RW);</span><br><span class="line">             <span class="keyword">if</span> (Expunge.EXPUNGE_ON_POLL == account.getExpungePolicy()) &#123;</span><br><span class="line">                 remoteFolder.expunge();</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="comment">/*</span><br><span class="line">          * Get the remote message count.</span><br><span class="line">          */</span></span><br><span class="line">         <span class="built_in">int</span> remoteMessageCount = remoteFolder.getMessageCount();</span><br><span class="line"></span><br><span class="line">         <span class="built_in">int</span> visibleLimit = localFolder.getVisibleLimit();</span><br><span class="line"></span><br><span class="line">         <span class="keyword">if</span> (visibleLimit &lt; <span class="number">0</span>) &#123;</span><br><span class="line">             visibleLimit = K9.DEFAULT_VISIBLE_LIMIT;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">final</span> List&lt;Message&gt; remoteMessages = <span class="keyword">new</span> ArrayList&lt;Message&gt;();</span><br><span class="line">         Map&lt;<span class="keyword">String</span>, Message&gt; remoteUidMap = <span class="keyword">new</span> <span class="keyword">HashMap</span>&lt;<span class="keyword">String</span>, Message&gt;();</span><br><span class="line"></span><br><span class="line">         <span class="keyword">final</span> Date earliestDate = account.getEarliestPollDate();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">         <span class="keyword">if</span> (remoteMessageCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">             <span class="comment">/* Message numbers start at 1.  */</span></span><br><span class="line">             <span class="built_in">int</span> remoteStart;</span><br><span class="line">             <span class="keyword">if</span> (visibleLimit &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                 remoteStart = Math.<span class="built_in">max</span>(<span class="number">0</span>, remoteMessageCount - visibleLimit) + <span class="number">1</span>;</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 remoteStart = <span class="number">1</span>;</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="built_in">int</span> remoteEnd = remoteMessageCount;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">if</span> (K9.DEBUG)</span><br><span class="line">                 Log.v(K9.LOG_TAG, <span class="string">"SYNC: About to get messages "</span> + remoteStart + <span class="string">" through "</span> + remoteEnd + <span class="string">" for folder "</span> + folder);</span><br><span class="line"></span><br><span class="line">             <span class="keyword">final</span> AtomicInteger headerProgress = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</span><br><span class="line">             <span class="keyword">for</span> (MessagingListener l : getListeners(listener)) &#123;</span><br><span class="line">                 l.synchronizeMailboxHeadersStarted(account, folder);</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">             List&lt;? extends Message&gt; remoteMessageArray = remoteFolder.getMessages(remoteStart, remoteEnd, earliestDate, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">             <span class="built_in">int</span> messageCount = remoteMessageArray.<span class="built_in">size</span>();</span><br><span class="line"></span><br><span class="line">             <span class="keyword">for</span> (Message thisMess : remoteMessageArray) &#123;</span><br><span class="line">                 headerProgress.incrementAndGet();</span><br><span class="line">                 <span class="keyword">for</span> (MessagingListener l : getListeners(listener)) &#123;</span><br><span class="line">                     l.synchronizeMailboxHeadersProgress(account, folder, headerProgress.<span class="built_in">get</span>(), messageCount);</span><br><span class="line">                 &#125;</span><br><span class="line">                 Message localMessage = localUidMap.<span class="built_in">get</span>(thisMess.getUid());</span><br><span class="line">                 <span class="keyword">if</span> (localMessage == <span class="keyword">null</span> || !localMessage.olderThan(earliestDate)) &#123;</span><br><span class="line">                     remoteMessages.<span class="built_in">add</span>(thisMess);</span><br><span class="line">                     remoteUidMap.put(thisMess.getUid(), thisMess);</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">for</span> (MessagingListener l : getListeners(listener)) &#123;</span><br><span class="line">                 l.synchronizeMailboxHeadersFinished(account, folder, headerProgress.<span class="built_in">get</span>(), remoteUidMap.<span class="built_in">size</span>());</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">         &#125; <span class="keyword">else</span> <span class="keyword">if</span> (remoteMessageCount &lt; <span class="number">0</span>) &#123;</span><br><span class="line">             <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Message count "</span> + remoteMessageCount + <span class="string">" for folder "</span> + folder);</span><br><span class="line">         &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="同步数据">同步数据</h3><p>判断用户是否设置为本地Folder与远程服务器同步<code>account.syncRemoteDeletions()</code>，若值为1，则删除服务器上不存在但本地存在的邮件</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span><br><span class="line">             * Remove any messages that are in the local store but no longer on the remote store or are too old</span><br><span class="line">             */</span></span><br><span class="line">            <span class="keyword">if</span> (account.syncRemoteDeletions()) &#123;</span><br><span class="line">                List&lt;Message&gt; destroyMessages = <span class="keyword">new</span> ArrayList&lt;Message&gt;();</span><br><span class="line">                <span class="keyword">for</span> (Message <span class="string">localMessage :</span> localMessages) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (remoteUidMap.get(localMessage.getUid()) == <span class="literal">null</span>) &#123;</span><br><span class="line">                        destroyMessages.add(localMessage);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                localFolder.destroyMessages(destroyMessages);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">for</span> (Message <span class="string">destroyMessage :</span> destroyMessages) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (MessagingListener <span class="string">l :</span> getListeners(listener)) &#123;</span><br><span class="line">                        l.synchronizeMailboxRemovedMessage(account, folder, destroyMessage);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="执行下载">执行下载</h3><p>执行<code>MessagingController.downloadMessages()</code>下载第3步确认下载的邮件到本地，下载结果是成功通知所有注册的<code>MessagingListener</code></p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span><br><span class="line">             * Now we download the actual content of messages.</span><br><span class="line">             */</span></span><br><span class="line">            <span class="keyword">int</span> newMessages = downloadMessages(account, remoteFolder, localFolder, remoteMessages, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> unreadMessageCount = localFolder.getUnreadMessageCount();</span><br><span class="line">            <span class="keyword">for</span> (MessagingListener l : getListeners()) &#123;</span><br><span class="line">                l.folderStatusChanged(account, folder, unreadMessageCount);</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="优先下载">优先下载</h3><p>在downloadMessages()中计算未同步的邮件、小邮件、大邮件到本地，最后保存到SQLite之中</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> * Grab the content of the small <span class="keyword">messages</span> <span class="keyword">first</span>. This <span class="keyword">is</span> going <span class="keyword">to</span></span><br><span class="line"> * <span class="keyword">be</span> very fast <span class="built_in">and</span> at very worst will <span class="keyword">be</span> <span class="keyword">a</span> single <span class="keyword">up</span> of <span class="keyword">a</span> few bytes <span class="built_in">and</span> <span class="keyword">a</span> single</span><br><span class="line"> * download of <span class="number">625</span><span class="keyword">k</span>.</span><br><span class="line"> */</span><br><span class="line">FetchProfile fp = <span class="keyword">new</span> FetchProfile();</span><br><span class="line">fp.<span class="built_in">add</span>(FetchProfile.Item.BODY);</span><br><span class="line">//        fp.<span class="built_in">add</span>(FetchProfile.Item.FLAGS);</span><br><span class="line">//        fp.<span class="built_in">add</span>(FetchProfile.Item.ENVELOPE);</span><br><span class="line"></span><br><span class="line">downloadSmallMessages(account, remoteFolder, localFolder, smallMessages, progress, unreadBeforeStart, newMessages, todo, fp);</span><br><span class="line">smallMessages.clear();</span><br></pre></td></tr></table></figure>
+<h3 id="判断邮件Body">判断邮件Body</h3><p>通过<code>message.getBody() == null</code>来判断该邮件是否有内容，如果邮件Body为空则直接调用对应的Folder的fetch()<code>remoteFolder.fetch()</code>方法来取得邮件；<br>、<code>localFolder.appendMessages()、localFolder.getMessage()</code>更新本地Folder信息；否则则通过<code>MessageExtractor.collectTextParts();</code>取得邮件的各个部分，再调用对应的<code>remoteFolder.fetchPart();</code>把邮件的每一个部分收集到本地,并构造到邮件中，然后<code>localFolder.appendMessages();</code>保存到SQLite中</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (message.getBody() == <span class="keyword">null</span>) &#123;</span><br><span class="line">   <span class="comment">/*</span><br><span class="line">  	* The provider was unable to get the structure of the message, so</span><br><span class="line">   * we'll download a reasonable portion of the messge and mark it as</span><br><span class="line">   * incomplete so the entire thing can be downloaded later if the user</span><br><span class="line">   * wishes to download it.</span><br><span class="line">   */</span></span><br><span class="line">   fp.clear();</span><br><span class="line">   fp.add(FetchProfile.Item.BODY_SANE);</span><br><span class="line">   <span class="comment">/*</span><br><span class="line">    *  TODO a good optimization here would be to make sure that all Stores set</span><br><span class="line">    *  the proper size after this fetch and compare the before and after size. If</span><br><span class="line">    *  they equal we can mark this SYNCHRONIZED instead of PARTIALLY_SYNCHRONIZED</span><br><span class="line">    */</span></span><br><span class="line"></span><br><span class="line">   remoteFolder.fetch(Collections.singletonList(message), fp, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">   <span class="comment">// Store the updated message locally</span></span><br><span class="line">   localFolder.appendMessages(Collections.singletonList(message));</span><br><span class="line"></span><br><span class="line">   Message localMessage = localFolder.getMessage(message.getUid());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="comment">// Certain (POP3) servers give you the whole message even when you ask for only the first x Kb</span></span><br><span class="line">   <span class="keyword">if</span> (!message.isSet(Flag.X_DOWNLOADED_FULL)) &#123;</span><br><span class="line">   <span class="comment">/*</span><br><span class="line">    * Mark the message as fully downloaded if the message size is smaller than</span><br><span class="line">    * the account's autodownload size limit, otherwise mark as only a partial</span><br><span class="line">    * download.  This will prevent the system from downloading the same message</span><br><span class="line">    * twice.</span><br><span class="line">    *</span><br><span class="line">    * If there is no limit on autodownload size, that's the same as the message</span><br><span class="line">    * being smaller than the max size</span><br><span class="line">    */</span></span><br><span class="line">   <span class="keyword">if</span> (account.getMaximumAutoDownloadMessageSize() == <span class="number">0</span> || message.getSize() &lt; account.getMaximumAutoDownloadMessageSize()) &#123;</span><br><span class="line">       localMessage.setFlag(Flag.X_DOWNLOADED_FULL, <span class="keyword">true</span>);</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="comment">// Set a flag indicating that the message has been partially downloaded and</span></span><br><span class="line">       <span class="comment">// is ready for view.</span></span><br><span class="line">       localMessage.setFlag(Flag.X_DOWNLOADED_PARTIAL, <span class="keyword">true</span>;</span><br><span class="line">       	&#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="comment">/*</span><br><span class="line">        * We have a structure to deal with, from which</span><br><span class="line">        * we can pull down the parts we want to actually store.</span><br><span class="line">        * Build a list of parts we are interested in. Text parts will be downloaded</span><br><span class="line">        * right now, attachments will be left for later.</span><br><span class="line">        */</span></span><br><span class="line"></span><br><span class="line">       <span class="built_in">Set</span>&lt;Part&gt; viewables = MessageExtractor.collectTextParts(message);</span><br><span class="line"></span><br><span class="line">       <span class="comment">/*</span><br><span class="line">        * Now download the parts we're interested in storing.</span><br><span class="line">        */</span></span><br><span class="line">       <span class="keyword">for</span> (Part <span class="literal">part</span> : viewables) &#123;</span><br><span class="line">           remoteFolder.fetchPart(message, <span class="literal">part</span>, <span class="keyword">null</span>);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">// Store the updated message locally</span></span><br><span class="line">       localFolder.appendMessages(Collections.singletonList(message));</span><br><span class="line"></span><br><span class="line">       Message localMessage = localFolder.getMessage(message.getUid());</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="设置重复下载">设置重复下载</h3><p>最后设置邮件下载标识防止重复下载<code>localMessage.setFlag(Flag.X_DOWNLOADED_PARTIAL, true)</code></p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// <span class="keyword">Set</span> a flag indicating this <span class="keyword">message</span> has been fully downloaded <span class="keyword">and</span> can be viewed.</span><br><span class="line">localMessage.setFlag(Flag.X_DOWNLOADED_PARTIAL, <span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+<p>通过<code>MessagingListener</code>通知文件夹添加或更新邮件，更新进度</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (MessagingListener <span class="keyword">l</span> : getListeners()) &#123;</span><br><span class="line">    <span class="keyword">l</span>.synchronizeMailboxAddOrUpdateMessage(account, folder, localMessage);</span><br><span class="line">    <span class="keyword">l</span>.synchronizeMailboxProgress(account, folder, progress.<span class="literal">get</span>(), todo);</span><br><span class="line">    <span class="keyword">if</span> (!localMessage.isSet(Flag.SEEN)) &#123;</span><br><span class="line">                    <span class="keyword">l</span>.synchronizeMailboxNewMessage(account, folder, localMessage);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="发送邮件">发送邮件</h2><p>发送邮件的过程中，客户端一边执行异步AnsycTask，一边更新UI线程，发送完成后返回发送成功的页面。</p>
+<p>发送邮件的过程如下：</p>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/sendemail.png" alt=""></p>
+<h3 id="启动后台">启动后台</h3><p>用户编写邮件的Activity是<code>MessageCompose</code>,在<code>MessageCpmpose</code>中触发<code>MenuItem</code>的<code>send</code>按钮启动发送邮件的过程</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> R.id.send:</span><br><span class="line">	mPgpData.setEncryptionKeys(<span class="keyword">null</span>);</span><br><span class="line">	onSend();</span><br><span class="line">	<span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>然后进行用户输入的检查，如果用户的发送地址，主题，邮件主题为空，则返回错误信息，使用Toast对用户进行提醒，并检查队列信息，如果之前没有邮件则调用<code>performSend()</code>，对用户的设置进行判断，进行不同方式的邮件加密（SignEncryptCallback and with encryptedData set in pgpData），调用<code>sendMessage()</code>方法执行一个新的<code>SendMessageTask()</code>,在这个类的<code>doInBackground()</code>在<code>MessagingController</code>中获取一个Instance执行<code>sendMessage()</code>动作<br><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MessagingController.getInstance(getApplication()).sendMessage(mAccount, message, <span class="literal">null</span>);</span><br></pre></td></tr></table></figure></p>
+<p>调用MessagingController的<code>sendMessage()</code>完成操作</p>
+<h3 id="本地保存">本地保存</h3><p>在MessageController的<code>send()</code>中,首先根据当前的account账户找到<code>LocalStore</code>对象，再根据<code>localStore</code>句柄获取<code>LocalFolder</code>对象，然后调用<code>localFolder.appendMessages()</code>把待发送的邮件保存在本地。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LocalStore <span class="built_in">local</span>Store = account.getLocalStore();</span><br><span class="line">LocalFolder <span class="built_in">local</span>Folder = <span class="built_in">local</span>Store.getFolder(account.getOutboxFolderName());</span><br><span class="line"><span class="built_in">local</span>Folder.open(Folder.OPEN_MODE_RW);</span><br><span class="line"><span class="built_in">local</span>Folder.appendMessages(Collections.singletonList(message));</span><br><span class="line">Message <span class="built_in">local</span>Message = <span class="built_in">local</span>Folder.getMessage(message.getUid());</span><br><span class="line"><span class="built_in">local</span>Message.setFlag(Flag.X_DOWNLOADED_FULL, <span class="literal">true</span>);</span><br><span class="line"><span class="built_in">local</span>Folder.close();</span><br><span class="line">sendPendingMessages(account, listener);</span><br></pre></td></tr></table></figure>
+<h3 id="发送邮件-1">发送邮件</h3><p>接下来<code>MessagingController</code>调用<code>sendPendingMessages()</code>从发件箱中发送邮件，<code>sendPendingMessagesSynchronous()</code>内完成具体邮件的发送工作并通知Listener更新UI界面,并且支持输出发送消息进度的信息</p>
+<pre><code>transport.sendMessage(<span class="keyword">message</span>);
+</code></pre><p>在<code>sendPendingMessagesSynchronous()</code>方法中，首先根据当前的account账户找到<code>LocalStore</code>对象，再根据<code>localStore</code>句柄获取<code>OutboxFolder</code>发件箱的<code>LocalFolder</code>对象后,调用向MessagingController注册的Listerner<code>sendPendingMessagesStarted()</code><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Store <span class="built_in">local</span>Store = account.getLocalStore();</span><br><span class="line"><span class="built_in">local</span>Folder = <span class="built_in">local</span>Store.getFolder(</span><br><span class="line">                  account.getOutboxFolderName());</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">local</span>Folder.exists()) &#123;</span><br><span class="line">    <span class="built_in">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (MessagingListener l : getListeners()) &#123;</span><br><span class="line">    l.sendPendingMessagesStarted(account);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">local</span>Folder.open(Folder.OPEN_MODE_RW);</span><br></pre></td></tr></table></figure></p>
+<p>如果发件箱中的邮件标记为“删除”，则先销毁这部分邮件，然后循环发送每一封邮件，并为每一封邮件打上状态标记（Flag.X_SEND_IN_PROGRESS）</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (<span class="class"><span class="keyword">message</span>.<span class="title">isSet</span>(Flag.DELETED)) </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">message</span>.<span class="title">destroy</span>();</span><br><span class="line">    continue;</span><br><span class="line">	&#125;</span></span><br></pre></td></tr></table></figure>
+<p>在发送的过程中，<br>调用向MessagingController注册的Listerner<code>synchronizeMailboxProgress()</code>通知监听器发送已开始，<br>在邮件的发送过程中，循环调用<code>synchronizeMailboxProgress()</code>方法传递progress参数，在发送每一封邮件<code>transport.sendMessage()</code>的过程中，进度计数器会<code>progress++</code>,在邮件发送结束后调用<code>l.sendPendingMessagesCompleted();</code><br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">for</span> (<span class="tag">MessagingListener</span> <span class="rule"><span class="attribute">l </span>:<span class="value"> <span class="function">getListeners</span>()) &#123;</span><br><span class="line">    l.<span class="function">synchronizeMailboxProgress</span>(account, account.<span class="function">getSentFolderName</span>(), progress, todo)</span></span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>sendPendingMessagesSynchronous()</code>调用<code>transport.sendMessage(message)</code>发送每一封邮件，如果不存在已发送文件夹则将发出的邮件destory，如果存在已发送文件夹则将已发送邮件从未发送文件夹转移到已发送文件夹，发送过程调用<code>EOLConvertingOutPutStrean</code>以数据流的方式将待发送的邮件写入服务器端。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">local</span>Folder.moveMessages(Collections.singletonList(message), <span class="built_in">local</span>SentFolder);</span><br></pre></td></tr></table></figure>
+<p>最后调用<code>processPendingCommands()</code>同步服务器端已发送文件夹。</p>
+<h2 id="删除邮件">删除邮件</h2><h3 id="删除一组邮件">删除一组邮件</h3><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/deletemesssage.png" alt="K9Mail删除邮件的流程"></p>
+<p>1.k9mail在Activity MessageList方法<code>onCustomKeyDown</code>中设置删除按钮的响应事件,根据删除按钮所在的界面(<code>MassageListFragment</code>和<code>MessageViewFragment</code>的删除按钮)调用<code>onDelect</code>方法删除邮件</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="variable">mDisplayMode =</span>= DisplayMode.MESSAGE_LIST) &#123;</span><br><span class="line">    mMessageListFragment.onDelete();</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (mMessageViewFragment != <span class="constant">null</span>) &#123;</span><br><span class="line">    mMessageViewFragment.onDelete();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>MassageListFragment</code>再分别调用<code>MessagingController</code>的方法<code>deleteThreads()</code>和<code>deleteMessages()</code>去删除一个会话邮件或是一组邮件,<code>MessageViewFragment</code>调用<code>MessagingController</code>的<code>deleteMessages()</code>方法删除一个邮件</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">onDeleteConfirmed</span><span class="params">(List&lt;LocalMessage&gt; messages)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mThreadedList) &#123;</span><br><span class="line">            mController.deleteThreads(messages);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            mController.deleteMessages(messages, <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在执行删除操作之前,kmail会<code>disable</code>删除按钮,防止连续误删</p>
+<p><code>MessagingController</code>执行删除操作调用<code>actOnMessages()</code>方法启动后台线程<code>deleteThreadsSynchronous()</code>并把任务压栈道名为mCommands的BlockingQueue<command>类型的队列中</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> putBackground(String <span class="keyword">description</span>, MessagingListener listener, Runnable runnable) &#123;</span><br><span class="line">        putCommand(mCommands, <span class="keyword">description</span>, listener, runnable, <span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
+<p>使在删除过程中，界面仍能够保持正常的响应，在操作过程中通知MessagingListener通知界面</p>
+<p>2.删除邮件之前先通知MessagingListener删除界面邮件，删除邮件时，判断是否存在垃圾箱，当前文件夹为垃圾箱，则将邮件打上<code>Flag.DELETED</code>的标签，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (folder.equals(account.getTrashFolderName()) || !account.hasTrashFolder()) &#123;</span><br><span class="line">    <span class="built_in">local</span>Folder.setFlags(messages, Collections.singleton(Flag.DELETED), <span class="literal">true</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">local</span>TrashFolder = <span class="built_in">local</span>Store.getFolder(account.getTrashFolderName());</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">local</span>TrashFolder.exists()) &#123;</span><br><span class="line">        <span class="built_in">local</span>TrashFolder.create(Folder.FolderType.HOLDS_MESSAGES);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">local</span>TrashFolder.exists()) &#123;</span><br><span class="line">        uidMap = <span class="built_in">local</span>Folder.moveMessages(messages, <span class="built_in">local</span>TrashFolder);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果待删除邮件在发件箱内，将待删除的邮件移入垃圾箱，则把要删除的邮件移入垃圾箱，同时向服务器执行PendingExpunge()在服务器上移动响应的文件夹；然后通过Account获取LocalStore后获取LocalFolder，通过Account的方法<code>getDeletePolicy()</code>获取用户删除操作执行不同的动作，如果设置删除动作为“已读”则给该邮件打上“已读”的标签，如果用户策略为删除则打上“删除”标签，执行真正的删除操作。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (folder.equals(account.getOutboxFolderName())) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">Message</span> message : messages) &#123;</span><br><span class="line">    <span class="comment">// If the message was in the Outbox, then it has been copied to local Trash, and has</span></span><br><span class="line">    <span class="comment">// to be copied to remote trash</span></span><br><span class="line">        <span class="type">PendingCommand</span> command = <span class="keyword">new</span> <span class="type">PendingCommand</span>();</span><br><span class="line">        command.command = <span class="type">PENDING_COMMAND_APPEND</span>;</span><br><span class="line">        command.arguments =</span><br><span class="line">            <span class="keyword">new</span> <span class="type">String</span>[] &#123;</span><br><span class="line">            account.getTrashFolderName(),</span><br><span class="line">            message.getUid()</span><br><span class="line">        &#125;;</span><br><span class="line">        queuePendingCommand(account, command);</span><br><span class="line">    &#125;</span><br><span class="line">    processPendingCommands(account);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (account.getDeletePolicy() == <span class="type">DeletePolicy</span>.<span class="type">ON_DELETE</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (folder.equals(account.getTrashFolderName())) &#123;</span><br><span class="line">        queueSetFlag(account, folder, <span class="type">Boolean</span>.<span class="built_in">toString</span>(<span class="built_in">true</span>), <span class="type">Flag</span>.<span class="type">DELETED</span>.<span class="built_in">toString</span>(), uids);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        queueMoveOrCopy(account, folder, account.getTrashFolderName(), <span class="built_in">false</span>, uids, uidMap);</span><br><span class="line">                &#125;</span><br><span class="line">        processPendingCommands(account);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (account.getDeletePolicy() == <span class="type">DeletePolicy</span>.<span class="type">MARK_AS_READ</span>) &#123;</span><br><span class="line">        queueSetFlag(account, folder, <span class="type">Boolean</span>.<span class="built_in">toString</span>(<span class="built_in">true</span>), <span class="type">Flag</span>.<span class="type">SEEN</span>.<span class="built_in">toString</span>(), uids);</span><br><span class="line">        processPendingCommands(account);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用<code>processPendingCommands()</code>方法将删除操作保存到SQLite的<code>Pending_commands</code>的表中<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List<span class="tag">&lt;<span class="title">PendingCommand</span>&gt;</span> commands = localStore.getPendingCommands();</span><br></pre></td></tr></table></figure></p>
+<p>执行完成后则从表中删除</p>
+<p>3.执行删除操作，获取到远程文件夹<br><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">Store</span> remoteStore = account.getRemoteStore();</span><br><span class="line"><span class="title">Folder</span> remoteFolder = remoteStore.getFolder(folder);</span><br></pre></td></tr></table></figure></p>
+<p>取得到ImapFolder，在<code>ImapFolder</code>中执行真正的删除操作<br><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">remoteFolder.<span class="keyword">open</span>(Folder.OPEN_MODE_RW);</span><br><span class="line"><span class="keyword">if</span> (remoteFolder.getMode() != Folder.OPEN_MODE_RW) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line">remoteFolder.expunge();</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            closeFolder(remoteFolder);</span><br></pre></td></tr></table></figure></p>
+<p><code>ImapFolder</code>调用另一个内部类<code>ImapConnection</code>向服务器发送<code>expunge()</code>命令，<code>ImapFolder</code>处理<code>expunge()</code>的响应。</p>
+<h2 id="IMAP邮件的解析、封装、保存">IMAP邮件的解析、封装、保存</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/服务器响应解析.png" alt="服务器响应解析"></p>
+<p>在获取邮件的过程中，通过<code>message.getBody() == null</code>来判断该邮件是否有内容，如果邮件Body为空则直接通过<code>MessageController</code>调用<code>ImapStore</code>的内部类<code>ImapFolder</code>的<code>fetch()</code>方法来获取邮件；否则则通过<code>MessageExtractor.collectTextParts();</code>取得邮件的各个部分，再调用对应的<code>remoteFolder.fetchPart();</code>把邮件的每一个部分收集到本地,并构造到邮件中，然后<code>localFolder.appendMessages();</code>保存到SQLite中</p>
+<p><code>fetch()</code>方法的操作流程如下：首先检查到服务器的TCP连接（若无连接则抛出异常）-&gt; 构造IMAP命令 -&gt; 通过ImapConnection将命令发送到邮件服务器 -&gt; 读取、解析服务器响应</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">mConnection.sendCommand(<span class="keyword">String</span>.format(<span class="string">"UID FETCH %s (%s)"</span>,</span><br><span class="line">	combine(uidWindow.toArray(<span class="keyword">new</span> <span class="keyword">String</span>[uidWindow.<span class="built_in">size</span>()]), <span class="string">','</span>),</span><br><span class="line">    combine(fetchFields.toArray(<span class="keyword">new</span> <span class="keyword">String</span>[fetchFields.<span class="built_in">size</span>()]), <span class="string">' '</span>)), <span class="keyword">false</span>);</span><br><span class="line">    ImapResponse response;</span><br><span class="line">    <span class="built_in">int</span> messageNumber = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    ImapResponseCallback callback = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (fp.contains(FetchProfile.Item.BODY) || fp.contains(FetchProfile.Item.BODY_SANE)) &#123;</span><br><span class="line">        callback = <span class="keyword">new</span> FetchBodyCallback(messageMap);</span><br><span class="line">    &#125;</span><br><span class="line">    response = mConnection.readResponse(callback);</span><br><span class="line"></span><br><span class="line">        ImapMessage imapMessage = (ImapMessage) message;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">Object</span> literal = handleFetchResponse(imapMessage, fetchList);</span><br></pre></td></tr></table></figure>
+<p>首先通过<code>mConnection.sendCommand()</code>方法向服务器传输命令，根据邮件UID来获取邮件，K9Mail通过使用了<code>java.net.Socket</code>类通过Socket连接邮件服务器，k9mail与邮件服务器建立连接和管理连接的实现封装在<code>ImapConnection</code>之中，连接过程通过域名服务器(DNS)解析@host域名，返回的IP地址逐个尝试连接服务器，直到连接到邮件服务器后将不再尝试后面的address，在与服务器的连接过程中，<code>ImapConnection</code>调用<code>ImapResponseParser</code>对服务器返回的响应先做一遍解析，提高对不规范邮件的错容性，尽可能的显示所有能够正常显示的邮件或者对于实在无法解析的邮件显示邮件的部分内容</p>
+<p>调用<code>ImapMessage</code>类解析服务器响应，将返回的数据封装成为<code>ImapMessage</code>类型，</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="typename">String</span> bodyString = (<span class="typename">String</span>)<span class="keyword">literal</span>;</span><br><span class="line">InputStream bodyStream = <span class="keyword">new</span> ByteArrayInputStream(bodyString.getBytes());</span><br><span class="line">imapMessage.parse(bodyStream);</span><br></pre></td></tr></table></figure>
+<p><code>Folder</code>,<code>Message</code>类其作用近似于接口但相对于接口它提供了一些通用方法的实现，例如判断发送时间先后的<code>olderThan()</code>方法，在实际处理业务逻辑的过程中使用的的是它们的子类，Message类只有一个子类<code>MimeMessage</code>，邮件头<code>MimeHearder</code>封装、Email地址<code>Address</code>封装,邮件体<code>MimeBody</code>封装等都定义在<code>MimeMessage</code>之中，<code>MimeMessage</code>有4个子类是响应Store的内部类用于实现对应<code>Store</code>类的具体功能。</p>
+<p>K9Mail实际解析邮件并且实现封装的类为<code>MimeMessage</code>主要的实现方法是调用的是Apache的开源邮件解析库mimej4来实现，K9mail主要使用了mime4j的编解码、解析邮件并封装为对象、处理特殊字符这三个方面的功能，<code>MimeHearder</code>类用于封装Mime邮件的头部，提供了获取邮件头信息（收件人、抄送人地址）的处理，拼装的方法</p>
+<p><img src="IMAP邮件的分装" alt="">(<a href="http://7nar5o.com1.z0.glb.clouddn.com/message.png" target="_blank" rel="external">http://7nar5o.com1.z0.glb.clouddn.com/message.png</a>)</p>
+<p>在<code>MimeMessage</code>中实际完成解析工作的是类方法<code>parse(InputStream in)</code>和内部类<code>MimeMessageBuilder</code>，二者的主要功能是提供邮件的解析机制完成邮件的解析并封装为<code>MimeMessage</code>对象<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> void parse(<span class="type">InputStream</span> <span class="keyword">in</span>, boolean recurse) throws <span class="type">IOException</span>, <span class="type">MessagingException</span> &#123;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="type">MimeStreamParser</span> <span class="keyword">parser</span> = <span class="keyword">new</span> <span class="type">MimeStreamParser</span>(parserConfig);</span><br><span class="line"><span class="keyword">parser</span>.setContentHandler(<span class="keyword">new</span> <span class="type">MimeMessageBuilder</span><span class="literal">()</span>);</span><br><span class="line"><span class="keyword">if</span> (recurse) &#123;</span><br><span class="line">    <span class="keyword">parser</span>.setRecurse<span class="literal">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">parser</span>.parse(<span class="keyword">new</span> <span class="type">EOLConvertingInputStream</span>(<span class="keyword">in</span>));</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>在解析过程中，遇到邮件内容的关键字<code>head</code>,<code>MultiPart</code>,<code>body</code>,<code>BodyPart</code>,<code>epilogue</code>、<code>preamble</code><br><code>field</code>等会触发响应类的解析工作，例如当开始解析头信息时，调用<code>Part.class</code>对header进行解析<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startHeader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expect(Part.<span class="keyword">class</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一个MimeMessage对象可以有一个<code>MultiPart</code>(同时又是一个Body类型)的mBody，这个Body可以有一组数量不限的BodyPart，每个BodyPart又是一个Body类型，同时每个<code>MultiPart</code>还可以有一个Part类型的父对象，这样就构成了一组递归关系，从父对象往BodyPart解析直到没有内容为止。</p>
+<p>MimeMessageBuilder是负责将解析好邮件的各个部分组装成为k9mail对邮件内容的封装类，最终解析好的邮件会被封装为MimeMessage对象<br><figure class="highlight monkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">MimeMessageBuilder</span> <span class="keyword">implements</span> <span class="title">ContentHandler</span></span></span><br></pre></td></tr></table></figure></p>
+<p><code>ContentHandler</code>类是<code>MimeMessageBuilder</code>类的接口，<code>ContentHandler</code>是mime4j的接口</p>
+<p>mime4j的MimeStreamParser类负责具体的解析工作，在解析过程中会以事件触发机制调用之前注册的<code>ContentHandler</code>(<code>MimeMessageBuilder</code>),通知其使用构建结果构建的对象<br><figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> T_BODY</span><br><span class="line">BodyDescriptor <span class="keyword">desc</span> = mimeTokenStream.getBodyDescriptor()</span><br><span class="line">InputStream bodyContent</span><br><span class="line"><span class="keyword">if</span> (contentDecoding) </span><br><span class="line">    bodyContent = mimeTokenStream.getDecodedInputStream()</span><br><span class="line">&#125; <span class="keyword">else</span> </span><br><span class="line">    bodyContent = mimeTokenStream.getInputStream()</span><br><span class="line">    handler.body(<span class="keyword">desc</span>, bodyContent)</span><br><span class="line"><span class="keyword">break</span>;</span><br></pre></td></tr></table></figure></p>
+<p>解析完成后调用<code>localFolder.appendMessages(Collections.singletonList(message))</code>将MimeMessage对象保存到SQlite的<code>message</code>表中，k9mail先提取各个字段的值保存到<code>ContentValue</code>（相当于Map，其中数据可以在SQLiteDatabase操作数据库使用）中，然后调用<code>android.database.sqlite</code>的<code>insert</code>方法将ContentValue的数据保存到message表中并创建在<code>threads</code>中的入口</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">ContentValues cv = new ContentValues();</span><br><span class="line">    cv.put(<span class="string">"message_part_id"</span>, rootMessagePartId);</span><br><span class="line">    cv.put(<span class="string">"uid"</span>, uid);</span><br><span class="line">    cv.put(<span class="string">"subject"</span>, <span class="keyword">message</span>.getSubject());</span><br><span class="line">    cv.put(<span class="string">"sender_list"</span>, Address.pack(<span class="keyword">message</span>.getFrom()));</span><br><span class="line">    cv.put(<span class="string">"date"</span>, <span class="keyword">message</span>.getSentDate() == null</span><br><span class="line">            ? System.currentTimeMillis() : <span class="keyword">message</span>.getSentDate().getTime());</span><br><span class="line">    cv.put(<span class="string">"flags"</span>, this.localStore.serializeFlags(<span class="keyword">message</span>.getFlags()));</span><br><span class="line">    cv.put(<span class="string">"deleted"</span>, <span class="keyword">message</span>.isSet(Flag.DELETED) ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">    cv.put(<span class="string">"read"</span>, <span class="keyword">message</span>.isSet(Flag.SEEN) ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">    cv.put(<span class="string">"flagged"</span>, <span class="keyword">message</span>.isSet(Flag.FLAGGED) ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">    cv.put(<span class="string">"answered"</span>, <span class="keyword">message</span>.isSet(Flag.ANSWERED) ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">    cv.put(<span class="string">"forwarded"</span>, <span class="keyword">message</span>.isSet(Flag.FORWARDED) ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">    cv.put(<span class="string">"folder_id"</span>, mFolderId);</span><br><span class="line">    cv.put(<span class="string">"to_list"</span>, Address.pack(<span class="keyword">message</span>.getRecipients(RecipientType.TO)));</span><br><span class="line">    cv.put(<span class="string">"cc_list"</span>, Address.pack(<span class="keyword">message</span>.getRecipients(RecipientType.CC)));</span><br><span class="line">    cv.put(<span class="string">"bcc_list"</span>, Address.pack(<span class="keyword">message</span>.getRecipients(RecipientType.BCC)));</span><br><span class="line">    cv.put(<span class="string">"preview"</span>, preview);</span><br><span class="line">    cv.put(<span class="string">"reply_to_list"</span>, Address.pack(<span class="keyword">message</span>.getReplyTo()));</span><br><span class="line">    cv.put(<span class="string">"attachment_count"</span>, attachmentCount);</span><br><span class="line">    cv.put(<span class="string">"internal_date"</span>, <span class="keyword">message</span>.getInternalDate() == null</span><br><span class="line">            ? System.currentTimeMillis() : <span class="keyword">message</span>.getInternalDate().getTime());</span><br><span class="line">    cv.put(<span class="string">"mime_type"</span>, <span class="keyword">message</span>.getMimeType());</span><br><span class="line">    cv.put(<span class="string">"empty"</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">String</span> messageId = <span class="keyword">message</span>.getMessageId();</span><br><span class="line">    <span class="keyword">if</span> (messageId != null) &#123;</span><br><span class="line">    cv.put(<span class="string">"message_id"</span>, messageId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (oldMessageId == -<span class="number">1</span>) &#123;</span><br><span class="line">    long msgId = db.insert(<span class="string">"messages"</span>, <span class="string">"uid"</span>, cv);</span><br><span class="line"></span><br><span class="line">    // Create entry in 'threads' table</span><br><span class="line">    cv.clear();</span><br><span class="line">    cv.put(<span class="string">"message_id"</span>, msgId);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rootId != -<span class="number">1</span>) &#123;</span><br><span class="line">        cv.put(<span class="string">"root"</span>, rootId);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (parentId != -<span class="number">1</span>) &#123;</span><br><span class="line">        cv.put(<span class="string">"parent"</span>, parentId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    db.insert(<span class="string">"threads"</span>, null, cv);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    db.update(<span class="string">"messages"</span>, cv, <span class="string">"id = ?"</span>, new <span class="keyword">String</span>[] &#123; Long.toString(oldMessageId) &#125;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="mime4j">mime4j</h3><p>开源项目mime4j是一个优秀的邮件内容解析、构建和处理库，它主要有两个特点：<br>    1.使用回调机制报告邮件解析事件的发生<br>    在解析过程中，当遇到开始和结束邮件头、邮件体等构成邮件元素的时候，mime4j会通过回调的方式对外发起调用，这种行为类似于SAX XML解析器，有效简化了邮件的解析和解析结果封装的实现。<br>    2.提高了对不规范邮件的兼容性<br>    mime4j对不规范邮件的兼容性达到了有Perl编写的邮件解析工具MIME:Tools的水平，二者在邮件解析结果的差别在0.5%，主要是在不规范垃圾邮件的解析上。</p>
+<h2 id="添加用户的流程">添加用户的流程</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/bindingaccount.png" alt="添加用户的流程"></p>
+<p>当用户不存在或用户在<code>Activity AccountList</code>中点击bottombar的添加新用户时，会启用Intent打开<code>Activity AccountSetupBasic</code>进行用户信息的相关配置，先进行一遍邮件地址的解析工作，如果是常用的邮件域名（为名为<code>R.xml.providers</code>文件中的域名），则根据响应的配置调用finishAutoSetup()自动完成配置的工作，否则则需要手动配置邮件服务器的信息<br><figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XmlResourceParser xml = getResources<span class="comment">()</span>.getXml<span class="comment">(R.xml.providers)</span>;</span><br></pre></td></tr></table></figure></p>
+<p><code>R.xml.providers</code>文件中邮件配置的定义如下：<br><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;provider <span class="variable">id=</span><span class="string">"gmail"</span> <span class="variable">label=</span><span class="string">"Gmail"</span> <span class="variable">domain=</span><span class="string">"gmail.com"</span>&gt;</span><br><span class="line">    &lt;incoming <span class="variable">uri=</span><span class="string">"imap+ssl+://imap.gmail.com"</span> <span class="variable">username=</span><span class="string">"$email"</span> /&gt;</span><br><span class="line">    &lt;outgoing <span class="variable">uri=</span><span class="string">"smtp+ssl+://smtp.gmail.com"</span> <span class="variable">username=</span><span class="string">"$email"</span> /&gt;</span><br><span class="line">&lt;/provider&gt;</span><br></pre></td></tr></table></figure></p>
+<p>finishAutoSetup()方法如下：<br><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">private void finishAutoSetup() &#123;</span><br><span class="line">        String <span class="variable">email =</span> mEmailView.getText().<span class="built_in">toString</span>();</span><br><span class="line">        String <span class="variable">password =</span> mPasswordView.getText().<span class="built_in">toString</span>();</span><br><span class="line">        String[] <span class="variable">emailParts =</span> splitEmail(email);</span><br><span class="line">        String <span class="variable">user =</span> emailParts[<span class="number">0</span>];</span><br><span class="line">        String <span class="variable">domain =</span> emailParts[<span class="number">1</span>];</span><br><span class="line">        try &#123;</span><br><span class="line">            String <span class="variable">userEnc =</span> UrlEncodingHelper.encodeUtf8(user);</span><br><span class="line">            String <span class="variable">passwordEnc =</span> UrlEncodingHelper.encodeUtf8(password);</span><br><span class="line"></span><br><span class="line">            String <span class="variable">incomingUsername =</span> mProvider.incomingUsernameTemplate;</span><br><span class="line">            <span class="variable">incomingUsername =</span> incomingUsername.replaceAll(<span class="string">"\\$email"</span>, email);</span><br><span class="line">            <span class="variable">incomingUsername =</span> incomingUsername.replaceAll(<span class="string">"\\$user"</span>, userEnc);</span><br><span class="line">            <span class="variable">incomingUsername =</span> incomingUsername.replaceAll(<span class="string">"\\$domain"</span>, domain);</span><br><span class="line"></span><br><span class="line">            URI <span class="variable">incomingUriTemplate =</span> mProvider.incomingUriTemplate;</span><br><span class="line">            URI <span class="variable">incomingUri =</span> new URI(incomingUriTemplate.getScheme(), incomingUsername + <span class="string">":"</span> + passwordEnc,</span><br><span class="line">                    incomingUriTemplate.getHost(), incomingUriTemplate.getPort(), <span class="constant">null</span>, <span class="constant">null</span>, <span class="constant">null</span>);</span><br><span class="line"></span><br><span class="line">            String <span class="variable">outgoingUsername =</span> mProvider.outgoingUsernameTemplate;</span><br><span class="line"></span><br><span class="line">            URI <span class="variable">outgoingUriTemplate =</span> mProvider.outgoingUriTemplate;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            URI outgoingUri;</span><br><span class="line"> 			<span class="keyword">if</span> (<span class="variable">mAccount =</span>= <span class="constant">null</span>) &#123;</span><br><span class="line">                <span class="variable">mAccount =</span> Preferences.getPreferences(this).newAccount();</span><br><span class="line">            &#125;</span><br><span class="line">            mAccount.setName(getOwnerName());</span><br><span class="line">            mAccount.setEmail(email);</span><br><span class="line">            mAccount.setStoreUri(incomingUri.<span class="built_in">toString</span>());</span><br><span class="line">            mAccount.setTransportUri(outgoingUri.<span class="built_in">toString</span>());</span><br><span class="line"></span><br><span class="line">            setupFolderNames(incomingUriTemplate.getHost().toLowerCase(Locale.US));</span><br><span class="line"></span><br><span class="line">            ServerSettings <span class="variable">incomingSettings =</span> RemoteStore.decodeStoreUri(incomingUri.<span class="built_in">toString</span>());</span><br><span class="line">            mAccount.setDeletePolicy(AccountCreator.getDefaultDeletePolicy(incomingSettings.type));</span><br><span class="line"></span><br><span class="line">            // Check incoming here.  Then check outgoing <span class="keyword">in</span> onActivityResult()</span><br><span class="line">            AccountSetupCheckSettings.actionCheckSettings(this, mAccount, CheckDirection.INCOMING);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<p>finishAutoSetup()的流程如下：</p>
+<p>1.先搜寻默认的Provider <code>findProviderForDomain(domain)</code><br>2.然后根据模板信息用模板信息拼装<code>incomingUri</code>和<code>outgoingUri</code><br>3.并调用<code>Preferences.getPreferences(this).newAccount()</code>方法建立一个新的Account，并配置一些用户信息，并保存用于从远程获取邮件的StoreUri（<code>incomingUri</code>），和向远程发送邮件的TransportUri(outgoingUri）<br>4.配置填写完成后调用<code>Activity AccountSetupCheckSetting</code>进行配置信息的检查</p>
+<p>之后传递Intent的EXTRA_ACCOUNT和EXTRA_CHECK_DIRECTION参数，打开<code>Activity AccountSetupCheckSetting</code>进行配置信息的检查<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">actionCheckSettings</span><span class="params">(Activity context, Account account,</span><br><span class="line">            CheckDirection direction)</span> </span>&#123;</span><br><span class="line">    Intent i = <span class="keyword">new</span> Intent(context, AccountSetupCheckSettings.<span class="keyword">class</span>);</span><br><span class="line">    i.putExtra(EXTRA_ACCOUNT, account.getUuid());</span><br><span class="line">    i.putExtra(EXTRA_CHECK_DIRECTION, direction);</span><br><span class="line">    context.startActivityForResult(i, ACTIVITY_REQUEST_CODE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>执行<code>execute()</code>开启一个新的AsyncTask<br><figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> CheckAccountTask(mAccount).<span class="keyword">execute</span>(mDirection);</span><br></pre></td></tr></table></figure></p>
+<p>清理完错误的认证信息后，执行checkServerSettings()方法<br><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">clearCertificateErrorNotifications<span class="list">(<span class="keyword">direction</span>)</span><span class="comment">;</span></span><br><span class="line">checkServerSettings<span class="list">(<span class="keyword">direction</span>)</span><span class="comment">;</span></span><br><span class="line">setResult<span class="list">(<span class="keyword">RESULT_OK</span>)</span><span class="comment">;</span></span><br><span class="line">finish<span class="list">()</span><span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p>checkServerSettings()方法进行服务器的获取发送测试<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> (direction) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">INCOMING:</span> &#123;</span><br><span class="line">        checkIncoming();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">OUTGOING:</span> &#123;</span><br><span class="line">        checkOutgoing();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>Activity AccountSetupBasic</code>通过Intent传递过来的<code>CheckDirection</code>参数是<code>INCOMING</code>,则进行获取邮件的测试<code>checkIncoming()</code>,<code>checkIncoming()</code>方法进行如下操作：<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Store</span> store = account.getRemoteStore<span class="literal">()</span></span><br><span class="line">publishProgress(<span class="type">R</span>.<span class="built_in">string</span>.account_setup_check_settings_check_incoming_msg);</span><br><span class="line">store.checkSettings<span class="literal">()</span>;</span><br><span class="line"><span class="type">MessagingController</span>.getInstance(getApplication<span class="literal">()</span>).listFoldersSynchronous(account, <span class="literal">true</span>, null);</span><br><span class="line"><span class="type">MessagingController</span>.getInstance(getApplication<span class="literal">()</span>).synchronizeMailbox(account, account.getInboxFolderName<span class="literal">()</span>, null, null);</span><br></pre></td></tr></table></figure></p>
+<p>1.先根据<code>account</code>获取远程Store，如果RemoteStore不存在则异步创建一个Pop3Store，该类包含着该账户所需的所有远程储存信息，同时Activity加载等待动画<br>2.调用Pop3Store的checkSettings()方法配置Pop3Store<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Pop3Folder</span> folder = <span class="keyword">new</span> <span class="type">Pop3Folder</span>(mStoreConfig.getInboxFolderName<span class="literal">()</span>);</span><br><span class="line">folder.<span class="keyword">open</span>(<span class="type">Folder</span>.<span class="type">OPEN_MODE_RW</span>);</span><br></pre></td></tr></table></figure></p>
+<p>创建一个新的Pop3Folder，用这个Folder的<code>open()</code>方法与邮件服务器通信以及发送其他命令</p>
+<p>3.打开一个线程调用<code>MessagingController</code>的<code>listFoldersSynchronous()</code>方法,该方法用于从邮件服务器中下载所有Folder，listFoldersSynchronous()`方法的主要流程如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Store <span class="built_in">local</span>Store = account.getLocalStore();</span><br><span class="line"><span class="built_in">local</span>Folders = <span class="built_in">local</span>Store.getPersonalNamespaces(<span class="literal">false</span>);</span><br><span class="line"><span class="keyword">if</span> (refreshRemote || <span class="built_in">local</span>Folders.isEmpty()) &#123;</span><br><span class="line">    <span class="keyword">do</span>RefreshRemote(account, listener);</span><br><span class="line">    <span class="built_in">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先根据<code>Account</code>获取<code>LocalStore</code>,根据<code>LocalStore</code>获取<code>PersonalNamespaces</code>如果远程目录有新邮件或者本地文件夹为空，则执行<code>doRefreshRemote()</code>方法，<code>doRefreshRemote()</code>方法的主要流程如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">for</span> (Folder remoteFolder : remoteFolders) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">local</span>FolderNames.contains(remoteFolder.getName()) == <span class="literal">false</span>) &#123;</span><br><span class="line">        LocalFolder <span class="built_in">local</span>Folder = <span class="built_in">local</span>Store.getFolder(remoteFolder.getName());</span><br><span class="line">        foldersToCreate.add(<span class="built_in">local</span>Folder);</span><br><span class="line">    &#125;</span><br><span class="line">    remoteFolderNames.add(remoteFolder.getName());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.打开一个线程调用<code>MessagingController</code>的<code>synchronizeMailbox()方法，该方法用于从邮件服务器中同步收件箱，</code>synchronizeMailbox()方法在后台执行<code>synchronizeMailboxSynchronous()</code>方法，<code>synchronizeMailboxSynchronous()</code>方法通知监听器后调用<code>processPendingCommandsSynchronous()</code>方法先邮件服务器发送命令<code>getInboxFolderName()</code>获取账户文件夹的名字</p>
+<h2 id="LocalStore数据库">LocalStore数据库</h2><p>K9 Mail在本地以email账号为单位，以UUID作为SQLite数据库名称，分别保存一个账号的文件夹（folders），邮件（messages），附件（attachment），邮件头信息（headers），提交到邮件服务器命令的栈（pending_commands），会话（邮件之间的关系threads），不同的账户有着各自的数据库</p>
+<h3 id="打开数据库">打开数据库</h3><p>LockableDataBase类中定义了打开数据库的操作和避免读写出错的数据库锁，系统根据用户的UUID获取数据库文件的位置databaseFile，从<br>而找到数据库打开数据库文件</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">File</span> databaseFile = storageManager.getDatabase(uUid, providerId);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> doOpenOrCreateDb(<span class="keyword">final</span> <span class="keyword">File</span> databaseFile) &#123;</span><br><span class="line">        <span class="keyword">if</span> (StorageManager.InternalStorageProvider.ID.equals(mStorageProviderId)) &#123;</span><br><span class="line">            <span class="comment">// internal storage</span></span><br><span class="line">            mDb = context.openOrCreateDatabase(databaseFile.getName(), Context.MODE_PRIVATE,</span><br><span class="line">                    <span class="keyword">null</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// external storage</span></span><br><span class="line">            mDb = SQLiteDatabase.openOrCreateDatabase(databaseFile, <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="数据库设计Schema">数据库设计Schema</h3><p>在新建数据库过程中LockableDataBase类根据StoreSchemaDefinition的数据库结构建立数据库表，同时升级软件版本是也根据Schema重新建立数据库表，db.getVersion()=29的Schema结构如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">db.execSQL("<span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> folders (id <span class="built_in">INTEGER</span> <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>, name <span class="built_in">TEXT</span>, <span class="string">"</span><br><span class="line">       + "</span>last_updated <span class="built_in">INTEGER</span>, unread_count <span class="built_in">INTEGER</span>, visible_limit <span class="built_in">INTEGER</span>, <span class="keyword">status</span> <span class="built_in">TEXT</span>, <span class="string">"</span><br><span class="line">       + "</span>push_state <span class="built_in">TEXT</span>, last_pushed <span class="built_in">INTEGER</span>, flagged_count <span class="built_in">INTEGER</span> <span class="keyword">default</span> <span class="number">0</span>, <span class="string">"</span><br><span class="line">       + "</span>integrate <span class="built_in">INTEGER</span>, top_group <span class="built_in">INTEGER</span>, poll_class <span class="built_in">TEXT</span>, push_class <span class="built_in">TEXT</span>, display_class <span class="built_in">TEXT</span>, notify_class <span class="built_in">TEXT</span><span class="string">"</span><br><span class="line">       + "</span>)<span class="string">");</span><br><span class="line"></span><br><span class="line">db.execSQL("</span><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> messages (<span class="string">" +</span><br><span class="line">        "</span>id <span class="built_in">INTEGER</span> <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>, <span class="string">" +</span><br><span class="line">        "</span>deleted <span class="built_in">INTEGER</span> <span class="keyword">default</span> <span class="number">0</span>, <span class="string">" +</span><br><span class="line">        "</span>folder_id <span class="built_in">INTEGER</span>, <span class="string">" +</span><br><span class="line">        "</span>uid <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>subject <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span><span class="built_in">date</span> <span class="built_in">INTEGER</span>, <span class="string">" +</span><br><span class="line">        "</span>flags <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>sender_list <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>to_list <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>cc_list <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>bcc_list <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>reply_to_list <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>attachment_count <span class="built_in">INTEGER</span>, <span class="string">" +</span><br><span class="line">        "</span>internal_date <span class="built_in">INTEGER</span>, <span class="string">" +</span><br><span class="line">        "</span>message_id <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>preview <span class="built_in">TEXT</span>, <span class="string">" +</span><br><span class="line">        "</span>mime_type <span class="built_in">TEXT</span>, <span class="string">"+</span><br><span class="line">        "</span>normalized_subject_hash <span class="built_in">INTEGER</span>, <span class="string">" +</span><br><span class="line">        "</span>empty <span class="built_in">INTEGER</span>, <span class="string">" +</span><br><span class="line">        "</span><span class="keyword">read</span> <span class="built_in">INTEGER</span> <span class="keyword">default</span> <span class="number">0</span>, <span class="string">" +</span><br><span class="line">        "</span>flagged <span class="built_in">INTEGER</span> <span class="keyword">default</span> <span class="number">0</span>, <span class="string">" +</span><br><span class="line">        "</span>answered <span class="built_in">INTEGER</span> <span class="keyword">default</span> <span class="number">0</span>, <span class="string">" +</span><br><span class="line">        "</span>forwarded <span class="built_in">INTEGER</span> <span class="keyword">default</span> <span class="number">0</span>, <span class="string">" +</span><br><span class="line">        "</span>message_part_id <span class="built_in">INTEGER</span><span class="string">" +</span><br><span class="line">        "</span>)<span class="string">");</span></span></span><br></pre></td></tr></table></figure>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/scheme.png" alt="数据库scheme"></p>
+<h4 id="Folders表">Folders表</h4><p>该表存放了当前账户所有的文件夹，该表以ID为主键，在name字段建立了索引，包括“文件夹设置”中的所有选项、显示（diaplay_class）、同步（poll_class）和推送（push_class）级别，k9mail支持<code>NONE NO_CLASS INHERITED FIRST_CLASS</code>、同步的时间(last_pushed)，是否将该文件夹下的邮件整合到全局收件箱（integrate），以及标星数</p>
+<p>字段top_group按照数字等级说明一个文件夹是否是“收件箱、垃圾箱、草稿箱、归档文件夹、发件箱、反垃圾邮件箱、已发送文件夹、错误文件夹”其中之一并且设置为置顶文件夹</p>
+<h4 id="Messages表">Messages表</h4><p>该表保存了一份邮件除了附件（保存在attachments之中）及头信息（保存在headers之中）的所有信息，每封邮件都在表中对应了一条记录，字段id为主键，在表上建立了如下索引：<br>    1.在字段uid和folder_id上建立了索引msg_uid<br>    2.在字段folder_id、delect和internal_data建立了索引msg_folder_id_delect_data<br>    3.在字段empty上建立了索引msg_empty<br>    4.在字段read上建立了索引msg_read<br>    5.在字段flagger上建立了索引msg_flagged</p>
+<p>字段flag是邮件的标识与服务器端保持一致，标识的值包括：<code>DELETED SEEN FLAGGED ANSWERED FORWARDED</code>等，字段<code>deleted flagged answered forwarded</code>与字段flag的标识相对应，字段<code>read</code>则对应着标识<code>SEEN</code>，用于标识flag是否存在对应的标识，类型为INTEGER，<code>0：存在；1：不存在</code>，默认值为0</p>
+<p>字段empty表明邮件是否为空，<code>0:邮件非空；1：空</code>；attachment_account表明一个邮件附件的总数目，对应<code>LocalMessage</code>类的属性<code>mAttachmentAccount</code></p>
+<h4 id="表message_parts">表message_parts</h4><p>表message_parts包括除了message表外的所有信息，在schema version 29中k9mail将表attachments和表header整合到表message_parts之中</p>
+<h5 id="表attachments">表attachments</h5><p>该表以id字段为主键，储存着邮件的附件信息，通过字段<code>message_id</code>对应着响应的Message，该表的每条字段关联着一个附件文件的链接，通过<code>content_url</code>从本地保存中获取到附件文件</p>
+<p>字段store_data保存着字符串类型的Android邮件头信息；字段<code>content_disposition</code>保存着邮件头信息中<code>Content_Disposition</code>的值，通过该字段可以获取附件的相关数据</p>
+<h5 id="表header">表header</h5><p>该表以id为主键，保存着邮件的头信息，与Attachment相似，一封邮件可以在该表中存在多条记录，字段<code>name``value</code>以键值对key-value的方式保存着头信息中的所有字段，在字段<code>message_id</code>上建立了索引<code>header_folder</code></p>
+<h4 id="表threads">表threads</h4><p>该表以id为主键，为客户端提供了邮件会话支持的功能，按顺序保存着一个会话中邮件的关系，该表的索引有：<br>1.在字段<code>message_id</code>上建立了索引<code>threads_message_id</code><br>2.在字段<code>root</code>上建立了索引<code>threads_root</code><br>3.在字段<code>parent</code>上建立了索引<code>threads_parent</code></p>
+<p>k9 mail使用了LocalStore内部类ThreadInfo作为threads的实体类，ThreadInfo中的属性threadId对应着该表之中的Id字段</p>
+<h4 id="表pending_command">表pending_command</h4><p>该表以id为主键，保存着提交到服务器的命令队列，其作用是保证这些命令不会丢失，防止客户端发生意外或意外退出时而导致命令丢失的情况发生，保证客户端与服务器端数据的一致性，字段Argements中保存着命令参数</p>
+<h3 id="触发器">触发器</h3><p>SQLite触发器可以在执行完一段特定的数据库更改后，触发完成后续的数据库操作，避免了开发专门的数据库代码<br>1.触发器set_thread_root<br>该触发器thread表，在该表中新增一条计入后,对新增的的记录设置root字段的值为id的值<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.execSQL("<span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> set_thread_root <span class="string">" +</span><br><span class="line">    "</span><span class="keyword">AFTER</span> <span class="keyword">INSERT</span> <span class="keyword">ON</span> threads <span class="string">" +</span><br><span class="line">    "</span><span class="keyword">BEGIN</span> <span class="string">" +</span><br><span class="line">    "</span><span class="keyword">UPDATE</span> threads <span class="keyword">SET</span> root=id <span class="keyword">WHERE</span> root <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">AND</span> ROWID = NEW.ROWID;</span> " +</span><br><span class="line">    "<span class="operator"><span class="keyword">END</span><span class="string">");</span></span></span><br></pre></td></tr></table></figure></p>
+<p>2.触发器delete_folder<br>该触发器作用于message表，在从folder表中删除记录前起作用，在从folder中删除记录前先将message表中属于待删除的文件夹的所有邮件自动删除<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">db.execSQL("<span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> delete_folder<span class="string">" +</span><br><span class="line">	"</span><span class="keyword">BEFORE</span> <span class="keyword">DELETE</span> <span class="keyword">ON</span> folders<span class="string">" +</span><br><span class="line">	"</span><span class="keyword">BEGIN</span> <span class="keyword">DELETE</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> old.id = folder_id;</span>" +</span><br><span class="line">	"<span class="operator"><span class="keyword">END</span>;</span>");</span><br></pre></td></tr></table></figure></p>
+<p>3.触发器delete_message<br>该触发器作用于message表和hearder表（message_parts表），在从从messages表中删除记录前起作用，用于自动删除邮件的附件头信息<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.execSQL("<span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> delete_message <span class="string">" +</span><br><span class="line">   "</span><span class="keyword">BEFORE</span> <span class="keyword">DELETE</span> <span class="keyword">ON</span> messages <span class="string">" +</span><br><span class="line">   "</span><span class="keyword">BEGIN</span> <span class="string">" +</span><br><span class="line">   "</span><span class="keyword">DELETE</span> <span class="keyword">FROM</span> message_parts <span class="keyword">WHERE</span> root = OLD.message_part_id;</span>" +</span><br><span class="line">   "<span class="operator"><span class="keyword">END</span><span class="string">");</span></span></span><br></pre></td></tr></table></figure></p>
+<h3 id="操作数据库">操作数据库</h3><p>LocalStore是唯一对外公开操作数据库的类，其内部包括9个内部类、1个接口，以邮件、文件夹为核心，提供了以面向对象方式围绕邮件和文件夹的一系列操作，包括向数据表插入新的数据，删除数据，更新数据库，获取数据等方法，k9 mail为不同的内部类设计了基类，即把不同的实体封装成为不同的类，又减少了代码的重复。</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/"> #Android </a>
+          
+            <a href="/tags/K-9-Mail/"> #K-9 Mail </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/12/Reservoir-Sampling/">Algorithms#001：Reservoir Sampling</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/11/Cicada-001/">Program Cicada#001：Introduction</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/07/11/Cicada-002/"
+               data-title="Program Cicada#002：K-9 Mail源码分析" data-url="http://masukio.tk/2015/07/11/Cicada-002/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实现层级"><span class="nav-number">1.</span> <span class="nav-text">实现层级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Library类"><span class="nav-number">2.</span> <span class="nav-text">Library类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#com-fsck-k9-mail"><span class="nav-number">2.1.</span> <span class="nav-text">com.fsck.k9.mail</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Address"><span class="nav-number">2.1.1.</span> <span class="nav-text">Address</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Store类"><span class="nav-number">2.1.2.</span> <span class="nav-text">Store类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Message"><span class="nav-number">2.1.3.</span> <span class="nav-text">Message</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MIME邮件的构成"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">MIME邮件的构成</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#MIME消息"><span class="nav-number">2.1.3.1.1.</span> <span class="nav-text">MIME消息</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#邮件头"><span class="nav-number">2.1.3.1.1.1.</span> <span class="nav-text">邮件头</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Folder"><span class="nav-number">2.1.4.</span> <span class="nav-text">Folder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Filter"><span class="nav-number">2.1.5.</span> <span class="nav-text">Filter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Power"><span class="nav-number">2.1.6.</span> <span class="nav-text">Power</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL"><span class="nav-number">2.1.7.</span> <span class="nav-text">SSL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transport"><span class="nav-number">2.1.8.</span> <span class="nav-text">Transport</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K9包"><span class="nav-number">2.2.</span> <span class="nav-text">K9包</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#业务实现流程"><span class="nav-number">3.</span> <span class="nav-text">业务实现流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#接收邮件"><span class="nav-number">3.1.</span> <span class="nav-text">接收邮件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动后台进程"><span class="nav-number">3.1.1.</span> <span class="nav-text">启动后台进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Messaging同步文件夹"><span class="nav-number">3.1.2.</span> <span class="nav-text">Messaging同步文件夹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取得远程Store"><span class="nav-number">3.1.3.</span> <span class="nav-text">取得远程Store</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步数据"><span class="nav-number">3.1.4.</span> <span class="nav-text">同步数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行下载"><span class="nav-number">3.1.5.</span> <span class="nav-text">执行下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优先下载"><span class="nav-number">3.1.6.</span> <span class="nav-text">优先下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断邮件Body"><span class="nav-number">3.1.7.</span> <span class="nav-text">判断邮件Body</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置重复下载"><span class="nav-number">3.1.8.</span> <span class="nav-text">设置重复下载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发送邮件"><span class="nav-number">3.2.</span> <span class="nav-text">发送邮件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动后台"><span class="nav-number">3.2.1.</span> <span class="nav-text">启动后台</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地保存"><span class="nav-number">3.2.2.</span> <span class="nav-text">本地保存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送邮件-1"><span class="nav-number">3.2.3.</span> <span class="nav-text">发送邮件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除邮件"><span class="nav-number">3.3.</span> <span class="nav-text">删除邮件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#删除一组邮件"><span class="nav-number">3.3.1.</span> <span class="nav-text">删除一组邮件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IMAP邮件的解析、封装、保存"><span class="nav-number">3.4.</span> <span class="nav-text">IMAP邮件的解析、封装、保存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mime4j"><span class="nav-number">3.4.1.</span> <span class="nav-text">mime4j</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加用户的流程"><span class="nav-number">3.5.</span> <span class="nav-text">添加用户的流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LocalStore数据库"><span class="nav-number">3.6.</span> <span class="nav-text">LocalStore数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#打开数据库"><span class="nav-number">3.6.1.</span> <span class="nav-text">打开数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库设计Schema"><span class="nav-number">3.6.2.</span> <span class="nav-text">数据库设计Schema</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Folders表"><span class="nav-number">3.6.2.1.</span> <span class="nav-text">Folders表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Messages表"><span class="nav-number">3.6.2.2.</span> <span class="nav-text">Messages表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#表message_parts"><span class="nav-number">3.6.2.3.</span> <span class="nav-text">表message_parts</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#表attachments"><span class="nav-number">3.6.2.3.1.</span> <span class="nav-text">表attachments</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#表header"><span class="nav-number">3.6.2.3.2.</span> <span class="nav-text">表header</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#表threads"><span class="nav-number">3.6.2.4.</span> <span class="nav-text">表threads</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#表pending_command"><span class="nav-number">3.6.2.5.</span> <span class="nav-text">表pending_command</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#触发器"><span class="nav-number">3.6.3.</span> <span class="nav-text">触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作数据库"><span class="nav-number">3.6.4.</span> <span class="nav-text">操作数据库</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>

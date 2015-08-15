@@ -1,0 +1,996 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="Android,交互,架构," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> Program Cicada#001：Introduction // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Program Cicada#001：Introduction
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-07-11
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Cicada/">Cicada</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/11/Cicada-001/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/11/Cicada-001/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：Cicada中文名「蝉」，是我的第一款Android应用，它是基于开源软件K-9 Mail库开发的TO-DO应用，它的特点在于其基于E-Mail协议，支持跨平台，无需注册即可实现任务的共享，即使没有安装APP，也可以通过邮件来实现大部分功能。本篇为概览，介绍软件的实现的功能，系统架构，UI及交互。<br><a id="more"></a><br><img src="http://7nar5o.com1.z0.glb.clouddn.com/Cidaca.PNG" alt=""></p>
+<h1 id="清单">清单</h1><p>很多人显然意识到了「一个脑子记不过来」这一惨痛的事实，开始寻求一些解决之道，于是开始接触时间管理、GTD 等概念。然而，这些概念要不过于复杂，不适用于自己的实际生活，要么过于理论，很难套用到具体的行为中去。</p>
+<p>而清单则是一个恰到好处的解决方案。一方面，清单充当了思维导图的角色，但你把不同的事项分别存放在不同的清单列表中，实际上已经是对这些事项的第一次梳理，明确了大致分类，方便对自己的日程和时间作出具体的分配和规划。另一方面，清单可以督促我们的行动。很多实验都已经证明了，无论你有没有强迫症，在清单上留有尚待完成的事项，都会激发一个人的行动欲，提高我们的办事效率。</p>
+<h1 id="TO-DO应用">TO-DO应用</h1><p>Android平台上已经有不少TO-DO类应用，例如大名鼎鼎的 OmniFocus、Things,TO-DO和最近很火的 Wunderlist 都是众多 Power User 的必备。</p>
+<h2 id="弃之不用">弃之不用</h2><p>其中GTD 老牌软件 OmniFocus、Things，你可以为每个事项设定不同的情景，关联不同的人物，在不同的透视下查看，当然，如果你每天都有上百个待办事项，OmniFocus 才是你唯一正确的选择。然而对于我们一般人，这些过于简单或复杂的设定，其实并不适用于大多数人的普通生活。</p>
+<h2 id="奇妙清单">奇妙清单</h2><p>「奇妙清单」接近我理想中的清单软件，我也一直将其作为日常生产力软件在使用，它没有复杂的情景设置，也没有任务的无限层级，事实上，从推出到现在，整体的设计和使用理念都没有发生过重大的改变。层级只有「清单 - 事项 - 子任务」三级，它只支持设置到期时间和一次提醒，可以对优先级高的任务打上星标，一款无所不能的 App，往往大多数人会因为学习成本过高而放弃。但「奇妙清单」非常巧妙地把握了这个平衡，在使用时一切功能都恰到好处。</p>
+<h2 id="Cicada优点">Cicada优点</h2><pre><code><span class="number">1</span>.不是每个人都是Wunderlist「奇妙清单」的用户，但每个人都有电子邮箱，
+  Cicada基于用户现有的邮箱系统即可实现，任务的存储，分享，通过电子邮箱自动导入关系链
+<span class="number">2</span>.「奇妙清单」缺少聚合清单的清单流，导致有的事项容易错过，
+  而Cicada通过算法进行重要性和任务周期进行事项的颜色标记和智能排序，
+    优先安排重要度-周期比高的任务和紧急任务
+<span class="number">3</span>.分布式加<span class="keyword">Group</span>，可以通过清单ID或二维码加入清单而不用一个一个的添加，例如办公室同事或同班同学清单
+<span class="number">4</span>.没有客户端也可以使用，跨平台
+<span class="number">5</span>.利用邮件的文件传输功能实现文件传输
+</code></pre><h1 id="实现目标">实现目标</h1><pre><code><span class="number">1</span>.实现个人事项的参加，持久化与云同步
+<span class="number">2</span>.支持事项的分类、检索与锁定（PIN）
+<span class="number">3</span>.支持基于邮件协议的事项分享
+<span class="number">4</span>.支持创建、加入清单群（Group），群二维码的生成
+<span class="number">5</span>.对邮件内容进行封装，即使在邮件客户端中也能够有良好的阅读体验
+<span class="number">6</span><span class="class">.Material</span> Design化,并使用Design Support Library向下兼容至Android V2.<span class="number">1</span>
+<span class="number">7</span><span class="class">.Private</span> List专属隐私列表，并使用PIN码保护
+<span class="number">8</span>.直接解析E-Mail中的联系人，并创建联系人列表
+<span class="number">9</span>.过期事项自动存档至回收箱中
+<span class="number">10</span>.任务按紧急程度，事项结束日期，持续时间自动排序
+<span class="number">11</span>.联系人的管理、分组，消息的接收、退出机制
+<span class="number">12</span>.邮件内容的解析，封装与呈现
+</code></pre><h1 id="系统构建">系统构建</h1><h2 id="电子邮件系统">电子邮件系统</h2><h3 id="原因">原因</h3><pre><code>1.Cicada使用电子邮件系统进行事项的分享，而无需搭建自己的服务器后台
+2.使用互联网分布式的邮件系统可以将事项发布给地球上的任何人，而不用担心其是否安装客户端
+3.电子邮件自带用户关系链，可以直接导入邮箱联系人
+4.用户使用现有系统而无需使用一项新服务
+5.邮件格式适合于群发，群组讨论
+6.与平台无关，电子邮件是一个跨平台的数据协议
+7.电子邮件适合长周期重要的事件，事项是对将来事件的计划无需实现即时通讯
+</code></pre><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/Table.PNG" alt="I/T Rate"></p>
+<h3 id="底层实现">底层实现</h3><p>Cicada使用K-9 Mail作为底层框架，支持SMTP/POP3/IMAP，即使团队成员没有使用客户端也可以发布待办任务和查看推送的代办事项</p>
+<h4 id="获取待办事项">获取待办事项</h4><p>Cicada通过搜索邮件特定邮件解析成XML数据格式通过Adapter绑定到RecyclerView上实现将邮件解析成可操作的数据，可以实现任务的紧急的排序，任务的搜索，加入tag，时间提醒，代办实现的广播等操作</p>
+<h4 id="共享代办事项">共享代办事项</h4><p>Cicada通过解析器将事项信息封装成HTML格式的邮件，通过邮件服务器发到各成员的邮箱，如果有安装客户端则用客户端进行解析，否则则按照正常邮件存在。</p>
+<h2 id="类MVC模型">类MVC模型</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/业务逻辑.PNG" alt="MVC模型"><br>MVC模式（Model-View-Controller）将软件系统分为三个基本部分：模型（Model）、视图（View）和控制器（Controller）</p>
+<p>MVC模式的目的是实现一种动态的程序设计，使后续对程序的修改和扩展简化，并且使程序某一部分的重复利用成为可能。除此之外，此模式通过对复杂度的简化，使程序结构更加直观。软件系统通过对自身基本部分分离的同时也赋予了各个基本部分应有的功能：</p>
+<pre><code>（控制器 Controller）-负责转发请求，对请求进行处理
+（视图 <span class="keyword">View</span>）-图形界面设计
+（模型 Model） -数据库数据管理和数据库设计
+</code></pre><p>Cicada将业务逻辑打包为Model，UI层设计使用Material Design进行呈现，Controller通过Activity，Service，Broadcast 和 Receiver 等等机制将用户请求转向Model层</p>
+<h3 id="View层">View层</h3><p>View层是采用XML文件进行界面的描述，包括各种界面组件、动画、交互的设计，分辨率、语言支持，UI遵循Material Design<br><img src="http://7nar5o.com1.z0.glb.clouddn.com/cicada002.png" alt=""></p>
+<h3 id="Controller层">Controller层</h3><p>Android的控制层的重任通常落在了众多的Acitvity的肩上，这句话也就暗含了不要在Acitivity中写代码，Acitivity负责对UI进行控制，要通过Activity交割Model业务逻辑层处理，这样做的另外一个原因是Android中的Acitivity的响应时间是5s，如果耗时的操作放在这里，程序就很容易被回收掉，Controller可以通过Activity，Service，Broadcast 和 Receiver 等等机制将用户请求转向Model层</p>
+<h3 id="Model层">Model层</h3><p>Model层用于对数据库的操作、对网络等的操作，Cicada的Model层包括K-9Mail库，包括TCP，Socket连接管理，邮件数据的封装，数据库的操作，IMAP服务器响应类，搜索功能及添加的数据解析模块，Group用户模块，响应来自Controller的请求</p>
+<h1 id="交互设计">交互设计</h1><h2 id="完成任务">完成任务</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/done.PNG" alt="完成任务"><br>当任务的时间到达TimeLine后，这个任务会从主清单中消失，消失过程为该TextView由长方形缩小为一个逐渐缩小旋转着的的圆，最后消失</p>
+<p>用户可以选择Doned该任务，长按改TextView，这个Item会Float起来，阴影范围扩大，此时处于可上下移动的状态，若移动下边的Item会跑上来以便改Item的插入，等待5000ms，若Item不发生移动，着产生水波的动画，将Item标绿然后消失</p>
+<h2 id="新建任务">新建任务</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/new.PNG" alt="新建任务"><br>用户点击FAB，由FAB的位置出现黄色水波填充整个长方形最后出现整个新建任务的Activity，该层下方的区域为不可编辑状态，FAB变为分享状态，点击后编辑区域向上滑动，下方出现添加分享人的区域，可以输入邮箱地址或用户名进行添加，添加分享人时，右边的Button为Add，若为空则该按钮变为Done，点击Done则新建任务界面打钩变绿，向下滑出，返回主清单列表，任务出现动画与消失时相反</p>
+<h2 id="查看详细任务">查看详细任务</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/scale.PNG" alt="查看详细任务"><br>点击该Item，改Item向四周展开覆盖全页，同时底部Item消失，同时处于可编辑状态，点击Back Button这返回</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/"> #Android </a>
+          
+            <a href="/tags/交互/"> #交互 </a>
+          
+            <a href="/tags/架构/"> #架构 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/11/Cicada-002/">Program Cicada#002：K-9 Mail源码分析</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/11/Chrome-APP-Bar/">定制Android 5.x下Chrome的App Bar颜色</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/07/11/Cicada-001/"
+               data-title="Program Cicada#001：Introduction" data-url="http://masukio.tk/2015/07/11/Cicada-001/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#清单"><span class="nav-number">1.</span> <span class="nav-text">清单</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TO-DO应用"><span class="nav-number">2.</span> <span class="nav-text">TO-DO应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#弃之不用"><span class="nav-number">2.1.</span> <span class="nav-text">弃之不用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#奇妙清单"><span class="nav-number">2.2.</span> <span class="nav-text">奇妙清单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cicada优点"><span class="nav-number">2.3.</span> <span class="nav-text">Cicada优点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现目标"><span class="nav-number">3.</span> <span class="nav-text">实现目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#系统构建"><span class="nav-number">4.</span> <span class="nav-text">系统构建</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#电子邮件系统"><span class="nav-number">4.1.</span> <span class="nav-text">电子邮件系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原因"><span class="nav-number">4.1.1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#底层实现"><span class="nav-number">4.1.2.</span> <span class="nav-text">底层实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取待办事项"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">获取待办事项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#共享代办事项"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">共享代办事项</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类MVC模型"><span class="nav-number">4.2.</span> <span class="nav-text">类MVC模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#View层"><span class="nav-number">4.2.1.</span> <span class="nav-text">View层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Controller层"><span class="nav-number">4.2.2.</span> <span class="nav-text">Controller层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Model层"><span class="nav-number">4.2.3.</span> <span class="nav-text">Model层</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交互设计"><span class="nav-number">5.</span> <span class="nav-text">交互设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#完成任务"><span class="nav-number">5.1.</span> <span class="nav-text">完成任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新建任务"><span class="nav-number">5.2.</span> <span class="nav-text">新建任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看详细任务"><span class="nav-number">5.3.</span> <span class="nav-text">查看详细任务</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>

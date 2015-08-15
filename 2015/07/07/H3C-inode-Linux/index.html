@@ -1,0 +1,1560 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="Openwrt,编译，H3C inode," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> 民间H3C inode客户端黑历史 // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              民间H3C inode客户端黑历史
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-07-07
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Openwrt开发笔记/">Openwrt开发笔记</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/07/H3C-inode-Linux/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/07/H3C-inode-Linux/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：iNode协议本是个集成的软件产品，其所设计的校园网认证机制是各项基础协议的组合。本文要谈及的内容有以下几点：（1）介绍构成iNode认证框架的一些基本协议；（2）介绍iNode逆向工作的研究进展，iNode客户端的前世今生，哪些人正在做该协议分析研究，有哪些软件或者代码可以成为替代品；（3）根据iNode在实际环境下的工作状态与协议内容，并作出逆向实践。<br><a id="more"></a></p>
+<h1 id="802-1x认证机制及相关协议">802.1x认证机制及相关协议</h1><p>802.1x认证机制及相关协议iNode协议的基础构架实际由802.1x协议认证机制组成，其中认证过程又采用EAPOLRADIUS方式。</p>
+<h2 id="缩略语">缩略语</h2><pre><code><span class="number">802.1</span>X 本文专指IEEE <span class="number">802.1</span>X 标准
+RADIUS 远程用户拨入认证服务 (Remote Authentication Dial <span class="keyword">In</span> User Service）
+PAP 密码验证协议 (Password Authentication Protocol）
+CHAP 质询握手验证协议 (Challenge Handshake Authentication Protocol）
+EAP 扩展验证协议 (Extensible Authentication Protocol）
+EAPOL 基于局域网的EAP (EAP over LAN）
+MD5 消息摘要算法<span class="number">5</span>版本 (Message-Digest Algorithm <span class="number">5</span>）
+PAE 端口认证实体 (<span class="keyword">Port</span> Authentication <span class="keyword">Entity</span>）
+</code></pre><h2 id="认证起源和作用">认证起源和作用</h2><p>IEEE802 LAN/WAN委员会为解决无线局域网网络安全问题，提出了802.1X协议。后来，802.1X协议作为局域网端口的一个普通接入控制机制在以太网中被广泛应用，主要解决以太网内认证和安全方面的问题。</p>
+<p>802.1X协议是一种基于端口的网络接入控制协议（port based network access control protocol）。“基于端口的网络接入控制”是指在局域网接入设备的端口这一级对所接入的用户设备进行认证和控制。连接在端口上的用户设备如果能通过认证，就可以访问局域网中的资源；如果不能通过认证，则无法访问局域网中的资源。</p>
+<h2 id="802-1X的体系结构">802.1X的体系结构</h2><p>802.1X系统为典型的Client/Server结构，包括三个实体：客户端（Client）、设备端（Device）和认证服务器（Server）。</p>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766382_image001_624138_30003_0.png" alt=""></p>
+<p>1.客户端是位于局域网段一端的一个实体，由该链路另一端的设备端对其进行认证。客户端一般为一个用户终端设备，用户可以通过启动客户端软件发起802.1X认证。客户端必须支持EAPOL（Extensible Authentication Protocol over LAN，局域网上的可扩展认证协议）。</p>
+<p>2.设备端是位于局域网段一端的另一个实体，对所连接的客户端进行认证。设备端通常为支持802.1X协议的网络设备，它为客户端提供接入局域网的端口，该端口可以是物理端口，也可以是逻辑端口。</p>
+<p>3.认证服务器是为设备端提供认证服务的实体。认证服务器用于实现对用户进行认证、授权和计费，通常为RADIUS（Remote Authentication Dial-In User Service，远程认证拨号用户服务）服务器。</p>
+<p>下图为福建农林大学的校园网拓扑图<br><img src="http://7nar5o.com1.z0.glb.clouddn.com/FAFU.PNG" alt=""><br>1.未认证的计算机不分配IP地址，可以在局域网内访问校内网站<br>2.认证的免费校内域可以访问教育网网段<br>3.认证的收费宿舍网可以访问所有网段</p>
+<h2 id="802-1X的认证方式">802.1X的认证方式</h2><p>802.1X认证系统使用EAP（Extensible Authentication Protocol，可扩展认证协议），来实现客户端、设备端和认证服务器之间认证信息的交换。</p>
+<p>1.在客户端与设备端之间，EAP协议报文使用EAPOL封装格式，直接承载于LAN环境中。</p>
+<p>2.在设备端与RADIUS服务器之间，可以使用两种方式来交换信息。一种是EAP协议报文由设备端进行中继，使用EAPOR（EAP over RADIUS）封装格式承载于RADIUS协议中；另一种是EAP协议报文由设备端进行终结，采用包含PAP（Password Authentication Protocol，密码验证协议）或CHAP（Challenge Handshake Authentication Protocal，质询握手验证协议）属性的报文与RADIUS服务器进行认证交互。</p>
+<h2 id="802-1X的基本概念">802.1X的基本概念</h2><h3 id="受控/非受控端口">受控/非受控端口</h3><p>设备端为客户端提供接入局域网的端口，这个端口被划分为两个逻辑端口：受控端口和非受控端口。任何到达该端口的帧，在受控端口与非受控端口上均可见。</p>
+<p>1.非受控端口始终处于双向连通状态，主要用来传递EAPOL协议帧，保证客户端始终能够发出或接收认证报文。</p>
+<p>2.受控端口在授权状态下处于双向连通状态，用于传递业务报文；在非授权状态下禁止从客户端接收任何报文。</p>
+<h3 id="授权/非授权状态">授权/非授权状态</h3><p>设备端利用认证服务器对需要接入局域网的客户端执行认证，并根据认证结果（Accept或Reject）对受控端口的授权/非授权状态进行相应地控制。</p>
+<p>图中显示了受控端口上不同的授权状态对通过该端口报文的影响。图中对比了两个802.1X认证系统的端口状态。系统1的受控端口处于非授权状态（相当于端口开关打开），系统2的受控端口处于授权状态（相当于端口开关关闭）。<br><img src="http://www.h3c.com.cn/res/200905/20/20090520_766383_image002_624138_30003_0.png" alt=""></p>
+<p>用户可以通过在端口下配置的接入控制的模式来控制端口的授权状态。端口支持以下三种接入控制模式：<br>1.强制授权模式（authorized-force）：表示端口始终处于授权状态，允许用户不经认证授权即可访问网络资源。<br>2.强制非授权模式（unauthorized-force）：表示端口始终处于非授权状态，不允许用户进行认证。设备端不对通过该端口接入的客户端提供认证服务。<br>3.自动识别模式（auto）：表示端口初始状态为非授权状态，仅允许EAPOL报文收发，不允许用户访问网络资源；如果认证通过，则端口切换到授权状态，允许用户访问网络资源。这也是最常见的情况。</p>
+<h3 id="受控方向">受控方向</h3><p>在非授权状态下，受控端口可以被设置成单向受控和双向受控。<br>1.实行双向受控时，禁止帧的发送和接收；<br>2.实行单向受控时，禁止从客户端接收帧，但允许向客户端发送帧。</p>
+<h2 id="802-1X的认证触发方式">802.1X的认证触发方式</h2><p>802.1X的认证过程可以由客户端主动发起，也可以由设备端发起。设备支持的认证触发方式包括以下两种：<br>1.客户端主动触发方式<br>客户端主动向设备端发送EAPOL-Start报文来触发认证，该报文目的地址为IEEE 802.1X协议分配的一个组播MAC地址：01-80-C2-00-00-03。<br>另外，由于网络中有些设备不支持上述的组播报文，使得认证设备无法收到客户端的认证请求，因此设备端还支持广播触发方式，即，可以接收客户端发送的目的地址为广播MAC地址的EAPOL-Start报文。这种触发方式需要H3C iNode的802.1X客户端的配合。<br>2.设备端主动触发方式<br>设备会每隔N秒（例如30秒）主动向客户端发送EAP-Request/Identity报文来触发认证，这种触发方式用于支持不能主动发送EAPOL-Start报文的客户端，例如Windows XP自带的802.1X客户端。</p>
+<h2 id="802-1X的认证过程">802.1X的认证过程</h2><p>802.1X系统支持EAP中继方式和EAP终结方式与远端RADIUS服务器交互完成认证。以下关于两种认证方式的过程描述，都以客户端主动发起认证为例。</p>
+<h3 id="EAP中继方式">EAP中继方式</h3><p>这种方式是IEEE 802.1X标准规定的，将EAP（可扩展认证协议）承载在其它高层协议中，如EAP over RADIUS，以便扩展认证协议报文穿越复杂的网络到达认证服务器。一般来说，EAP中继方式需要RADIUS服务器支持EAP属性：EAP-Message和Message-Authenticator，分别用来封装EAP报文及对携带EAP-Message的RADIUS报文进行保护。</p>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766389_image008_624138_30003_0.png" alt=""></p>
+<p>认证过程如下：<br>(1)当用户有访问网络需求时打开802.1X客户端程序，输入已经申请、登记过的用户名和密码，发起连接请求（EAPOL-Start报文）。此时，客户端程序将发出请求认证的报文给设备端，开始启动一次认证过程。<br>(2)设备端收到请求认证的数据帧后，将发出一个请求帧（EAP-Request/Identity报文）要求用户的客户端程序发送输入的用户名。<br>(3)客户端程序响应设备端发出的请求，将用户名信息通过数据帧（EAP-Response/Identity报文）发送给设备端。设备端将客户端发送的数据帧经过封包处理后（RADIUS Access-Request报文）送给认证服务器进行处理。<br>(4)RADIUS服务器收到设备端转发的用户名信息后，将该信息与数据库中的用户名表对比，找到该用户名对应的密码信息，用随机生成的一个加密字对它进行加密处理，同时也将此加密字通过RADIUS Access-Challenge报文发送给设备端，由设备端转发给客户端程序。<br>(5)客户端程序收到由设备端传来的加密字（EAP-Request/MD5 Challenge报文）后，用该加密字对密码部分进行加密处理（此种加密算法通常是不可逆的），生成EAP-Response/MD5 Challenge报文，并通过设备端传给认证服务器。<br>(6)RADIUS服务器将收到的已加密的密码信息（RADIUS Access-Request报文）和本地经过加密运算后的密码信息进行对比，如果相同，则认为该用户为合法用户，反馈认证通过的消息（RADIUS Access-Accept报文和EAP-Success报文）。<br>(7)设备收到认证通过消息后将端口改为授权状态，允许用户通过端口访问网络。在此期间，设备端会通过向客户端定期发送握手报文的方法，对用户的在线情况进行监测。缺省情况下，两次握手请求报文都得不到客户端应答，设备端就会让用户下线，防止用户因为异常原因下线而设备无法感知。<br>(8)客户端也可以发送EAPOL-Logoff报文给设备端，主动要求下线。设备端把端口状态从授权状态改变成未授权状态，并向客户端发送EAP-Failure报文。</p>
+<h3 id="EAP终结方式">EAP终结方式</h3><p>这种方式将EAP报文在设备端终结并映射到RADIUS报文中，利用标准RADIUS协议完成认证、授权和计费。设备端与RADIUS服务器之间可以采用PAP或者CHAP认证方法。</p>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766390_image009_624138_30003_0.png" alt=""></p>
+<p>EAP终结方式与EAP中继方式的认证流程相比，不同之处在于用来对用户密码信息进行加密处理的随机加密字由设备端生成，之后设备端会把用户名、随机加密字和客户端加密后的密码信息一起送给RADIUS服务器，进行相关的认证处理。</p>
+<h2 id="802-1X的接入控制方式">802.1X的接入控制方式</h2><p>设备不仅支持协议所规定的基于端口的接入认证方式，还对其进行了扩展、优化，支持基于MAC的接入控制方式。</p>
+<p>1.当采用基于端口的接入控制方式时，只要该端口下的第一个用户认证成功后，其它接入用户无须认证就可使用网络资源，但是当第一个用户下线后，其它用户也会被拒绝使用网络。</p>
+<p>2.采用基于MAC的接入控制方式时，该端口下的所有接入用户均需要单独认证，当某个用户下线时，也只有该用户无法使用网络。</p>
+<h2 id="802-1X的定时器">802.1X的定时器</h2><p>802.1X认证过程中会启动多个定时器以控制接入用户、设备以及RADIUS服务器之间进行合理、有序的交互。802.1X的定时器主要有以下几种<br>：<br>1.用户名请求超时定时器（tx-period）：该定时器定义了两个时间间隔。其一，当设备端向客户端发送EAP-Request/Identity请求报文后，设备端启动该定时器，若在tx-period设置的时间间隔内，设备端没有收到客户端的响应，则设备端将重发认证请求报文；其二，为了兼容不主动发送EAPOL-Start连接请求报文的客户端，设备会定期组播EAP-Request/Identity请求报文来检测客户端。tx-period定义了该组播报文的发送时间间隔。</p>
+<p>2.客户端认证超时定时器（supp-timeout）：当设备端向客户端发送了EAP-Request/MD5 Challenge请求报文后，设备端启动此定时器，若在该定时器设置的时长内，设备端没有收到客户端的响应，设备端将重发该报文。</p>
+<p>3.认证服务器超时定时器（server-timeout）：当设备端向认证服务器发送了RADIUS Access-Request请求报文后，设备端启动server-timeout定时器，若在该定时器设置的时长内，设备端没有收到认证服务器的响应，设备端将重发认证请求报文。</p>
+<p>4.握手定时器（handshake-period）：此定时器是在用户认证成功后启动的，设备端以此间隔为周期发送握手请求报文，以定期检测用户的在线情况。如果配置发送次数为N，则当设备端连续N次没有收到客户端的响应报文，就认为用户已经下线。</p>
+<p>5.静默定时器（quiet-period）：对用户认证失败以后，设备端需要静默一段时间（该时间由静默定时器设置），在静默期间，设备端不处理该用户的认证请求。</p>
+<p>6.周期性重认证定时器（reauth-period）：如果端口下开启了周期性重认证功能，设备端以此定时器设置的时间间隔为周期对该端口在线用户发起重认证。</p>
+<h2 id="EAPOL消息的封装">EAPOL消息的封装</h2><p>1.EAPOL数据包的格式<br>EAPOL是802.1X协议定义的一种报文封装格式，主要用于在客户端和设备端之间传送EAP协议报文，以允许EAP协议报文在LAN上传送。</p>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766384_image003_624138_30003_0.png" alt=""></p>
+<p>PAE Ethernet Type：表示协议类型，为0x888E。<br>Protocol Version：表示EAPOL帧的发送方所支持的协议版本号。<br>Type：表示EAPOL数据帧类型，目前设备上支持的数据类型见下表。</p>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/EAPOL数据类型.PNG" alt=""></p>
+<p>Length：表示数据长度，也就是“Packet Body”字段的长度，单位为字节。如果为0，则表示没有后面的数据域。<br>Packet Body：表示数据内容，根据不同的Type有不同的格式。</p>
+<p>2.EAP数据包的格式<br>802.1x定义了接入设备与介入端口间点到点的连接方式，为了建立点与点之间的连接通信，PPP协议必须要发送LCP数据包来对该数据链路进行配置。而EAPOL就是PPP的一个扩展认证协议。所以该协议的格式规范必须了解，那么EAPOL协议的格式规范在下面介绍。<br>典型的PPP协议帧格式为下图：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741000732040.png" alt=""></p>
+<p>当PPP帧protocol字段域填充类型表明C227类型时，即表明封装的是PPP EAP数据包，也应用着扩展认证协议EAP。所以在information字段域内是封装的EAP报文格式。一个典型的EAP认证报文过程分为request，response，success或failure阶段。每个阶段报文传送都由information域所携带的EAP报文来承担。</p>
+<p>当EAPOL数据包格式Type域为EAP-Packet时，Packet Body为EAP数据包结构</p>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766385_image004_624138_30003_0.png" alt=""></p>
+<p>EAP报文的格式为：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741009954954.png" alt=""></p>
+<p>1.Code：指明EAP包的类型，共有4种：Request、Response、Success、Failure。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741015261284.png" alt=""></p>
+<p>Code=1和2的情形下，Type又有多种选择:</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741015261284.png" alt=""></p>
+<p>Code=3和4的情形下，只回答成功或失败。</p>
+<p>2.Identifier字段域<br>主要完成request和response的匹配，即一对正确配对的request和response的识别字段域是标号相同的。</p>
+<p>3.Length字段域<br>Length域为两个字节，表明EAP数据包从头到尾的所有长度，超出Length域的字节应视为数据链路层填充，在接受时被忽略到。这个信息很重要！</p>
+<p>4.Data字段域<br>    1.Success和Failure类型的包没有Data域，相应的Length域的值为4。<br>    2.Request和Response类型数据包的Data域的格式如图 所示。Type为EAP的认证类型，Type data的内容由类型决定。例如，Type值为1时代表Identity，用来查询对方的身份；Type值为4时，代表MD5-Challenge，类似于PPP CHAP协议，包含质询消息。</p>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766386_image005_624138_30003_0.png" alt=""></p>
+<p>Identifier：用于匹配Request消息和Response消息。<br>Length：EAP包的长度，包含Code、Identifier、Length和Data域，单位为字节。<br>Data：EAP包的内容，由Code类型决定。</p>
+<h2 id="EAP属性的封装">EAP属性的封装</h2><p>RADIUS为支持EAP认证增加了两个属性：EAP-Message（EAP消息）和Message-Authenticator（消息认证码）。</p>
+<ol>
+<li>EAP-Message<br>这个属性用来封装EAP数据包，类型代码为79，String域最长253字节，如果EAP数据包长度大于253字节，可以对其进行分片，依次封装在多个EAP-Message属性中。</li>
+</ol>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766387_image006_624138_30003_0.png" alt=""></p>
+<ol>
+<li>Message-Authenticator<br>如图 7所示，这个属性用于在使用EAP、CHAP等认证方法的过程中，避免接入请求包被窃听。在含有EAP-Message属性的数据包中，必须同时也包含Message-Authenticator，否则该数据包会被认为无效而被丢弃。</li>
+</ol>
+<p><img src="http://www.h3c.com.cn/res/200905/20/20090520_766388_image007_624138_30003_0.png" alt=""></p>
+<h1 id="各类型EAPOL结构">各类型EAPOL结构</h1><h2 id="EAPOL-Start">EAPOL-Start</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">组播地址：01 80 c2 00 00 03</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：01表示请求连接，02表示请求断开</td>
+</tr>
+</tbody>
+</table>
+<h2 id="交换机请求用户名（或维持链路请求包，1包/15秒）">交换机请求用户名（或维持链路请求包，1包/15秒）</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">目标MAC（主机）</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC（交换机）</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：00</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 05</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Code：01：请求，02：回复，03：成功，04：失败</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">标识：从01开始，每成功收发一次，自动加一，到FF后清零重新开始</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 05</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Type：14</td>
+</tr>
+</tbody>
+</table>
+<h2 id="响应请求用户名">响应请求用户名</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">目标MAC（交换机）</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC（主机）</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：00</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 1a</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Code：01：请求，02：回复，03：成功，04：失败</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">标识：从01开始，每成功收发一次，自动加一，到FF后清零重新开始</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 1a</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Type：01 (identifier)</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">IP：15 04  +  IP （10.7.2.75—0a 07 02 4b）</td>
+</tr>
+<tr>
+<td>n字节（n为用户名长度）</td>
+<td style="text-align:center">用户名：lgh@0806.com.cn—6c 67 68 40 30 38 30 36 2e 63 6f 6d 2e 63 6e</td>
+</tr>
+</tbody>
+</table>
+<h2 id="交换机请求密码">交换机请求密码</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">目标MAC（主机）</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC（交换机）</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：00</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 16</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Code：01：请求，02：回复，03：成功，04：失败</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">标识：从01开始，每成功收发一次，自动加一，到FF后清零重新开始</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 16</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Type：04 （MD5-Challenge）</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">数据长度：10</td>
+</tr>
+<tr>
+<td>16字节</td>
+<td style="text-align:center">数据：MD5要用到的16个字节数据（命名为Data_md5），交换机随机生成的</td>
+</tr>
+</tbody>
+</table>
+<h2 id="响应请求密码">响应请求密码</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">目标MAC（交换机）</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC（主机）</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：00</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：10（16个字节的MD5校验码） + n（用户名长度）+ 06</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Code：01：请求，02：回复，03：成功，04：失败</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">标识：从01开始，每成功收发一次，自动加一，到FF后清零重新开始</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：10（16个字节的MD5校验码） + n（用户名长度）</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Type：04 （MD5-Challenge）</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">MD5校验码长度：10</td>
+</tr>
+<tr>
+<td>16字节</td>
+<td style="text-align:center">MD5校验码：（标识＋密码＋Data_md5）的MD5校验</td>
+</tr>
+<tr>
+<td>ｎ字节</td>
+<td style="text-align:center">用户名</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Success">Success</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">目标MAC（主机）</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC（交换机）</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：00</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 04</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Code：01：请求，02：回复，03：成功，04：失败</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">标识：从01开始，每成功收发一次，自动加一，到FF后清零重新开始</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 04</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Failure">Failure</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">目标MAC（主机）</td>
+<td></td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC（交换机）</td>
+<td></td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+<td></td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+<td></td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：00</td>
+<td></td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 07</td>
+<td></td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Code：01：请求，02：回复，03：成功，04：失败</td>
+<td></td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">标识：从01开始，每成功收发一次，自动加一，到FF后清零重新开始</td>
+<td></td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 07</td>
+<td></td>
+</tr>
+<tr>
+<td>3字节</td>
+<td style="text-align:center">08 01 08（08 01 00）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="响应维持链路包">响应维持链路包</h2><table>
+<thead>
+<tr>
+<th>字节</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">目标MAC（交换机）</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">源MAC（主机）</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">协议：88 8e</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">版本：01</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">包类型：00</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 1b</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Code：01：请求，02：回复，03：成功，04：失败</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">标识：从01开始，每成功收发一次，自动加一，到FF后清零重新开始</td>
+</tr>
+<tr>
+<td>2字节</td>
+<td style="text-align:center">包长度：00 1b</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">Type：14 (generic token_card type)</td>
+</tr>
+<tr>
+<td>1字节</td>
+<td style="text-align:center">00</td>
+</tr>
+<tr>
+<td>6字节</td>
+<td style="text-align:center">IP：15 04  +  IP （10.7.2.75—0a 07 02 4b）</td>
+</tr>
+<tr>
+<td>n字节(n为用户名长度)</td>
+<td style="text-align:center">用户名：lgh@0806.com.cn—6c 67 68 40 30 38 30 36 2e 63 6f 6d 2e 63 6e</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="校园网认证的研究现状">校园网认证的研究现状</h1><h2 id="清华的802-1x校园网认证">清华的802.1x校园网认证</h2><p>802.1x校园网认证年初，清华大学做了一个校园网运行与管理的相关报告，其中指出该校想采取802.1x接入，但是选择何种具体实现方式需要考虑。如使用触发方式，但流量不易通过，启动过程比较慢。使用不加修改的阀门端，也正是我上章节所说的，只要搞定了RADIUS自动地帮你处理后续事情，也就是阀门端只起到代理传递的作用，没有做安全管理。<br><img src="http://images.cnitblog.com/blog/613080/201501/161741029799527.png" alt=""></p>
+<h2 id="北大的802-1x校园网认证">北大的802.1x校园网认证</h2><p>该校也在2008年初的校园网认证论坛提出基于IP控制网关的认证，基于透明网关的思路，北京大学自行开发了千兆的控制网关，简称工作在千兆网络中，年在北大部署，后在中国农业大学和北京地质大学等十多所高校实际运行。虽然该通过软件实现，适应于通用开放平台，但是我在年末在北大登陆账号时，听同学说过有客户端，但也可以通过网页登陆，想必现在的认证方式更加复杂和多元了。</p>
+<p>802.1x系统是两者相结合的，同时运行在校园网内，主要框架结构为下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741039487456.png" alt=""></p>
+<p>两者结合的目的在于用户只需”一次认证”就能够进行802.1x认证，完成校内资源和校外资源的透明过渡，用户察觉不到内网和外网的分别。</p>
+<h2 id="iNode校园网认证">iNode校园网认证</h2><p>上述各类认证在吐槽和破解的程度上都不如iNode，大家搜搜iNode，就看到百度贴吧里面的题目是有多么恨这个软件了，还有的发了邮件到工信部投诉区投诉去了。也可以认为iNode几乎在东南方高校市场很常见，当然了西安电子科大，财经院校也用这个，很多院校都采用iNode客户端。想必是这个软件引起了很多同学的不舒服，难怪激起了那么多人的逆向工作，此消彼长的升级和破解对抗，促成了如今的局面。</p>
+<p>iNode智能客户端是一款强大的windows多业务接入客户端软件。该软件为用户提供802.1xPortal等多种认证方式，可以与以太网交换机、路由器、网关等网络设备共同组网，实现对宽带接入、接入和无线接入的用户认证，从而大幅度提高网络的整体安全。</p>
+<h1 id="iNode协议逆向实践">iNode协议逆向实践</h1><p>iNode逆向工作研究现状各校应该联合最广大的程序员阶级，对本校的校园网客户端作出研究分析，同时向他们和它们致敬，他们是攻击者，它们是防御者，没有了对手何来斗争的快乐。现最为著名者，为南京工程学院802.1x项目，该项目目的为逆向分析iNode客户端认证过程，重新编写相关程序，往好了说就是写一个替代品程序，以便实现计算机的其他功能，如双网卡或开等。往坏了说就是做了一个程序欺骗认证服务器。网址参见资料项目引用了sourceforgegithub项目分支，其中下图我截屏了github上的代码分支，显示了部分人员的参与代码修改工作，大约几十人参与到其中。<br><img src="http://images.cnitblog.com/blog/613080/201501/161741065587387.png" alt=""></p>
+<h2 id="iNode协议的实际过程">iNode协议的实际过程</h2><p>在实际情况中，首先我们打开计算机，接通电缆，然后打开iNode运行客户端，通过认证之后，服务器授权，最后我们可以连接互联网。此时我们再次把前面的那幅图搬过来，放在了本段落的上面，因为这很重要。根据上面这幅图，虽然为802.1x的标准体系，华为iNode认证过程也遵循着主要流程，但是在具体处理和报文细节上有所不同，有它独特的地方。<br>抓包分析，对应上面红色区域的包情形如下图所示。<br><img src="http://images.cnitblog.com/blog/613080/201501/161741091989860.png" alt=""></p>
+<p>上图红色区域的编号为恰好对应着802.1x体系的基本流程。那么我们针对这几个流程包作深入分析。我们将此划分为三个部分，第一个部分是55start64success部分，第二个是56request57response部分，第三个是编号部分。</p>
+<h2 id="StartSuccess数据包部分">StartSuccess数据包部分</h2><p>该两个数据包标志着认证开始和结束。这里是本机用广播方式呼叫边缘路由器，即呼叫阀门端，当阀门端听见后，随即响应本机。广播方式的开始包内容如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741091989860.png" alt=""><br>结束成功标志包内容如下：<br><img src="http://images.cnitblog.com/blog/613080/201501/161741091989860.png" alt=""></p>
+<p>对照一下上图可以看到，例如success<br>START包，观察红色方框围住的区域，是以太网封装EAPOL的类型，后面紧接着的是版本号，再后面的，指的是发起帧，最后两个是长度字段域，指明后面还有没有负载。既然长度字段域为，则表明后面负载没有东西。<br><img src="http://images.cnitblog.com/blog/613080/201501/161741140585679.png" alt=""><br>success包，红色框围住的部分前面内容是<code>01 00 00 04</code>就是标志着后面封装内容有个字节。那么红色框围住的部分就是封装的<code>f0 de f1</code>和后面三个字节被红色抹除的六个字节为本机<code>0c da 41</code>及其后面三个字节被红色抹除的六个字节为阀门端的<code>03 02 00 04</code>包的内容。域为成功，编号，最后标志着包长度为个字节。说明整个认证过程内的数据包认为是的数据流，以便同者进行统一处理。而包后还有填充零，可以参看文献资料，以太网协议标准规定对于10Mbps以太网的一帧最小发送时间必须为51.2us，被称为以太网时隙，转换为最小长度则为字节。因此若包长不足，则填充填充符补齐。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741148087308.png" alt=""></p>
+<h2 id="请求认证和认证响应">请求认证和认证响应</h2><p>由于我们本机在呼叫阀门端，阀门端听到后，则阀门端响应本机，响应本机的内容就是阀门端的请求包，该请求包内容细节如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741155892479.png" alt=""><br>上图红色框围住部分是封装的数据包，封装含义可以看上图中含有。该请求帧的发出，标志着我们服务器开始让我们填写”申请表”，准备连接互联网。<br>我们填写好”申请表”后，则进行响应，这是最为关键和重要的一步。在这里华为作出了他自己的改动和变化，以太网的控制信息细节一般都不敢改动，因为企业设备如果具备良好的市场推广，首先要符合广大协议标准。而后封装的控制信息头也不敢改动，所以改动的文章只能作在后面的有效载荷上，在有效载荷上使用解析重构，匹配是否符合自己的规则，达到认证目的。那么响应包细节如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741164019594.png" alt=""><br>上图蓝色围住的部分就是封装的包，其中控制信息头有02 01 00 32 01，标志着全体从头到尾有个字节的长度。而这个字节的长度包含了控制信息头个字节，剩下的个字节究竟封装了什么？上图看不清，我截了一个清晰的图。<br><img src="http://images.cnitblog.com/blog/613080/201501/161741168088652.png" alt=""><br>红色框围住部分不清楚，蓝色围住部分也不清楚，黑色围住部分还是不清楚，就是最后个字符很清楚因为那是我的姓名全拼，该死的校园网宁愿对某些东西加密，居然连账户名都不愿加密，竟然明文传输？（当然说句公道话，上网密码还是加密了。）所以这个工作要交给软件逆向工程的童鞋去完成，发现这些字节的含义。当然了观察黑色框围住的编码模式，可以猜出是做了某些编码（黑色框围住部分最后出现的等号或许是一个特征），只不过通过软件逆向工程可以更加清晰和有效地发现编码模式，因为该编码模式与互联网上公开的编码模式还不太一样，是华为自己设计的一些加密模式。这部分内容会在iNode逆向分析章节，即小节详细论述，基本是前辈先驱的工作成果，小子只是当个传声筒。</p>
+<h2 id="MD5加密请求和响应">MD5加密请求和响应</h2><p>上面请求认证和认证响应的称谓不准确，实际上一小节的两个小包是版本查询包（所以上一小节的最后一张图黑色编码是对此类的加密），验证正确后，则进行本MD5的请求和响应操作，主要验证的是上网密码是否正确。一旦密码正确，则可获得认证授权。</p>
+<p>MD5援引百度百科，它是让大容量信息在用数字签名软件签署私人密匙前，被”压缩”成一种保密的格式（就是把一个任意长度的字节串变换成一定长的大整数）。不管是MD2、MD4还是MD5，它们都需要获得一个随机长度的信息并产生一个128位的信息摘要。虽然这些算法的结构或多或少有些相似，但MD2的设计与MD4和MD5完全不同，那是因为MD2是为8位机器做过设计优化的，而MD4和MD5却是面向32位的电脑。</p>
+<p>MD5是一个安全的散列算法。通过输入两个不同的明文，经过MD5算法处理后，不会得到相同的输出值，并且输出值不能返回头得到原始的明文，即其过程不可逆；所以要解密MD5没有现成的算法，只能用穷举法，把可能出现的明文，用MD5算法散列之后，把得到的散列值和原始的数据形成一个一对一的映射表，通过比在表中比破解密码的MD5算法散列值，通过匹配从映射表中找出破解密码所对应的原始明文。这是目前的穷举法。</p>
+<p>下图为阀门端向本机的请求MD5验证的请求包。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741175428809.png" alt=""></p>
+<p>为后续iNode的逆向分析做准备，首先我们要了解MD5加密算法的原理，其原理过程为：</p>
+<p>（1）算法输入：是一个字节串，即每8bit的串。</p>
+<p>（2）算法第一步：先对输入数据补位，使得数据长度对64字节求余结果是56个字节。补位方法是先补一个置位为1的单比特内容，然后继续填充置位为0的比特序列。</p>
+<p>（3）算法第二步：在完成上述数据补位操作后满足第一步的数据求余标准，再对该数据附加一个额外序列，即还要在补一些东西。该额外序列的长度为64bit长。</p>
+<p>小结：经过第一步和第二步，我们可以发现最终的数据长度可以被表达为：</p>
+<p>数据长度 = (N <em> 64Bytes) + 56Bytes + 8Bytes = (N + 1) </em> 64Bytes</p>
+<p>即长度最终是64字节的整数倍，这样做的原因时满足后续处理的需要和要求。</p>
+<p>（4）算法第三步：定义算法的四个条件变量，分别为A，B，C，D四个字变量。其中四个变量为：</p>
+<p>A = 0x01234567 B = 0x89abcedf C = 0xfedcba98 D = 0x76543210</p>
+<p>看到这里是不是有一些iNode（或称华为公司）在版本号上处理的影子？也是正反双序的初始化。</p>
+<p>部分文章提醒注意这里的变量是低位在前，高位在后。故在写程序的时候不是上面这样的写法。</p>
+<p>（5）算法第四步：定义算法的四个转换函数，分别为F函数，G函数，H函数，I函数，XYZ分别为三个4字节整数。下面是四个非线性的转换函数，可能是造成不可逆的重要原因。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741181365923.png" alt=""></p>
+<p>（6）算法第五步：主要是做变换。我们输入的数据通过我们补齐成为(N+1)64Bytes长度，所以一定是64个字节的倍数。我们将补齐后的数据以64字节为单位划分为组，肯定有N+1组。每组做一次循环，每次循环做四轮操作。我们先讨论第一组，因为后面第二组，直到N+1组处理方式是一样的。</p>
+<p>第一组64字节内容，分成16个4字节的数组M[0]到M[15]表示，每个M单元存储4个字节，即存着输入后被补齐的数据的第一组32bit内容。然后定义常数T，如何取常数，算法定义为T[i]=2^32 * abs(sin(i))，其中前面是2的32次方，后面是正弦函数的取值，i是弧度，取值从1到64选择。最后的T[i]取32bit长度的整数部分，去掉小数。定义变换算子如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741187454510.png" alt=""></p>
+<p>以第一组的16个4字节M组为例，做第一轮变换，变换步骤如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741191513568.png" alt=""></p>
+<p>第二轮变换步骤如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741195895167.png" alt=""></p>
+<p>第三轮变换步骤如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741200736483.png" alt=""></p>
+<p>第四轮变换步骤如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741210424412.png" alt=""></p>
+<p>最后做合并操作如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741224796885.png" alt=""></p>
+<p>在以第一组得到了AA，BB，CC，DD内容（请注意AA不是指A与A连接，它只是个变量名称而已），以DD’CC’BB’AA的顺序连接起来，输出的则为第一组的结果内容，显然长度为32bit×4=128bit。以上部分递归细节由于网络上有些不清楚，我自己重新写了一些，细节上可能不同，但是意思本质是一样的。</p>
+<h2 id="版本查询包的解密工作">版本查询包的解密工作</h2><p>上节已提及，版本查询包黑色方框围住的部分，产生了如下的编码和我的上网帐户名：<br>    bGBeTUpXN3cuTEgycQV5foKo5pw=’\space\space’t<em>*s</em>y*<br>观察等号猜测可能为base64编码，具体如何编码可能与公开标准不同，这里thorqqAGanNo2做了大量的反编译工作，没有他们在反编译层次的观察和解析，是不可能分析加密编码的，并且两位先驱在不同版本号的情形下做了大量工作，bitdust则他们的工作后发现了版本下的版本号加密密钥。<br>观察等号猜测可能为base64编码，具体如何编码可能与公开标准不同，这里thorqq和AGanNo2做了大量的反编译工作，没有他们在反编译层次的观察和解析，是不可能分析加密编码的，并且两位先驱在不同版本号的情形下做了大量工作，bitdust则他们的工作后发现了v5版本下的版本号加密密钥。</p>
+<p>有前辈做了反编译工作，分析了两类数据包的大概结构，一个是response的版本号加密，还有一个是心跳包在线检测结构。心跳包为检测用户是否在线，时不时来一个包探测一下，PC再答复以表明在线。</p>
+<p>下面为response版本号查询包结构</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef struct UsernameFrm</span><br><span class="line">&#123;</span><br><span class="line">PKTHDR Hdr;</span><br><span class="line">u_char8 Unknown1<span class="attr_selector">[2]</span>; <span class="comment">//0x15,0x04</span></span><br><span class="line">u_char8 Ip<span class="attr_selector">[4]</span>;</span><br><span class="line">u_char8 Unknown2<span class="attr_selector">[2]</span>; <span class="comment">//0x06,0x07</span></span><br><span class="line">u_char8 Base64<span class="attr_selector">[30]</span>;</span><br><span class="line">u_char8 Username<span class="attr_selector">[20]</span>;<span class="comment">//假定用户名不会超过</span></span><br><span class="line">&#125;USERNAMEFRM, *PUSERNAMEFRM;</span><br></pre></td></tr></table></figure>
+<p>对照下面的response查询包内部细节图</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741233702557.png" alt=""><br>由前辈的反编译工作可知红色框围住的部分为<code>15 04 0a 68 7e 3c</code>，其中<code>15 04</code>是固定字段，说明是华为自定义设计的，该指令污点执行也没能获得其语义。<code>0a 68 7e 3c</code>则是ip地址，也就是我们打开iNode运行连接，通过验证之后，iNode提示你的：您当前地址是多少多少。如果是0a 68 7e 3c则表明当时抓包ip地址为局域网10.104.126.60。于是陷入了一个新的问题，也和bitdust讨论了，ip怎么会在接入认证就已经有了的问题，果然是我没有学好计算机网络知识，通过请教M老师，DHCP进程自设备启动便可以启动服务，如果要抓这个DHCP，时机和骨干节点镜像很重要。</p>
+<p>蓝色方框围住的部分为06 07，根据结构体可知为固定字节，语义则也未知，猜测有两种情况，一是反编译得到了结果，但是前辈不敢发，否则侵权，界限很微妙，不允许提供反编译细节，可以提供作明显公开工具可以获得的信息，二是反编译没有得到语义信息结果。随后有30字节的base64编码，20字节的账户名字。先来吐槽一下30字节的base64编码，抓了几次包，发现都是28字节，然后两个空格补齐凑成30字节。看来还是要学习反编译的研究成果。再吐槽一下账户名20个字节一般是够用，他算准了双字复姓的每个字拼音也不会超过5个字母，不过在脑洞大开的时候，取个”仲长霜庄”这名字不行吗？拼音超过20字节了(=。=)(←_←) 查询一下12306的真实姓名填充，使用国内字符标准，以字符集表达姓名，12306提供20字节应该对于中国人是够了，20个汉字的中国名字毕竟是少之又少，但没有考虑到国外友人英文名字的感受[5]，那这就是你12306的字符边界不足了。既然被加密的部分是base64编码，则重点放在base64编码的解析上。</p>
+<h2 id="Base64">Base64</h2><p>上节已指出由AGanNo2等众多前辈反编译工作，发现了base64编码，有必要涉及到base64编码的基础引入。</p>
+<p>首先什么是base64编码，为什么要用这个编码？在七角WB老师的课程上曾经讲到过Base64的编码知识，该编码使用64个明文来编码任意的二进制文件。在链路层或物理层等比特流透明传输特点下，部分二进制流内的填充序列因与控制信息命令内容重复，可能会导致解包冲突，因此此类协议要么使用透明传输方法，即硬件上只要发现5个连续1，则立即填入一个0。或在软件上控制信息使用独立编码，并在有效载荷上作转义字符处理。早期的问题已经不是现在的问题，base64编码可以认为是历史的产物。早期处理透明传输的方式就有base64编码，既能够实现加密处理，当然了防君子不防小人，只是看不出内容，base64编码仍是可解的；又能够在早期Email处理问题上解决传输及效率问题，早期Email允许传送ASCII字符，但只是低七位，如果带有非ASCII字符，很有可能被网关强制置最高为0，导致解包产生问题。</p>
+<p>综上所述正是如此，才引入了base64编码加密，既能够很好保护邮件内容，又能够处理好控制信息与邮件内容不被设备的误处理。其主要原理为将每三个8bit字节转换为四个6bit字节，最后添加两位高位0补齐成为四个8bit字节内容。举个例子：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">转换前：aaaaaabb ccccdddd eeffffff </span><br><span class="line">转换后：<span class="number">00</span>aaaaaa <span class="number">00</span>bbcccc <span class="number">00</span>ddddee <span class="number">00</span>ffffff</span><br><span class="line">转换前的三个字节是原文，下面四个字节是转换后的内容。这里的abcdef请看成未知数，看成比特值，不是字符的意思。下面就做一个真实的表达（援引百度百科例子）：</span><br><span class="line">转换前：<span class="number">10101101</span> <span class="number">10111010</span> <span class="number">01110110</span></span><br><span class="line">转换后：<span class="number">00101011</span> <span class="number">00011011</span> <span class="number">00101001</span> <span class="number">00110110</span> （r <span class="tag">b</span> <span class="tag">q</span> <span class="number">2</span>）</span><br></pre></td></tr></table></figure>
+<p>请注意转换前的原文内容不一定是字符，可以是二进制文件，反复讲明的。Base64编码有自己的一套码表，转换后独立编码即可，根据独立编码可知转换后为的字符时rbq2。独立编码表如下：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741241369956.png" alt=""><br>当每三个字节补成四个字节，肯定是每三个去数，若三个一组不够的时候，余数肯定剩下一个或两个字节，如何处理？如果剩下一个字节，则为8bit，一般补上4个0即可，凑成了两个6bit。如果剩下两个字节，则为16bit，一般补上2个0即可，凑成了三个6bit。为表明是补齐的0，前者在翻译完独立码表后补上两个等号”=”，后者在翻译完独立码表后补上一个等号”=”表明自身的特殊情况。所以等号”=”一度成为base64的招牌动作。</p>
+<p>最后介绍iNode使用哪些要素参数来进行base64编码加密，iNode Base64编码过程如下图所示：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741248862586.png" alt=""><br>iNodebase64编码使用了几个要素（根据前人反编译工作得出，一开始时是不知道的）：<br>（1）随机数<br>（2）版本号<br>运算是异或逻辑运算。而异或运算的细节如下图所示：<br><img src="http://images.cnitblog.com/blog/613080/201501/161741248862586.png" alt=""><br>那么认证服务器是怎么解码的呢？如下图所示进行解码：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741255899200.png" alt=""></p>
+<p>首先要感谢A，T，刘群等几位前辈的反汇编工作才能得到这样的解密过程。然后要声明随机数由程序生成，我们实际使用的版本号肯定也不会是V2.40，因为每一个学校使用的客户端版本都可能不太一样，至少我们使用的iNode客户端是定制版的，连某某序号都要认证，看来是完整版，因为很多地方不需要某某序号认证。在我们软件版本号未知下，bitdust率先开辟地解出我校版本号密文，在他的指导下那么根据我自己的抓包结果，或许可以试试，我们既然已经获得我们的base64编码，则为bGBeTUpXN3cuTEgycQV5foKo5pw=，那么我们先做解码工作，看看版本号是多少，考虑该版本号已在网络上公开且流传很广，只是我们不知道恰恰是这个版本号成为了我们的使用版本，其中部分其他研究者都已经出具软件产品，甚至iNode的最新版已经高出我们使用版本很多了版次了，故可以公开讨论。下面我仅作解码工作，以验证和挖掘真正的固定密钥是什么，我使用的是python编程语言验证。</p>
+<p>在bitdust的多次建议下使用python做一下解码工作，正好加强python的学习。通过import base64的python模块得到了初步解码的序列，如下图所示（没截取完整，保证十六进制序列是完整的）：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741273084460.png" alt=""></p>
+<p>我们可以通过两个方面简单验证一下：</p>
+<p>（1）头三个\x6c \x60 \x5e的二进制序列如下：</p>
+<p><code>01101100``01100000``01011110</code></p>
+<p>转换为base64的头4个字节内容为：</p>
+<p><code>00011011``00000110``00000001``00011110</code></p>
+<p>翻译成base64独立码表字符为b G B e</p>
+<p>（2）按照每三个字节数，剩下0xe6，0x9c，故补齐一个等号即可。</p>
+<p>然后进行与公共密钥”HuaWei3COM1X”异或（此处正式声明HuaWei3COM1X密钥适用版本2.4，而非其他版本密钥，这里我使用的是符合我实际情况的版本号密钥，此密钥如何得来，也是反编译工作所得，本文考虑到某些因素，确实不便公开，网上实际上是有的，大神bitdust在其github源代码中给出了具体密钥，若想要可进入github。其他论坛中可以通过百度关键词搜索得到，本文也没有必要提供。），根据实际密钥做三次异或得到下面序列，如下图所示第[4]个输出，最后使用竖线隔开的最后四个字节是随机数。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741281363645.png" alt=""></p>
+<p>根据解密过程可知最后四个字节是生成的随机数，即0xce 0x某某 0xce 0x某某。</p>
+<p>为了验证正确性，只要做最后一步，与随机数作异或就可以得到版本号字符串了。首先提取出随机数，然后注意随机数转成字符，此时的转化与一般意义不同，具体细节可自行体会，编程过程中我绕了一个小时在这里，最后想明白了。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741285739946.png" alt=""></p>
+<p>待转随机数是十六进制序列，但是需要将十六进制下的表达符号一模一样地转化为字符，我的python编程方式是设置了字典，将0到f的十六进制一一对应转化。观察了大神的写法以后，python一句话格式化操作解决，佩服佩服！最后做完异或就得到了符合我实际使用的版本号，如下图所示。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741292459317.png" alt=""></p>
+<p>上述图片做了一些处理，若想知道全部版本号请参看github代码托管网站，liuqun及bitdust的分支，本博文因某些问题，不予提供，本文通过编写python脚本，验证版本号为CH V5.20-0407。通过查看软件帮助可知，恰好为版本号。（当然在逆向破解之前，不知道这个是版本查询包，直到破解出这个序列才明白原来response是为了加密版本号，以便查询之用。我在前面一节就引用了这个术语，是不妥的，有些误导，有些先入为主。）</p>
+<p>4.3.3MD5验证的解密工作</p>
+<p>若版本号查询包的交互状态结果，后面是进行MD5的验证工作，里面有什么参数，在一开始逆向分析时不清楚的。根据802.1x认证体系（不是实际情况，这里介绍一般情形），接下来出现的MD5过程主要是：</p>
+<p>认证服务器收到交换机转发上来的用户名信息后，将该信息与数据库中的用户名表相比对，找到该用户名对应的口令信息，认证服务器使用随机生成的加密字段对口令进行加密处理，返回MD5密文。</p>
+<p>我们的客户端收到后，使用加密字对口令部分进行MD5加密，响应认证服务器。服务器收到我们客户端的响应后，将送上来的加密后口令和服务器自己经过加密运算后的口令信息相比较，判断用户是否合法，回应认证成功或失败报文到接入设备。</p>
+<p>可以看到MD5加密使用的参数大致有：</p>
+<p>（1）口令信息（注：这里的口令不仅有上网账户名，也有上网密码）</p>
+<p>（2）随机数</p>
+<p>MD5先由认证服务器及阀门端发起请求request，然后我们个人客户端发起响应，过程如下图所示。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741300117718.png" alt=""></p>
+<p>然后我们查看服务器那边过来的请求包具体内容，如下图：</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741306363076.png" alt=""></p>
+<p>根据网上802.1x体系说明，按照一般情形是需要MD5加密，并携带加密密钥，以便对比。而实际情形援引前辈的文章总结，EAP-MD5是一种单向认证机制，即认证过程没有加密密钥的生成，则request数据包既是要求我们认证密码，并且里面的challenge字段是接头的暗号，我们使用上网和密码和challenge一起做MD5后响应即可。</p>
+<p>还有一张图是我们客户端响应服务器的数据包，由下图可见，我的上网账户名是明文传输，附在了密文后面，说明上网密码是被MD5加密了。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741315111976.png" alt=""></p>
+<p>在具体的逆向工作上，此时较为幸运，因为我们没有必要去破解MD5密钥，（因为我们没有必要偷别人的上网账号和密码），我们只要自己正常自制MD5包，完成与服务器的认证即可，这样替代品客户端既完成了上网连接的任务，又避免了占用大量内存和不能开wifi的问题（iNode原客户端占用内存较大，根据各位前辈写的替代品软件一般大小就只有1兆左右，而且还可以开wifi）。</p>
+<p>所以我们验证iNode的MD5过程是否可以有效复制，只需要把challenge的字段和我的上网密码做一下MD5，看得到的是不是这个MD5的response数据包里数值即可。下面是两串密文：</p>
+<p>request EAP-MD5 Value: 754865596e324163060723c8640a3b23</p>
+<p>response EAP-MD5 Value: 7795dd505a42740888e45866f438c8d4</p>
+<p>验证过程则应该将上行密文与上网密码结合，通过MD5则可得到下行密文，若成功得到，则说明可以成功复制数据包。通过Python 编程，可以实现HASH库调用，支持MD5加密操作。通过提取request数据包内value，然后将我的上网密码在前，value在后连在一起做md5，生成了7795开头的加密序列，对照response数据包，发现加密密文是一致的，说明该数据包可以仿制。如下图所示。</p>
+<p><img src="http://images.cnitblog.com/blog/613080/201501/161741323239091.png" alt=""></p>
+<p>由上图可知，数据包MD5验证成功，所以iNode的逆向编写工作接近尾声，可以开始逆写了。还有最后一个”鸡肋”的部分，就是心跳包部分。</p>
+<p>4.3.3心跳包的协议分析</p>
+<p>心跳包主要为检测用户是否在线，在2.1.3节或4.2节的经典流程图中的蓝色线框围住的部分，可以观察到心跳包实际上就是一个出出声，讲讲话，透透气的过程。为什么说鸡肋，在于认证服务器可能不管你出的什么声，不管你讲的什么话，没有管你透的什么气。只要是一句话，是一口气，就认为你是在线的。也就是说心跳包的制作可以随便填充什么序列，不管协议机制都可能通过验证。没有验证某某编号的时候，要么一开始就上不了线，要么上线后一直提示验证某某编号。后者现象证明心跳包即使没有验证某某编号也不会踢你下线。即只要通过两道Base64和MD5验证，就基本具备上网资格认定。</p>
+<p>当然，心跳包若认真的做认证，还是非常重要的一环节，就看各高校对校园网的认证程度有怎样的政策和态度了。如下图为一个心跳包，当然了服务器向个人PC发过来请求心跳包检测的请求报文我就没有截图了，那个包和success包很像。重点说一下我们iNode客户端如何回复心跳包请求的，即我们是如何发心跳包的。实际上还是做了一个base64编码，只不过有了新的密钥做成，还是相当于验证了一个版本号，没有难度。至于如何验证某某编号的，大家抓一下包就知道了，是否融入到心跳包中也可以做一个简单验证，这里限于已经到了近30页（太长则无法上传博客）的篇幅，就不给编程结果了。<br><img src="http://images.cnitblog.com/blog/613080/201501/161741331513979.png" alt=""></p>
+<h1 id="引用文献及网页">引用文献及网页</h1><p>1.本文修改至iNode协议逆向研究初步入门by tsy(<a href="http://www.cnblogs.com/bitpeach/p/4092806.html),作者为Bitpeach" target="_blank" rel="external">http://www.cnblogs.com/bitpeach/p/4092806.html),作者为Bitpeach</a></p>
+<p>2.802.1x协议解析，作者未知，猜测为thorqq前辈<br>华为802.1x技术白皮书或参看H3C 802.1x技术介绍的官方主页<br><a href="http://www.h3c.com.cn/Products___Technology/Technology/Security_Encrypt/Other_technology/Technology_recommend/200812/624138_30003_0.htm" target="_blank" rel="external">http://www.h3c.com.cn/Products___Technology/Technology/Security_Encrypt/Other_technology/Technology_recommend/200812/624138_30003_0.htm</a></p>
+<p>3.南京工程学院802.1x客户端<br><a href="http://wiki.ubuntu.org.cn/%E5%8D%97%E4%BA%AC%E5%B7%A5%E7%A8%8B%E5%AD%A6%E9%99%A2802.1X%E5%AE%A2%E6%88%B7%E7%AB%AF#.E5.BC.80.E5.8F.91.E5.9B.A2.E9.98.9F" target="_blank" rel="external">http://wiki.ubuntu.org.cn/%E5%8D%97%E4%BA%AC%E5%B7%A5%E7%A8%8B%E5%AD%A6%E9%99%A2802.1X%E5%AE%A2%E6%88%B7%E7%AB%AF#.E5.BC.80.E5.8F.91.E5.9B.A2.E9.98.9F</a></p>
+<p>4.CSDN博客，为什么以太网帧的长度最短64字节，最长1518字节。<br><a href="http://blog.csdn.net/rainertop/article/details/3020315" target="_blank" rel="external">http://blog.csdn.net/rainertop/article/details/3020315</a></p>
+<p>5.老外12306网站购票遇麻烦：名字超20个字符不能有空格<br><a href="http://www.yongshenme.com/zixun/0310/756.html" target="_blank" rel="external">http://www.yongshenme.com/zixun/0310/756.html</a></p>
+<p>6.使用xClient代替iNode 突破网卡限制自由分享Wi-Fi – 王谦 I just play主页<br><a href="http://www.ijustplay.cn/xclient/" target="_blank" rel="external">http://www.ijustplay.cn/xclient/</a></p>
+<p>7.工具及文档<br>链接: <a href="http://pan.baidu.com/s/1bnwdztH" target="_blank" rel="external">http://pan.baidu.com/s/1bnwdztH</a> 密码: qpuk</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Openwrt/"> #Openwrt </a>
+          
+            <a href="/tags/编译，H3C-inode/"> #编译，H3C inode </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/07/Image-Builder/">利用Image Builder编译Openwrt固件</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/07/TechCrash-001/">TechCrash#001：数控时代下的大工业制造</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/07/07/H3C-inode-Linux/"
+               data-title="民间H3C inode客户端黑历史" data-url="http://masukio.tk/2015/07/07/H3C-inode-Linux/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#802-1x认证机制及相关协议"><span class="nav-number">1.</span> <span class="nav-text">802.1x认证机制及相关协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#缩略语"><span class="nav-number">1.1.</span> <span class="nav-text">缩略语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#认证起源和作用"><span class="nav-number">1.2.</span> <span class="nav-text">认证起源和作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#802-1X的体系结构"><span class="nav-number">1.3.</span> <span class="nav-text">802.1X的体系结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#802-1X的认证方式"><span class="nav-number">1.4.</span> <span class="nav-text">802.1X的认证方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#802-1X的基本概念"><span class="nav-number">1.5.</span> <span class="nav-text">802.1X的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#受控/非受控端口"><span class="nav-number">1.5.1.</span> <span class="nav-text">受控/非受控端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#授权/非授权状态"><span class="nav-number">1.5.2.</span> <span class="nav-text">授权/非授权状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#受控方向"><span class="nav-number">1.5.3.</span> <span class="nav-text">受控方向</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#802-1X的认证触发方式"><span class="nav-number">1.6.</span> <span class="nav-text">802.1X的认证触发方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#802-1X的认证过程"><span class="nav-number">1.7.</span> <span class="nav-text">802.1X的认证过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EAP中继方式"><span class="nav-number">1.7.1.</span> <span class="nav-text">EAP中继方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EAP终结方式"><span class="nav-number">1.7.2.</span> <span class="nav-text">EAP终结方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#802-1X的接入控制方式"><span class="nav-number">1.8.</span> <span class="nav-text">802.1X的接入控制方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#802-1X的定时器"><span class="nav-number">1.9.</span> <span class="nav-text">802.1X的定时器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EAPOL消息的封装"><span class="nav-number">1.10.</span> <span class="nav-text">EAPOL消息的封装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EAP属性的封装"><span class="nav-number">1.11.</span> <span class="nav-text">EAP属性的封装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#各类型EAPOL结构"><span class="nav-number">2.</span> <span class="nav-text">各类型EAPOL结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EAPOL-Start"><span class="nav-number">2.1.</span> <span class="nav-text">EAPOL-Start</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交换机请求用户名（或维持链路请求包，1包/15秒）"><span class="nav-number">2.2.</span> <span class="nav-text">交换机请求用户名（或维持链路请求包，1包/15秒）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#响应请求用户名"><span class="nav-number">2.3.</span> <span class="nav-text">响应请求用户名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交换机请求密码"><span class="nav-number">2.4.</span> <span class="nav-text">交换机请求密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#响应请求密码"><span class="nav-number">2.5.</span> <span class="nav-text">响应请求密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Success"><span class="nav-number">2.6.</span> <span class="nav-text">Success</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Failure"><span class="nav-number">2.7.</span> <span class="nav-text">Failure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#响应维持链路包"><span class="nav-number">2.8.</span> <span class="nav-text">响应维持链路包</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#校园网认证的研究现状"><span class="nav-number">3.</span> <span class="nav-text">校园网认证的研究现状</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#清华的802-1x校园网认证"><span class="nav-number">3.1.</span> <span class="nav-text">清华的802.1x校园网认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#北大的802-1x校园网认证"><span class="nav-number">3.2.</span> <span class="nav-text">北大的802.1x校园网认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iNode校园网认证"><span class="nav-number">3.3.</span> <span class="nav-text">iNode校园网认证</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#iNode协议逆向实践"><span class="nav-number">4.</span> <span class="nav-text">iNode协议逆向实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#iNode协议的实际过程"><span class="nav-number">4.1.</span> <span class="nav-text">iNode协议的实际过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#StartSuccess数据包部分"><span class="nav-number">4.2.</span> <span class="nav-text">StartSuccess数据包部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求认证和认证响应"><span class="nav-number">4.3.</span> <span class="nav-text">请求认证和认证响应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MD5加密请求和响应"><span class="nav-number">4.4.</span> <span class="nav-text">MD5加密请求和响应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本查询包的解密工作"><span class="nav-number">4.5.</span> <span class="nav-text">版本查询包的解密工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Base64"><span class="nav-number">4.6.</span> <span class="nav-text">Base64</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引用文献及网页"><span class="nav-number">5.</span> <span class="nav-text">引用文献及网页</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>

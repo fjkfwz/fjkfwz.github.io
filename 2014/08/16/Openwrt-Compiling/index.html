@@ -1,0 +1,1549 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="Openwrt,编译," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> Openwrt编译入门 // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Openwrt编译入门
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2014-08-15
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Openwrt开发笔记/">Openwrt开发笔记</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2014/08/16/Openwrt-Compiling/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2014/08/16/Openwrt-Compiling/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：这篇文章是Openwrt编译的学习笔记包括（1）Openwrt基础入门（2）Openwrt基础进阶（3）集成软件<br><a id="more"></a></p>
+<hr>
+<p>之前总喜欢在在写文章之前写一大段自己的光荣事迹，后来发现看别人这样写的文章是一件很蛋疼的事，毕竟这是一篇技术类文章，不是小学生日记。<br>好吧，这次直接进入正题，抱歉，又写了一段和本文内容无关的文字……<br>去年学校开始用H3C认证来限制我们上网，于是好奇心再次害死猫，本宫终于修成正果，误入Openwrt这个大坑，折腾Openwrt有一年多了，到了回馈社会的时候了，这篇文章写写Openwrt编译的一些高级配置（相对入门级编译教程而言），以HG255D为例。</p>
+<hr>
+<h1 id="Openwrt基础编译">Openwrt基础编译</h1><p>这类文章一手一大把，精简的，详细的（多半是废话）都有，这里就简单的把一些指令写下</p>
+<hr>
+<pre><code>编译环境为Ubuntu
+<span class="preprocessor">#升级组件包</span>
+sudo apt-<span class="keyword">get</span> update
+<span class="preprocessor">#安装编译需要的组件</span>
+sudo apt-<span class="keyword">get</span> install gcc g++ binutils patch bzip2 flex bison make autoconf gettext texinfo unzip sharutils subversion libncurses5-dev ncurses-term zlib1g-dev git-core gawk asciidoc libz-dev sphinxsearch libtool sphinx-common libssl-dev libsqlite3* intltool libiconv* gstreamer-<span class="number">0.10</span>* glib2.0 libxml2-dev qemu
+（*<span class="number">64</span>位系统需安装ia32-libs）
+<span class="preprocessor">#使用非root用户登录，建立openwrt目录</span>
+mkdir openwrt
+<span class="preprocessor">#进入openwrt目录</span>
+cd openwrt
+<span class="preprocessor">#下载openwrt源码</span>
+svn checkout svn:<span class="comment">//svn.openwrt.org/openwrt/trunk</span>
+<span class="preprocessor">#赋予trunk目录权限</span>
+sudo chmod -R <span class="number">777</span> trunk
+<span class="preprocessor">#进入trunk目录</span>
+cd trunk
+<span class="preprocessor">#更新最新源码</span>
+./scripts/feeds update -a
+<span class="preprocessor">#安装最新源码</span>
+./scripts/feeds install -a
+<span class="preprocessor">#更新版本号</span>
+svn up
+<span class="preprocessor">#进入编译菜单</span>
+make menuconfig
+Y：选择Y，该软件将被编译，并且加入到你的目标固件里；
+M：选择M，该软件包将会被编译，但不会被放入固件里。在需要它的时候，可以用OPKG软件包管理器进行安装；
+N：选择N，该软件包将不会被编译，也不会被安装进固件。
+方向键是移动光标
+回车键是确认
+空格键是选择，可以代替Y/M/N键的使用
+/:搜索
+<span class="preprocessor">#编译</span>
+make V=<span class="number">99</span>
+<span class="preprocessor">#清除编译过程产生的临时文件</span>
+make clean
+<span class="preprocessor">#恢复编译环境</span>
+make defconfig
+</code></pre><h1 id="Openwrt编译进阶">Openwrt编译进阶</h1><p>其实按照上面的指令一路执行下来，你已经能够在/bin/$target下找到刷机固件了,是不是很简单……</p>
+<h2 id="修改WIFI设置">修改WIFI设置</h2><p><em><code>package/kernel/mac80211/files/lib/wifi/mac80211.sh</code></em></p>
+<pre><code>config wifi-device  radio$devidx
+    <span class="built_in">option</span> <span class="keyword">type</span>     mac80211
+    <span class="built_in">option</span> channel  <span class="number">11</span>
+    <span class="built_in">option</span> hwmode    <span class="number">11n</span>g
+    <span class="built_in">option</span> path    <span class="char">'10180000.wmac'</span>
+    <span class="built_in">option</span> htmode    <span class="type">HT20</span>
+    <span class="built_in">list</span> ht_capab    <span class="type">GF</span>
+    <span class="built_in">list</span> ht_capab    <span class="type">SHORT</span>-<span class="type">GI</span>-<span class="number">20</span>
+    <span class="built_in">list</span> ht_capab    <span class="type">SHORT</span>-<span class="type">GI</span>-<span class="number">40</span>
+    <span class="built_in">list</span> ht_capab    <span class="type">TX</span>-<span class="type">STBC</span>
+    <span class="built_in">list</span> ht_capab    <span class="type">RX</span>-<span class="type">STBC12</span>
+    # <span class="type">REMOVE</span> <span class="type">THIS</span> <span class="type">LINE</span> <span class="type">TO</span> <span class="type">ENABLE</span> <span class="type">WIFI</span>:
+    <span class="built_in">option</span> disabled <span class="number">0</span>
+    <span class="built_in">option</span> noscan <span class="number">1</span>
+    <span class="built_in">option</span> txpower <span class="number">20</span>
+    <span class="built_in">option</span> htmode <span class="type">HT40</span>-
+
+config wifi-iface
+    <span class="built_in">option</span> device   radio$devidx
+    <span class="built_in">option</span> network  lan
+    <span class="built_in">option</span> mode     ap
+    #自定义<span class="type">SSID</span>为<span class="type">MakeBlaze_MAC</span>后六位
+    <span class="built_in">option</span> ssid     <span class="type">MakeBlaze_</span>$(cat /sys/class/ieee80211/${dev}/macaddress|awk -<span class="type">F</span> <span class="string">":"</span> <span class="char">'{print $4""$5""$6 }'</span>| tr a-z <span class="type">A</span>-<span class="type">Z</span>) 
+    <span class="built_in">option</span> encryption none
+</code></pre><h2 id="修改LUCI">修改LUCI</h2><h3 id="修改LUCI界面配置">修改LUCI界面配置</h3><p><em><code>feeds/luci/modules/base/root/etc/config/luci</code></em></p>
+<pre><code>config core main
+    <span class="built_in">option</span> resourcebase <span class="string">'/luci-static/resources'</span>
+    <span class="preprocessor">#设置默认语言</span>
+    <span class="built_in">option</span> lang <span class="string">'zh_cn'</span>
+    <span class="preprocessor">#设置默认主题</span>
+    <span class="built_in">option</span> mediaurlbase <span class="string">'/luci-static/bootstrap'</span>
+
+<span class="preprocessor">#设置可选择的语言        </span>
+config internal languages
+    <span class="built_in">option</span> zh_cn <span class="string">'chinese'</span>
+    <span class="built_in">option</span> en <span class="string">'English'</span>
+<span class="preprocessor">#设置可选择的主题</span>
+config internal themes
+    <span class="built_in">option</span> Bootstrap <span class="string">'/luci-static/bootstrap'</span>
+</code></pre><h3 id="添加释放内存">添加释放内存</h3><p><em><code>feeds/luci/modules/admin-full/luasrc/controller/admin/index.lua</code></em></p>
+<pre><code><span class="function"><span class="keyword">function</span> <span class="title">index</span>()</span>
++    entry({<span class="string">"admin"</span>, <span class="string">"Free_Memory"</span>}, call(<span class="string">"Free_Memory"</span>), _(<span class="string">"释放内存"</span>), <span class="number">75</span>)
+<span class="function"><span class="keyword">end</span></span>
+
+<span class="function"><span class="keyword">function</span> <span class="title">Free_Memory</span>()</span>
+    luci.util.exec(<span class="string">"echo 3 &gt; /proc/sys/vm/drop_caches"</span>)
+    luci.<span class="keyword">http</span>.redirect(luci.dispatcher.build_url(<span class="string">"admin"</span>, <span class="string">"status"</span>, <span class="string">"overview"</span>))
+<span class="function"><span class="keyword">end</span></span>
+</code></pre><h3 id="在顶栏显示重启">在顶栏显示重启</h3><p><em><code>feeds/luci/modules/admin-full/luasrc/controller/admin/system.lua</code></em></p>
+<pre><code><span class="function"><span class="keyword">function</span> <span class="title">index</span><span class="params">()</span>
+    <span class="title">entry</span><span class="params">({<span class="string">"admin"</span>, <span class="string">"reboot"</span>}, call<span class="params">(<span class="string">"action_reboot"</span>)</span>, _<span class="params">(<span class="string">"Reboot"</span>)</span>, <span class="number">90</span>)</span>
+<span class="title">end</span></span>
+</code></pre><p><em><code>feeds/luci/modules/admin-full/luasrc/view/admin_system/reboot.htm</code></em><br>    </p><p><a href="<%=controller%>/admin/reboot?reboot=1">&lt;%:Perform reboot%&gt;</a></p><p></p>
+<h3 id="在顶栏显示备份/升级">在顶栏显示备份/升级</h3><p><em><code>feeds/luci/modules/admin-full/luasrc/controller/admin/system.lua</code></em></p>
+<pre><code><span class="function"><span class="keyword">function</span> <span class="title">index</span><span class="params">()</span>
+    <span class="title">entry</span><span class="params">({<span class="string">"admin"</span>, <span class="string">"flashops"</span>}, call<span class="params">(<span class="string">"action_flashops"</span>)</span>, _<span class="params">(<span class="string">"Backup / Flash Firmware"</span>)</span>, <span class="number">70</span>)</span>
+<span class="title">end</span></span>
+</code></pre><h2 id="修改配置文件">修改配置文件</h2><p><em><code>package/base-files/files/etc/</code></em><br>在这个目录里，你可以把你的备份的路由器导入进来</p>
+<h3 id="修改root密码">修改root密码</h3><p><em><code>package/base-files/files/etc/shadow</code></em></p>
+<pre><code><span class="comment">#默认情况下root是没有密码的，需设定密码才能开启ssh</span>
+root:<span class="variable">$1</span><span class="variable">$wEehtjxj</span><span class="variable">$YBu4quNfVUjzfv8p</span>/PBo5.:<span class="number">0</span>:<span class="number">0</span>:<span class="number">99999</span>:<span class="number">7</span>:::
+</code></pre><h3 id="修改路由连接数">修改路由连接数</h3><p><em><code>package/base-files/files/etc/sysctl.conf</code></em></p>
+<pre><code>net<span class="class">.netfilter</span><span class="class">.nf_conntrack_max</span>=<span class="number">65535</span>
+</code></pre><h3 id="修改主机名，设定时区">修改主机名，设定时区</h3><p><em><code>package/base-files/files/etc/config/system</code></em></p>
+<pre><code>config system
+    <span class="preprocessor">#设置主机名</span>
+    <span class="built_in">option</span> hostname <span class="string">'MakeBlaze'</span>
+    <span class="built_in">option</span> conloglevel <span class="string">'8'</span>
+    <span class="built_in">option</span> cronloglevel <span class="string">'8'</span>
+    <span class="preprocessor">#设置时区</span>
+    <span class="built_in">option</span> zonename <span class="string">'Asia/Shanghai'</span>
+    <span class="built_in">option</span> timezone <span class="string">'CST-8'</span>
+
+<span class="preprocessor">#设置时间服务器</span>
+config timeserver <span class="string">'ntp'</span>
+    <span class="built_in">option</span> enable_server <span class="string">'1'</span>
+    list server <span class="string">'210.72.145.44'</span>
+    list server <span class="string">'s1a.time.edu.cn'</span>
+    list server <span class="string">'s1b.time.edu.cn'</span>
+    list server <span class="string">'202.120.2.101'</span>
+
+config led <span class="string">'usb_led'</span>
+    <span class="built_in">option</span> name <span class="string">'USB'</span>
+    <span class="built_in">option</span> sysfs <span class="string">'hg255d:usb'</span>
+    <span class="built_in">option</span> trigger <span class="string">'usbdev'</span>
+    <span class="built_in">option</span> dev <span class="string">'1-1'</span>
+    <span class="built_in">option</span> interval <span class="string">'50'</span>
+
+config led <span class="string">'wlan_led'</span>
+    <span class="built_in">option</span> name <span class="string">'WLAN'</span>
+    <span class="built_in">option</span> sysfs <span class="string">'hg255d:wlan'</span>
+    <span class="built_in">option</span> trigger <span class="string">'netdev'</span>
+    <span class="built_in">option</span> dev <span class="string">'ra0'</span>
+    <span class="built_in">option</span> mode <span class="string">'link tx'</span>
+
+config led <span class="string">'internet_led'</span>
+    <span class="built_in">option</span> name <span class="string">'INTERNET'</span>
+    <span class="built_in">option</span> sysfs <span class="string">'hg255d:internet'</span>
+    <span class="built_in">option</span> trigger <span class="string">'netdev'</span>
+    <span class="built_in">option</span> dev <span class="string">'eth0.2'</span>
+    <span class="built_in">option</span> mode <span class="string">'tx rx'</span>
+</code></pre><h3 id="SAMBA免密码访问">SAMBA免密码访问</h3><p><em><code>package/base-files/files/etc/config/samba</code></em></p>
+<pre><code>config samba
+    <span class="preprocessor">#显示中文</span>
+    <span class="built_in">option</span> charset <span class="string">'gb2312'</span>
+
+config sambashare
+    <span class="built_in">option</span> read_only <span class="string">'no'</span>
+    <span class="built_in">option</span> guest_ok <span class="string">'yes'</span>
+    <span class="built_in">option</span> create_mask <span class="string">'0777'</span>
+    <span class="built_in">option</span> dir_mask <span class="string">'0777'</span>
+    <span class="built_in">option</span> display charset
+</code></pre><p><em><code>package/base-files/files/etc/samba/smb.conf.template</code></em></p>
+<pre><code>[global]
+    netbios <span class="variable">name =</span> |NAME| 
+    display <span class="variable">charset =</span> |CHARSET|
+    <span class="variable">interfaces =</span> |INTERFACES|
+    server <span class="variable">string =</span> |DESCRIPTION|
+    unix <span class="variable">charset =</span> |CHARSET|
+    <span class="variable">workgroup =</span> |WORKGROUP|
+    <span class="variable">browseable =</span> yes
+    <span class="variable">deadtime =</span> <span class="number">30</span>
+    domain <span class="variable">master =</span> yes
+    encrypt <span class="variable">passwords =</span> <span class="constant">true</span>
+    enable core <span class="variable">files =</span> no
+    guest <span class="variable">account =</span> root
+    guest <span class="variable">ok =</span> yes
+    <span class="comment">#invalid users = root</span>
+    local <span class="variable">master =</span> yes
+    load <span class="variable">printers =</span> no
+    <span class="built_in">map</span> to <span class="variable">guest =</span> Bad User
+    max <span class="variable">protocol =</span> SMB2
+    min receivefile <span class="variable">size =</span> <span class="number">16384</span>
+    <span class="constant">null</span> <span class="variable">passwords =</span> yes
+    obey pam <span class="variable">restrictions =</span> yes
+    os <span class="variable">level =</span> <span class="number">20</span>
+    passdb <span class="variable">backend =</span> smbpasswd
+    preferred <span class="variable">master =</span> yes
+    <span class="variable">printable =</span> no
+    <span class="variable">security =</span> share
+    smb <span class="variable">encrypt =</span> disabled
+    <span class="comment">#smb passwd file = /etc/samba/smbpasswd</span>
+    socket <span class="variable">options =</span> TCP_NODELAY IPTOS_LOWDELAY
+    <span class="variable">syslog =</span> <span class="number">2</span>
+    use <span class="variable">sendfile =</span> yes
+    <span class="variable">writeable =</span> yes
+</code></pre><h2 id="集成软件">集成软件</h2><h3 id="添加aria2，luci添加，web管理界面">添加aria2，luci添加，web管理界面</h3><p><code>aria2 http://sourceforge.net/projects/aria2/files/stable/</code></p>
+<pre><code><span class="preprocessor">#aria2的依赖安装</span>
+sudo apt-<span class="keyword">get</span> update 
+sudo apt-<span class="keyword">get</span> install autoconf automake libcppunit-dev autopoint openssl libtool sphinx-common sphinxsearch libgcrypt11-dev 
+<span class="preprocessor">#下载aria2源码</span>
+cd dl
+sudo apt-<span class="keyword">get</span> install wget
+wget http:<span class="comment">//sourceforge.net/projects/aria2/files/stable/aria2-1.18.7/aria2-1.18.7.tar.bz2</span>
+<span class="preprocessor">#获取md5码</span>
+md5sum aria2-<span class="number">1.18</span>.7.tar.bz2
+<span class="preprocessor">#添加luci-aria2</span>
+</code></pre><p>这里用的是南浦月的luci-app-aira2和webui-aria2<br><code>OpenWrt-Extra https://github.com/nanpuyue/openwrt-extra</code></p>
+<pre><code>在feeds<span class="class">.conf</span><span class="class">.default</span>中添加`src-git extra git:<span class="comment">//github.com/nanpuyue/openwrt-extra.git`</span>
+./scripts/feeds update -<span class="tag">a</span>
+./scripts/feeds install -a
+</code></pre><p>在make menuconfig中选中aria2，luci-app-aira2和webui-aria2就可以了</p>
+<h3 id="添加将自己开发的程序">添加将自己开发的程序</h3><p>在package下建立一个文件夹，以自己的项目命名，里边包括一个files文件夹和一个Makefile文件</p>
+<pre><code>目录结构
+<span class="tag">&lt;<span class="title">ccnu</span>&gt;</span>
+├Makefile
+├<span class="tag">&lt;<span class="title">files</span>&gt;</span>
+│  ├<span class="tag">&lt;<span class="title">etc</span>&gt;</span>
+│  │  ├<span class="tag">&lt;<span class="title">config</span>&gt;</span>
+│  │  │  └ccnu
+│  │  ├<span class="tag">&lt;<span class="title">init.d</span>&gt;</span>
+│  │  │  └ccnu
+│  ├<span class="tag">&lt;<span class="title">usr</span>&gt;</span>
+│  │  ├<span class="tag">&lt;<span class="title">lib</span>&gt;</span>
+│  │  │  ├<span class="tag">&lt;<span class="title">lua</span>&gt;</span>
+│  │  │  │  ├<span class="tag">&lt;<span class="title">luci</span>&gt;</span>
+│  │  │  │  │  ├<span class="tag">&lt;<span class="title">controller</span>&gt;</span>
+│  │  │  │  │  │  └ccnu.lua
+│  │  │  │  │  ├<span class="tag">&lt;<span class="title">model</span>&gt;</span>
+│  │  │  │  │  │  ├<span class="tag">&lt;<span class="title">cbi</span>&gt;</span>
+│  │  │  │  │  │  │  └ccnu.lua
+│  │  ├<span class="tag">&lt;<span class="title">sbin</span>&gt;</span>
+│  │  │  └ccnu
+</code></pre><p><em><code>package/ccnu/Makefile</code></em></p>
+<pre><code><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">TOPDIR)</span>/rules.mk
+
+<span class="constant">PKG_NAME:</span>=ccnu
+<span class="constant">PKG_VERSION:</span>=<span class="number">2.0</span>.<span class="number">1</span>        
+<span class="constant">PKG_RELEASE:</span>=<span class="number">1</span>
+<span class="constant">PKG_BUILD_DIR </span><span class="symbol">:</span>= <span class="variable">$(</span><span class="constant">BUILD_DIR)</span>/<span class="variable">$(</span><span class="constant">PKG_NAME)</span>
+
+<span class="keyword">include</span> <span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/package.mk
+
+define <span class="constant">Package/</span>ccnu
+  <span class="constant">SECTION:</span>=utils
+  <span class="constant">CATEGORY:</span>=<span class="constant">Utilities</span>
+  <span class="constant">SUBMENU:</span>=<span class="constant">H3C </span>inode
+  <span class="constant">TITLE:</span>= iNode <span class="constant">Compatible Client </span><span class="keyword">for</span> <span class="constant">CCNU</span>
+  <span class="constant">DEPENDS:</span>=+libc +libgcc 
+  <span class="constant">MAINTAINER:</span>= <span class="constant">RiceLyn </span>&lt;fjkfwz<span class="variable">@gmail</span>.com&gt;
+endef
+
+define <span class="constant">Package/</span>ccnu/description
+    iNode <span class="constant">Compatible Client </span><span class="keyword">for</span> <span class="constant">CCNU</span>
+endef
+
+define <span class="constant">Build/Prepare</span>
+endef
+
+define <span class="constant">Build/Configure</span>
+endef
+
+define <span class="constant">Build/Compile</span>
+endef
+
+define <span class="constant">Package/</span>ccnu/install
+    <span class="variable">$(</span><span class="constant">CP)</span> ./files/* <span class="variable">$(</span><span class="number">1</span>)/
+endef
+
+<span class="variable">$(</span>eval <span class="variable">$(</span>call <span class="constant">BuildPackage,</span>ccnu))
+</code></pre><p>之后./scripts/feeds install -a,ccnu就会出现在Utilities -&gt; H3C inode里啦<br>这里先做一个简单的程序，以后会写文章详细介绍。</p>
+<h2 id="HG255D个性化配置">HG255D个性化配置</h2><h3 id="开启HG255D编译">开启HG255D编译</h3><p><em><code>/target/linux/ramips/image/Makefile</code></em>去除HG255D前的<code>#</code></p>
+<pre><code>Image/Build/Profile/H<span class="keyword">G255</span>D=$<span class="comment">(call BuildFirmware/Default16M/$(1)</span>,$<span class="comment">(1)</span>,h<span class="keyword">g255</span>d,H<span class="keyword">G255</span>D)
+$<span class="comment">(call Image/Build/Profile/HG255D,$(1)</span>)
+</code></pre><h3 id="make_menuconfig配置">make menuconfig配置</h3><pre><code><span class="comment">#选择编译对象</span>
+Target System (Ralink RT288x/RT3xxx)    —&gt;
+Subtarget (RT3x5x/RT5350 based boards)  —&gt;
+Target Profile (HuaWei HG255D)          —&gt;
+
+<span class="comment">#添加USB挂载</span>
+Base system —&gt; <span class="variable">&lt;*&gt;</span>block-mount   
+
+<span class="comment">#添加硬盘格式支持</span>
+Kernel modules —&gt; Filesystems —&gt; <span class="variable">&lt;*&gt;</span> kmod-fs-ext4 (移动硬盘EXT4格式选择)
+Kernel modules —&gt; Filesystems —&gt; <span class="variable">&lt;*&gt;</span> kmod-fs-vfat(FAT16 / FAT32 格式 选择)
+Kernel modules —&gt; Filesystems —&gt; <span class="variable">&lt;*&gt;</span> kmod-fs-ntfs (NTFS 格式 选择)
+
+<span class="comment">#添加USB相关支持</span>
+Kernel modules —&gt; USB Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-usb-core.
+Kernel modules —&gt; USB Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-usb-ohci.
+Kernel modules —&gt; USB Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-usb-storage.
+Kernel modules —&gt; USB Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-usb-storage-extras.
+Kernel modules —&gt; USB Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-usb2.
+Kernel modules —&gt; USB Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-usb3.
+
+<span class="comment">#添加自动挂载工具</span>
+Utilities —&gt; Filesystem —&gt; <span class="variable">&lt;*&gt;</span> badblocks
+
+<span class="comment">#添加UTF8编码,CP437编码，ISO8859-1编码</span>
+Kernel modules —&gt; Native Language Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-nls-cp437
+Kernel modules —&gt; Native Language Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-nls-iso8859-<span class="number">1</span>
+Kernel modules —&gt; Native Language Support —&gt; <span class="variable">&lt;*&gt;</span> kmod-nls-utf8
+
+<span class="comment">#添加SCSI支持</span>
+Kernel modules —&gt; Block Devices —&gt; <span class="variable">&lt;*&gt;</span>kmod-scsi-core
+
+<span class="comment">#添加LED支持</span>
+LED modules  —&gt;
+<span class="variable">&lt; *&gt;</span> kmod-ledtrig-usbdev…………………………. LED USB device Trigger
+
+<span class="comment">#添加luci</span>
+LuCI -&gt;Collections -&gt; <span class="variable">&lt;*&gt;</span> luci
+
+<span class="comment">#添加luci的中文语言包</span>
+LuCI -&gt;Translations -&gt; <span class="variable">&lt;*&gt;</span> luci-i18n-chinese
+
+<span class="comment">#添加luci应用</span>
+LuCI -&gt;Applications  —&gt; <span class="variable">&lt;*&gt;</span> luci-app-aria2……………………………… LuCI Support <span class="keyword">for</span> aria2
+LuCI -&gt;Applications  —&gt; <span class="variable">&lt;*&gt;</span> luci-app-ddns……………………… Dynamic DNS configuration module
+LuCI -&gt;Applications  —&gt; <span class="variable">&lt;*&gt;</span> luci-app-samba……………….. Network Shares – Samba SMB/CIFS module
+LuCI -&gt;Applications  —&gt; <span class="variable">&lt;*&gt;</span> luci-app-transmission…………………. LuCI Support <span class="keyword">for</span> Transmission
+</code></pre><h3 id="开启POWER_LED状态指示灯">开启POWER LED状态指示灯</h3><p><em><code>target\linux\ramips\base-files\etc\diag.sh</code></em></p>
+<pre><code>get_status_led() {
+    <span class="keyword">case</span> <span class="variable">$(</span>ramips_board_name) <span class="keyword">in</span>
++    hg255d)
++        status_led=<span class="string">"hg255d:power"</span>
++        ;;
+</code></pre><h3 id="使用RA-MOD软件源">使用RA-MOD软件源</h3><p><em><code>RA-MOD https://github.com/ravageralpha/my_openwrt_mod</code></em></p>
+<pre><code>feeds<span class="class">.conf</span><span class="class">.default</span>
+src-git ramod git:<span class="comment">//github.com/ravageralpha/my_openwrt_mod.git</span>
+<span class="id">#src-git</span> luci http:<span class="comment">//git.openwrt.org/project/luci.git    </span>
+
+./scripts/feeds clean
+./scripts/update -<span class="tag">a</span>
+./scripts/install -a
+</code></pre><h3 id="添加自动挂载脚本">添加自动挂载脚本</h3><p><em><code>/package/base-files/files/etc/gotplug/block/30-block_mount</code></em></p>
+<pre><code><span class="shebang">#!/bin/sh
+</span>
+<span class="comment">#---------------------------------------------------------------------</span>
+<span class="comment"># Filename:    30-block_mount</span>
+<span class="comment"># Revision:    0.5.1</span>
+<span class="comment"># Data:        Jul. 7, 2014</span>
+<span class="comment"># Email:       kevinyu@vip.qq.com</span>
+<span class="comment"># Contacts:    QQ/TM 389191 or mail address above</span>
+<span class="comment"># Licensing:   General Public License v2</span>
+<span class="comment"># Description: Created for automatic mount block devices on OpenWRT</span>
+<span class="comment"># Usage:       Put this script into directory /etc/hotplug.d/block</span>
+<span class="comment">#---------------------------------------------------------------------</span>
+
+<span class="comment">## Global settings of auto-mount script ##</span>
+
+<span class="comment"># Turn on|off auto-mount function for disk volumes</span>
+VOL_ENABLED=<span class="number">1</span>  <span class="comment"># &lt;0|1  0-Disable, 1-Enable&gt;</span>
+
+<span class="comment"># Turn on|off auto-mount function for sawp partition  </span>
+SWAP_ENABLED=<span class="number">1</span>  <span class="comment"># &lt;0|1  0-Disable, 1-Enable&gt;</span>
+
+<span class="comment"># Set which method you want to name the mounted volumes</span>
+USE_VLABEL=<span class="number">1</span>  <span class="comment"># &lt;0|1  0-Use device name, 1-Use volume label&gt;  Eg. /mnt/sda1 | /mnt/DataDisk</span>
+<span class="comment">#</span>
+<span class="comment"># Note that if you choose name mount point by volume label but the volume's label is empty,</span>
+<span class="comment"># the volume will be named to 'volume_$PARTUUID', such as the /mnt/volume_31173116-01</span>
+<span class="comment"># Also, if exist more than one device which have the same volume label, it will be renamed </span>
+<span class="comment"># as the original name + sequence number, such as the /mnt/DataDisk_n (n=1,2,3..9)</span>
+
+<span class="comment"># Show filesystem type as the prefix of mount point, requires set USE_VLABEL=1</span>
+FSTYPE_IN_VLABEL=<span class="number">1</span>  <span class="comment"># &lt;0|1  0-Disable, 1-Enable&gt;  Eg. /mnt/[ntfs]-DataDisk</span>
+
+<span class="comment"># Set access the mounted device with read-write or read-only permission</span>
+FS_READONLY=<span class="number">0</span>  <span class="comment"># &lt;0|1  0-Read Write, 1-Read Only&gt;</span>
+
+<span class="comment"># Exclusion list of auto-mount function</span>
+<span class="comment"># Allows mixing the device name, volume label and UUID, each item must be separated by space(s)</span>
+<span class="comment"># Eg. EXCLUDE_LIST="sda1 DataDisk f32b2ea6-4d42-43a5-bcec-7d818a163d07" </span>
+EXCLUDE_LIST=<span class="string">""</span>  <span class="comment"># Default: empty string</span>
+
+<span class="comment"># Specify a directory for mounts</span>
+MOUNTS_PATH=<span class="string">"/mnt"</span>  <span class="comment"># Default: /mnt , don't need include the trailing slash (/)</span>
+
+<span class="comment"># Define the add-ons scripts directory for automatic execute</span>
+ADDSH_PATH=<span class="string">"/etc/hotplug.d/user"</span>  <span class="comment"># Script naming rule: [0-9][0-9]-xxxxx, Eg. 20-backup-sdcard</span>
+
+<span class="comment">## End of global settings ##</span>
+
+<span class="comment"># Purge the directory MOUNTS_PATH</span>
+<span class="function"><span class="title">purge_mnts</span></span>()
+{
+<span class="built_in">local</span> i RETVAL
+[ <span class="operator">-d</span> <span class="variable">$MOUNTS_PATH</span> ] || <span class="built_in">return</span> <span class="number">1</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$MOUNTS_PATH</span>/* ; <span class="keyword">do</span>
+    <span class="keyword">if</span> [ <span class="operator">-d</span> <span class="variable">$i</span> ] ; <span class="keyword">then</span>
+        <span class="keyword">if</span> [ -z <span class="string">"`ls -A <span class="variable">$i</span> 2&gt;&amp;-`"</span> ] ; <span class="keyword">then</span>
+            `grep -qs <span class="string">"<span class="variable">$i</span>"</span> /proc/mounts` || { rm -rf <span class="variable">$i</span> <span class="number">2</span>&gt;/dev/null; RETVAL=$?; }
+            <span class="keyword">if</span> [ <span class="variable">$RETVAL</span> <span class="operator">-eq</span> <span class="number">0</span> ] ; <span class="keyword">then</span>
+                logger -t Auto-Mount <span class="string">"[Notice] Unused mount point <span class="variable">$i</span> was removed"</span>
+                [ <span class="string">"<span class="variable">$CLI</span>"</span> = <span class="string">"yes"</span> ] &amp;&amp; <span class="built_in">echo</span> <span class="string">"[Notice] Unused mount point '<span class="variable">$i</span>' was removed"</span>
+            <span class="keyword">else</span>
+                logger -t Auto-Mount <span class="string">"[Error] Remove unused mount point <span class="variable">$i</span> failed"</span>
+                [ <span class="string">"<span class="variable">$CLI</span>"</span> = <span class="string">"yes"</span> ] &amp;&amp; <span class="built_in">echo</span> <span class="string">"[Error] Remove unused mount point <span class="variable">$i</span> failed"</span>
+            <span class="keyword">fi</span>
+        <span class="keyword">fi</span>
+    <span class="keyword">fi</span>
+<span class="keyword">done</span>
+}
+
+<span class="comment"># Unmount all block device</span>
+<span class="function"><span class="title">umountall</span></span>()
+{
+<span class="built_in">local</span> i MOUNTS
+MOUNTS=`grep -os <span class="string">'^/dev/sd[a-z][1-9]'</span> /proc/mounts`
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$MOUNTS</span> ; <span class="keyword">do</span>
+    umount <span class="operator">-f</span> <span class="variable">$i</span>
+    [ $? <span class="operator">-eq</span> <span class="number">0</span> ] &amp;&amp;    <span class="built_in">echo</span> <span class="string">"[Notice] Device <span class="variable">$i</span> unmounted"</span> | tee /proc/self/fd/<span class="number">2</span> | logger -t Auto-Mount
+<span class="keyword">done</span>
+purge_mnts
+}
+
+<span class="comment"># Detect blkid exists</span>
+BLKID=`<span class="built_in">which</span> blkid`
+<span class="keyword">if</span> [ $? <span class="operator">-ne</span> <span class="number">0</span> ] ; <span class="keyword">then</span>
+    logger -t Auto-Mount <span class="string">"[Error] Unable to mount block devices automatically because 'blkid' does not exist"</span>
+    <span class="built_in">exit</span> <span class="number">1</span>
+<span class="keyword">fi</span>
+
+MOUNTS_PATH=<span class="variable">${MOUNTS_PATH%/}</span>
+[ -z <span class="string">"<span class="variable">$ACTION</span>"</span> ] &amp;&amp; ACTION=<span class="variable">${1##*-}</span>
+[ -n <span class="string">"<span class="variable">$DEVICENAME</span>"</span> ] &amp;&amp; DEV=<span class="variable">$DEVICENAME</span> || DEV=<span class="variable">$2</span>
+logger -t Auto-Mount <span class="string">"[Debug] action='<span class="variable">$ACTION</span>' devicename='<span class="variable">$DEV</span>'"</span>
+<span class="keyword">case</span> <span class="string">"<span class="variable">$ACTION</span>"</span> <span class="keyword">in</span>
+    add)
+        [ -z <span class="string">"<span class="variable">$DEV</span>"</span> ] &amp;&amp; { logger -t Auto-Mount <span class="string">"[Error] Missing required arguments: \$devicename"</span>; <span class="built_in">exit</span> <span class="number">1</span>; }
+        <span class="keyword">if</span> [ -n <span class="string">"<span class="variable">$EXCLUDE_LIST</span>"</span> ] ; <span class="keyword">then</span>
+            UUID=`<span class="variable">$BLKID</span> <span class="operator">-s</span> UUID /dev/<span class="variable">$DEV</span> | awk -F <span class="string">'='</span> <span class="string">'{print $NF}'</span> | tr <span class="operator">-d</span> <span class="string">'"| '</span>`
+            VLABEL=`<span class="variable">$BLKID</span> <span class="operator">-d</span> <span class="operator">-s</span> LABEL /dev/<span class="variable">$DEV</span> | awk -F <span class="string">'='</span> <span class="string">'{print $NF}'</span> | tr <span class="operator">-d</span> <span class="string">'"| '</span>`
+            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$EXCLUDE_LIST</span> ; <span class="keyword">do</span>
+                ignore=<span class="number">0</span>
+                <span class="keyword">if</span> `<span class="built_in">echo</span> <span class="string">"<span class="variable">$i</span>"</span> | grep -qs <span class="string">'^sd[a-z][1-9]$'</span>` ; <span class="keyword">then</span>  <span class="comment"># is device name</span>
+                    [ <span class="variable">$i</span> = <span class="variable">$DEV</span> ] &amp;&amp; ignore=<span class="number">1</span>
+                <span class="keyword">elif</span> `<span class="built_in">echo</span> <span class="string">"<span class="variable">$i</span>"</span> | grep -Eiqs <span class="string">'^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'</span>` ; <span class="keyword">then</span>  <span class="comment"># is UUID</span>
+                    [ <span class="variable">$i</span> = <span class="variable">$UUID</span> ] &amp;&amp; ignore=<span class="number">1</span>
+                <span class="keyword">else</span>  <span class="comment"># as volume label</span>
+                    [ <span class="variable">$i</span> = <span class="variable">$VLABEL</span> ] &amp;&amp; ignore=<span class="number">1</span>
+                <span class="keyword">fi</span>
+                [ <span class="variable">$ignore</span> <span class="operator">-eq</span> <span class="number">1</span> ] &amp;&amp; { logger -t Auto-Mount <span class="string">"[Notice] Device <span class="variable">$DEV</span> is ignored because it in exclusion list"</span>; <span class="built_in">exit</span> <span class="number">0</span>; }
+            <span class="keyword">done</span>
+        <span class="keyword">fi</span>
+        <span class="keyword">if</span> `<span class="built_in">echo</span> <span class="string">"<span class="variable">$DEV</span>"</span> | grep -qs <span class="string">'^sd[a-z][1-9]$'</span>` ; <span class="keyword">then</span>
+            [ -z <span class="string">"<span class="variable">$VLABEL</span>"</span> ] &amp;&amp; VLABEL=`<span class="variable">$BLKID</span> <span class="operator">-d</span> <span class="operator">-s</span> LABEL /dev/<span class="variable">$DEV</span> | awk -F <span class="string">'='</span> <span class="string">'{print $NF}'</span> | tr <span class="operator">-d</span> <span class="string">'"| '</span>`
+            [ -z <span class="string">"<span class="variable">$VLABEL</span>"</span> ] &amp;&amp; VLABEL=<span class="string">"unknown"</span>
+            FSTYPE=`<span class="variable">$BLKID</span> <span class="operator">-s</span> TYPE /dev/<span class="variable">$DEV</span> | awk -F <span class="string">'='</span> <span class="string">'{print $NF}'</span> | tr <span class="operator">-d</span> <span class="string">'"| '</span>`
+            logger -t Auto-Mount <span class="string">"[Debug] devicename='<span class="variable">$DEV</span>' volume_label='<span class="variable">$VLABEL</span>' fstype='<span class="variable">$FSTYPE</span>'"</span>
+            MCMD=<span class="string">""</span>  <span class="comment"># set default value</span>
+            [ <span class="variable">$FS_READONLY</span> <span class="operator">-eq</span> <span class="number">1</span> ] &amp;&amp; acs=<span class="string">"ro"</span> || acs=<span class="string">"rw"</span>
+            <span class="keyword">case</span> <span class="string">"<span class="variable">$FSTYPE</span>"</span> <span class="keyword">in</span>
+                ext[<span class="number">234</span>])
+                    <span class="keyword">if</span> `grep -vs <span class="string">'^nodev'</span> /proc/filesystems | grep -qs <span class="string">"<span class="variable">$FSTYPE</span>"</span>` ; <span class="keyword">then</span>
+                        MCMD=<span class="string">"mount -t <span class="variable">$FSTYPE</span> -o <span class="variable">${acs}</span>,noatime"</span>
+                    <span class="keyword">fi</span>
+                    ;;
+                xfs|reiserfs)
+                    <span class="keyword">if</span> `grep -vs <span class="string">'^nodev'</span> /proc/filesystems | grep -qs <span class="string">"<span class="variable">$FSTYPE</span>"</span>` ; <span class="keyword">then</span>
+                        MCMD=<span class="string">"mount -t <span class="variable">$FSTYPE</span> -o <span class="variable">${acs}</span>,noatime"</span>
+                    <span class="keyword">fi</span>
+                    ;;
+                iso9660|udf)
+                    <span class="keyword">if</span> `grep -vs <span class="string">'^nodev'</span> /proc/filesystems | grep -qs <span class="string">"<span class="variable">$FSTYPE</span>"</span>` ; <span class="keyword">then</span>
+                        MCMD=<span class="string">"mount -t <span class="variable">$FSTYPE</span> -o ro"</span>
+                    <span class="keyword">fi</span>                    ;;
+                vfat|msdos)
+                    <span class="keyword">if</span> `grep -vs <span class="string">'^nodev'</span> /proc/filesystems | grep -qs <span class="string">"<span class="variable">$FSTYPE</span>"</span>` ; <span class="keyword">then</span>
+                        MCMD=<span class="string">"mount -t <span class="variable">$FSTYPE</span> -o <span class="variable">${acs}</span>,codepage=936,umask=000"</span>  <span class="comment">#iocharset=utf8</span>
+                    <span class="keyword">fi</span>
+                    ;;
+                exfat)
+                    <span class="keyword">if</span> `grep -Eqs <span class="string">'^[[:space:]]+fuseblk$'</span> /proc/filesystems` &amp;&amp; `<span class="built_in">which</span> mount.exfat &gt;/dev/null` ; <span class="keyword">then</span>
+                        MCMD=<span class="string">"mount.exfat -o <span class="variable">${acs}</span>,iocharset=cp936,umask=000"</span>
+                    <span class="keyword">fi</span>
+                    ;;
+                ntfs)
+                    <span class="keyword">if</span> `grep -Eqs <span class="string">'^[[:space:]]+fuseblk$'</span> /proc/filesystems` &amp;&amp; `<span class="built_in">which</span> mount.ntfs-<span class="number">3</span>g &gt;/dev/null` ; <span class="keyword">then</span>
+                        MCMD=<span class="string">"mount -t ntfs-3g -o <span class="variable">${acs}</span>,noatime,big_writes,async,umask=000"</span>
+                    <span class="keyword">fi</span>
+                    ;;
+                swap)
+                    [ <span class="variable">$SWAP_ENABLED</span> <span class="operator">-ne</span> <span class="number">1</span> ] &amp;&amp; <span class="built_in">exit</span> <span class="number">0</span>
+                    <span class="keyword">if</span> [ `grep -vs <span class="string">'^Filename'</span> /proc/swaps | wc <span class="operator">-l</span>` <span class="operator">-eq</span> <span class="number">0</span> ] ; <span class="keyword">then</span>
+                        MCMD=<span class="string">"swapon /dev/<span class="variable">$DEV</span>"</span>
+                    <span class="keyword">fi</span>
+                    ;;
+                *)
+                    MCMD=<span class="string">""</span>
+                    ;;
+            <span class="keyword">esac</span>
+            [ <span class="variable">$VOL_ENABLED</span> <span class="operator">-ne</span> <span class="number">1</span> ] &amp;&amp; <span class="built_in">exit</span> <span class="number">0</span>
+            <span class="keyword">if</span> [ <span class="variable">$FSTYPE</span> = <span class="string">"swap"</span> ] ; <span class="keyword">then</span>
+                MOPT=<span class="string">""</span>
+            <span class="keyword">elif</span> [ <span class="variable">$FSTYPE</span> = <span class="string">"iso9660"</span> -o <span class="variable">$FSTYPE</span> = <span class="string">"udf"</span> ] ; <span class="keyword">then</span>
+                CDROM=<span class="string">"cdrom"</span>
+                <span class="keyword">if</span> `grep -qs <span class="string">"<span class="variable">$MOUNTS_PATH</span>/<span class="variable">$CDROM</span> "</span> /proc/mounts` ; <span class="keyword">then</span>
+                    SUFFIX=<span class="number">1</span>
+                    <span class="keyword">while</span> `grep -qs <span class="string">"<span class="variable">$MOUNTS_PATH</span>/<span class="variable">$CDROM</span> "</span> /proc/mounts` ; <span class="keyword">do</span>
+                        [ <span class="variable">$SUFFIX</span> <span class="operator">-lt</span> <span class="number">10</span> ] &amp;&amp; CDROM=<span class="string">"<span class="variable">${CDROM%_*}</span>_<span class="variable">$SUFFIX</span>"</span> || { CDROM=<span class="string">"<span class="variable">${CDROM%_*}</span>_99"</span>; <span class="built_in">break</span>; }
+                        <span class="built_in">let</span> SUFFIX++
+                    <span class="keyword">done</span>
+                <span class="keyword">fi</span>
+                MPOINT=<span class="variable">$CDROM</span>
+            <span class="keyword">else</span>
+                <span class="keyword">if</span> [ <span class="variable">$USE_VLABEL</span> <span class="operator">-eq</span> <span class="number">1</span> ] ; <span class="keyword">then</span>
+                    <span class="keyword">if</span> [ <span class="variable">$VLABEL</span> = <span class="string">"unknown"</span> ] ; <span class="keyword">then</span>
+                        PARTUUID=`<span class="variable">$BLKID</span> <span class="operator">-s</span> PARTUUID /dev/<span class="variable">$DEV</span> | awk -F <span class="string">'='</span> <span class="string">'{print $NF}'</span> | tr <span class="operator">-d</span> <span class="string">'"| '</span>`
+                        [ -z <span class="string">"<span class="variable">$PARTUUID</span>"</span> ] &amp;&amp; PARTUUID=`cat /proc/sys/kernel/random/uuid | cut <span class="operator">-f</span>1 <span class="operator">-d</span><span class="string">'-'</span>`
+                        VLABEL=<span class="string">"volume_<span class="variable">${PARTUUID}</span>"</span>
+                    <span class="keyword">elif</span> `grep -qis <span class="string">"<span class="variable">$MOUNTS_PATH</span>/<span class="variable">$VLABEL</span> "</span> /proc/mounts` ; <span class="keyword">then</span>
+                        SUFFIX=<span class="number">1</span>
+                        <span class="keyword">while</span> `grep -qis <span class="string">"<span class="variable">$MOUNTS_PATH</span>/<span class="variable">$VLABEL</span> "</span> /proc/mounts` ; <span class="keyword">do</span>
+                            <span class="keyword">if</span> [ <span class="variable">$SUFFIX</span> <span class="operator">-lt</span> <span class="number">10</span> ] ; <span class="keyword">then</span>
+                                VLABEL=<span class="string">"<span class="variable">$(echo "$VLABEL" | sed 's/_[0-9]\+$//')</span>_<span class="variable">$SUFFIX</span>"</span>
+                                <span class="built_in">let</span> SUFFIX++
+                            <span class="keyword">else</span>
+                                VLABEL=<span class="string">"<span class="variable">$(echo "$VLABEL" | sed 's/_[0-9]\+$//')</span>_99"</span>
+                                <span class="built_in">break</span>
+                            <span class="keyword">fi</span>
+                        <span class="keyword">done</span>
+                    <span class="keyword">fi</span>
+                    [ <span class="variable">$FSTYPE_IN_VLABEL</span> <span class="operator">-eq</span> <span class="number">1</span> ] &amp;&amp; MPOINT=<span class="string">"[<span class="variable">${FSTYPE}</span>]-<span class="variable">${VLABEL}</span>"</span> || MPOINT=<span class="variable">$VLABEL</span>
+                <span class="keyword">else</span>
+                    MPOINT=<span class="variable">$DEV</span>
+                <span class="keyword">fi</span>
+                MOPT=<span class="string">"/dev/<span class="variable">$DEV</span> <span class="variable">$MOUNTS_PATH</span>/<span class="variable">$MPOINT</span>"</span>
+            <span class="keyword">fi</span>
+            <span class="keyword">if</span> [ -n <span class="string">"<span class="variable">$MCMD</span>"</span> ] ; <span class="keyword">then</span>
+                <span class="keyword">if</span> ! `grep -qs <span class="string">'/dev/$DEV'</span> /proc/mounts` ; <span class="keyword">then</span>
+                    [ <span class="variable">$FSTYPE</span> = <span class="string">"swap"</span> ] || { [ <span class="operator">-d</span> <span class="variable">$MOUNTS_PATH</span>/<span class="variable">$MPOINT</span> ] || mkdir -p <span class="variable">$MOUNTS_PATH</span>/<span class="variable">$MPOINT</span>; }
+                    logger -t Auto-Mount <span class="string">"[Debug] MountCMD='<span class="variable">$MCMD</span> <span class="variable">$MOPT</span>'"</span>
+                    <span class="comment"># echo "[Debug] MountCMD='$MCMD $MOPT'" &gt;&gt; /tmp/auto-mount-debug</span>
+                    <span class="variable">$MCMD</span> <span class="variable">$MOPT</span>
+                    RETVAL=$?
+                    <span class="keyword">if</span> [ <span class="variable">$FSTYPE</span> = <span class="string">"swap"</span> ] ; <span class="keyword">then</span>
+                        <span class="keyword">if</span> [ <span class="variable">$RETVAL</span> <span class="operator">-eq</span> <span class="number">0</span> ] ; <span class="keyword">then</span>
+                            logger -t Auto-Mount <span class="string">"[Notice] Swap device /dev/<span class="variable">$DEV</span> turned on"</span> 
+                        <span class="keyword">fi</span>
+                    <span class="keyword">else</span>
+                        <span class="keyword">if</span> [ <span class="variable">$RETVAL</span> <span class="operator">-eq</span> <span class="number">0</span> ] ; <span class="keyword">then</span>
+                            logger -t Auto-Mount <span class="string">"[Notice] Block device /dev/<span class="variable">$DEV</span> mounted on <span class="variable">$MOUNTS_PATH</span>/<span class="variable">$MPOINT</span>"</span> 
+                        <span class="keyword">else</span>
+                            logger -t Auto-Mount <span class="string">"[Warning] Re-try mount the block device /dev/<span class="variable">$DEV</span> after 2 seconds..."</span>
+                            sleep <span class="number">2</span>
+                            <span class="variable">$MCMD</span> <span class="variable">$MOPT</span>
+                            <span class="keyword">if</span> [ $? <span class="operator">-eq</span> <span class="number">0</span> ] ; <span class="keyword">then</span>
+                                logger -t Auto-Mount <span class="string">"[Notice] Block device /dev/<span class="variable">$DEV</span> mounted on <span class="variable">$MOUNTS_PATH</span>/<span class="variable">$MPOINT</span>"</span> 
+                            <span class="keyword">else</span>
+                                rm -rf <span class="variable">$MOUNTS_PATH</span>/<span class="variable">$MPOINT</span> <span class="number">2</span>&gt;/dev/null
+                                logger -t Auto-Mount <span class="string">"[Error] Mount block device /dev/<span class="variable">$DEV</span> encounters an error"</span>
+                                <span class="built_in">exit</span> <span class="number">1</span>
+                            <span class="keyword">fi</span>
+                        <span class="keyword">fi</span>
+                    <span class="keyword">fi</span>
+                <span class="keyword">fi</span>
+            <span class="keyword">else</span>
+                <span class="keyword">if</span> [ <span class="variable">$FSTYPE</span> = <span class="string">"swap"</span> ] ; <span class="keyword">then</span>
+                    logger -t Auto-Mount <span class="string">"[Notice] Swap device /dev/<span class="variable">$DEV</span> was ignored"</span>
+                <span class="keyword">else</span>
+                    logger -t Auto-Mount <span class="string">"[Error] Unsupported filesystem '<span class="variable">$FSTYPE</span>' on /dev/<span class="variable">$DEV</span>"</span>
+                <span class="keyword">fi</span>
+            <span class="keyword">fi</span>
+            <span class="built_in">unset</span> MCMD
+        <span class="keyword">fi</span>
+        purge_mnts
+        ;;
+    remove)
+        [ -z <span class="string">"<span class="variable">$DEV</span>"</span> ] &amp;&amp; { logger -t Auto-Mount <span class="string">"[Error] Missing required arguments: \$devicename"</span>; <span class="built_in">exit</span> <span class="number">1</span>; }
+        <span class="keyword">if</span> `<span class="built_in">echo</span> <span class="string">"<span class="variable">$DEV</span>"</span> | grep -qs <span class="string">'^sd[a-z][1-9]$'</span>` ; <span class="keyword">then</span>
+            <span class="keyword">if</span> `grep -qs <span class="string">'/dev/$DEV'</span> /proc/mounts` ; <span class="keyword">then</span>
+                MPATH=`awk -F <span class="string">' '</span> <span class="string">'/\/dev\/'</span><span class="string">"<span class="variable">$DEV</span>"</span><span class="string">'/ {print $2}'</span> /proc/mounts <span class="number">2</span>&gt;/dev/null`
+                umount /dev/<span class="variable">$DEV</span>
+                [ $? <span class="operator">-eq</span> <span class="number">0</span> ] &amp;&amp;    logger -t Auto-Mount <span class="string">"[Notice] Block device <span class="variable">$DEV</span> unmounted"</span>
+                [ <span class="operator">-d</span> <span class="string">"<span class="variable">$MPATH</span>"</span> ] &amp;&amp; rm -rf <span class="variable">$MPATH</span> <span class="number">2</span>&gt;/dev/null
+            <span class="keyword">fi</span>
+            <span class="keyword">if</span> `grep -qs <span class="string">'/dev/$DEV'</span> /proc/swaps` ; <span class="keyword">then</span>
+                swapoff <span class="variable">$DEV</span>
+                [ $? <span class="operator">-eq</span> <span class="number">0</span> ] &amp;&amp;    logger -t Auto-Mount <span class="string">"[Notice] Swap device <span class="variable">$DEV</span> turned off"</span>                 
+            <span class="keyword">fi</span>            
+        <span class="keyword">fi</span>
+        purge_mnts
+        ;;
+    umountall)
+        CLI=<span class="string">"yes"</span>
+        umountall
+        ;;
+    purge)
+        CLI=<span class="string">"yes"</span>
+        purge_mnts
+        ;;
+    *)
+        <span class="built_in">echo</span> <span class="string">"[Error] ** Invalid action arguments: <span class="variable">$ACTION</span>"</span> | tee /proc/self/fd/<span class="number">2</span> | logger -t Auto-Mount
+        ;;
+<span class="keyword">esac</span>
+
+<span class="comment">## Execute the add-ons script</span>
+<span class="comment"># ADDSH_PATH="$(cd "$(dirname "$0")"; cd ..; pwd)/user"</span>
+<span class="keyword">if</span> [ -n <span class="string">"`ls -A <span class="variable">$ADDSH_PATH</span> 2&gt;&amp;-`"</span> ]; <span class="keyword">then</span>
+    i=<span class="number">0</span>
+    <span class="keyword">for</span> addsh <span class="keyword">in</span> <span class="variable">${ADDSH_PATH}</span>/[<span class="number">0</span>-<span class="number">9</span>][<span class="number">0</span>-<span class="number">9</span>]-* ; <span class="keyword">do</span>
+        [ <span class="variable">$i</span> <span class="operator">-eq</span> <span class="number">0</span> ] &amp;&amp; logger -t Auto-Mount <span class="string">"[Notice] -- Execute additional scripts ..."</span>
+        logger -t Hotplug-Debug <span class="string">"-- Exec script - <span class="variable">$addsh</span>"</span>
+        sh <span class="variable">$addsh</span> <span class="variable">$ACTION</span> <span class="variable">$DEV</span> 
+        <span class="built_in">let</span> i++
+    <span class="keyword">done</span>
+<span class="keyword">fi</span>
+<span class="comment"># Script EOF</span>
+</code></pre>
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Openwrt/"> #Openwrt </a>
+          
+            <a href="/tags/编译/"> #编译 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/04/Luci-Developing/">Openwrt开发与Luci介绍</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/08/12/php-ssh2-openwrt/">利用PHP SSH2扩展实现远程控制Openwrt</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2014/08/16/Openwrt-Compiling/"
+               data-title="Openwrt编译入门" data-url="http://masukio.tk/2014/08/16/Openwrt-Compiling/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Openwrt基础编译"><span class="nav-number">1.</span> <span class="nav-text">Openwrt基础编译</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Openwrt编译进阶"><span class="nav-number">2.</span> <span class="nav-text">Openwrt编译进阶</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改WIFI设置"><span class="nav-number">2.1.</span> <span class="nav-text">修改WIFI设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改LUCI"><span class="nav-number">2.2.</span> <span class="nav-text">修改LUCI</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改LUCI界面配置"><span class="nav-number">2.2.1.</span> <span class="nav-text">修改LUCI界面配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加释放内存"><span class="nav-number">2.2.2.</span> <span class="nav-text">添加释放内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在顶栏显示重启"><span class="nav-number">2.2.3.</span> <span class="nav-text">在顶栏显示重启</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在顶栏显示备份/升级"><span class="nav-number">2.2.4.</span> <span class="nav-text">在顶栏显示备份/升级</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改配置文件"><span class="nav-number">2.3.</span> <span class="nav-text">修改配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改root密码"><span class="nav-number">2.3.1.</span> <span class="nav-text">修改root密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改路由连接数"><span class="nav-number">2.3.2.</span> <span class="nav-text">修改路由连接数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改主机名，设定时区"><span class="nav-number">2.3.3.</span> <span class="nav-text">修改主机名，设定时区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SAMBA免密码访问"><span class="nav-number">2.3.4.</span> <span class="nav-text">SAMBA免密码访问</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集成软件"><span class="nav-number">2.4.</span> <span class="nav-text">集成软件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加aria2，luci添加，web管理界面"><span class="nav-number">2.4.1.</span> <span class="nav-text">添加aria2，luci添加，web管理界面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加将自己开发的程序"><span class="nav-number">2.4.2.</span> <span class="nav-text">添加将自己开发的程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HG255D个性化配置"><span class="nav-number">2.5.</span> <span class="nav-text">HG255D个性化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#开启HG255D编译"><span class="nav-number">2.5.1.</span> <span class="nav-text">开启HG255D编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#make_menuconfig配置"><span class="nav-number">2.5.2.</span> <span class="nav-text">make menuconfig配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开启POWER_LED状态指示灯"><span class="nav-number">2.5.3.</span> <span class="nav-text">开启POWER LED状态指示灯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用RA-MOD软件源"><span class="nav-number">2.5.4.</span> <span class="nav-text">使用RA-MOD软件源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加自动挂载脚本"><span class="nav-number">2.5.5.</span> <span class="nav-text">添加自动挂载脚本</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>

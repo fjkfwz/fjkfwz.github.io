@@ -1,0 +1,1209 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="Makefile,Openwrt," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> Openwrt编译过程 // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Openwrt编译过程
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-07-07
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Openwrt开发笔记/">Openwrt开发笔记</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/08/Openwrt-Makefile/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/08/Openwrt-Makefile/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：本篇通过分析Makefile,了解Openwrt编译过程，包括（1）Openwrt目录结构（2）主Makefile的解析过程，各子目录的目标生成。（3）kernel编译过程（4）firmware的生成过程（5）软件包的编译过程<br><a id="more"></a><br>从github上clone了openwrt的代码仓库。</p>
+<pre><code>git clone <span class="string">https:</span><span class="comment">//github.com/openwrt-mirror/openwrt.git</span>
+</code></pre><h1 id="Openwrt目录结构">Openwrt目录结构</h1><p><img src="http://images.cnitblog.com/blog/563391/201409/141300297779715.png" alt=""></p>
+<p>上图是openwrt目录结构，其中第一行是原始目录，第二行是编译过程中生成的目录。各目录的作用是：</p>
+<pre><code>tools - 编译时需要一些工具， tools里包含了获取和编译这些工具的命令。里面是一些<span class="constant">Makefile</span>，有的可能还有patch。每个<span class="constant">Makefile</span>里都有一句:$(eval $(call <span class="constant">Host</span>Build))，表示编译这个工具是为了在主机上使用的。
+toolchain - 包含一些命令去获取<span class="built_in">kernel</span> headers, <span class="constant">C</span> library, bin-utils, compiler, debugger
+<span class="literal">target</span> - 各平台在这个目录里定义了firmware和<span class="built_in">kernel</span>的编译过程。
+<span class="keyword">package</span> - 包含针对各个软件包的<span class="constant">Makefile</span>。openwrt定义了一套<span class="constant">Makefile</span>模板，各软件包参照这个模板定义了自己的信息，如软件包的版本、下载地址、编译方式、安装地址等。
+<span class="literal">include</span> - openwrt的<span class="constant">Makefile</span>都存放在这里。
+scripts - 一些perl脚本，用于软件包管理。
+dl - 软件包下载后都放到这个目录里
+build_dir - 软件包都解压到build_dir/里，然后在此编译
+staging_dir - 最终安装目录。tools, toolchain被安装到这里，rootfs也会放到这里。
+feeds - feeds.conf订阅的软件下载目录。
+bin - 编译完成之后，firmware和各ipk会放到此目录下。
+</code></pre><h1 id="Openwrt编译过程">Openwrt编译过程</h1><h2 id="main_Makefile">main Makefile</h2><p>openwrt根目录下的Makefile是执行make命令时的入口。从这里开始分析。</p>
+<pre><code>world:
+
+ifndef ($(OPENWRT_BUILD),<span class="number">1</span>)
+  <span class="comment"># 第一个逻辑</span>
+   <span class="keyword">...</span>
+<span class="keyword">else</span>
+  <span class="comment"># 第二个逻辑</span>
+   <span class="keyword">...</span>
+endif
+</code></pre><p>上面这段是主Makefile的结构，可以得知：</p>
+<p>执行make时，若无任何目标指定，则默认目标是world<br>执行make时，无参数指定，则会进入第一个逻辑。如果执行命令make OPENWRT_BUILD=1，则直接进入第二个逻辑。</p>
+<p>编译时一般直接使用<code>make V=s -j 5</code>这样的命令，不会指定OPENWRT_BUILD变量，显然这里OPENWRT_BUILD用于标记当前openwrt BSP是否已经编译过，因此第一次编译当然应该执行第一个逻辑，同时令OPENWRT_BUILD为1，标示openwrt BSP已经编译过了。</p>
+<h2 id="第一个逻辑">第一个逻辑</h2><pre><code>override OPENWRT_B<span class="built_in">UILD</span>=<span class="number">1</span>
+<span class="keyword">export</span> OPENWRT_B<span class="built_in">UILD</span>
+</code></pre><p>更改了OPENWRT_BUILD变量的值。这里起到的作用是下次执行make时，因为已经编译过，会进入到第二逻辑中。</p>
+<p>第一个逻辑中会include toplevel.mk，该文件中的 “%::” 用于解释world目标的规则：</p>
+<pre><code>prereq:: prepare-tmpinfo .config
+    <span class="variable">@+</span><span class="variable">$(</span>MAKE) -r -s tmp/.prereq-build <span class="variable">$(</span>PREP_MK)
+    <span class="variable">@+</span><span class="variable">$(</span>NO_TRACE_MAKE) -r -s <span class="variable">$@</span>
+
+<span class="variable">%:</span>:
+    <span class="variable">@+</span><span class="variable">$(</span>PREP_MK) <span class="variable">$(</span>NO_TRACE_MAKE) -r -s prereq
+    <span class="variable">@(</span> \
+        cp .config tmp/.config; \
+        ./scripts/config/conf --defconfig=tmp/.config -w tmp/.config Config.<span class="keyword">in</span> &gt; /dev/null <span class="number">2</span>&gt;&amp;<span class="number">1</span>; \
+        <span class="keyword">if</span> ./scripts/kconfig.pl <span class="string">'&gt;'</span> .config tmp/.config | grep -q CONFIG; then \
+            printf <span class="string">"$(_R)WARNING: your configuration is out of sync. Please run make menuconfig, oldconfig or defconfig!$(_N)\n"</span> &gt;&amp;<span class="number">2</span>; \
+        fi \
+    )
+    <span class="variable">@+</span><span class="variable">$(</span>ULIMIT_FIX) <span class="variable">$(</span>SUBMAKE) -r <span class="variable">$@</span>
+</code></pre><p>执行 make V=s 时，上面这段规则简化为：</p>
+<pre><code>prereq<span class="type-annotation">::</span> prepare-tmpinfo .config
+    <span class="macrocall">@make</span> -r -s tmp/.prereq-build
+    <span class="macrocall">@make</span> V=ss -r -s prereq
+
+%<span class="type-annotation">::</span>
+    <span class="macrocall">@make</span> V=s -r -s prereq
+    <span class="macrocall">@make</span> -w -r world
+</code></pre><p>可见其中最终又执行了prereq和world目标，这两个目标都会进入到第二逻辑中。</p>
+<h2 id="第二逻辑">第二逻辑</h2><p>首先就引入了target, package, tools, toolchain这四个关键目录里的Makefile文件</p>
+<pre><code><span class="literal">include</span> <span class="literal">target</span>/<span class="constant">Makefile</span>
+<span class="literal">include</span> <span class="keyword">package</span>/<span class="constant">Makefile</span>
+<span class="literal">include</span> tools/<span class="constant">Makefile</span>
+<span class="literal">include</span> toolchain/<span class="constant">Makefile</span>
+</code></pre><p>这些子目录里的Makefile使用include/subdir.mk里定义的两个函数来动态生成规则，这两个函数是subdir和stampfile</p>
+<h2 id="stampfile">stampfile</h2><p>拿target/Makefile举例：</p>
+<pre><code><span class="list">(<span class="keyword"><span class="built_in">eval</span></span><span class="list">(<span class="keyword">call</span> stampfile,$<span class="list">(<span class="keyword">curdir</span>)</span>,target,prereq,.config)</span>)</span>
+</code></pre><p>会生成规则：</p>
+<pre><code>target/stamp-<span class="symbol">prereq:</span>=<span class="variable">$(</span><span class="constant">STAGING_DIR</span>)/stamp/.target_prereq
+
+<span class="variable">$$</span>(target/stamp-prereq)<span class="symbol">:</span> <span class="variable">$(</span><span class="constant">TMP_DIR</span>)/.build .config
+  @+<span class="variable">$(</span><span class="constant">SCRIPT_DIR</span>)/timestamp.pl -n <span class="variable">$$</span>(target/stamp-prereq) target .config || \
+      make <span class="variable">$$</span>(target/flags-prereq) target/prereq
+  <span class="variable">@mkdir</span> -p <span class="variable">$$</span><span class="variable">$$</span>(dirname <span class="variable">$$</span>(target/stamp-prereq))
+  <span class="variable">@touch</span> <span class="variable">$$</span>(target/stamp-prereq)
+
+<span class="variable">$$</span>(<span class="keyword">if</span> <span class="variable">$(</span>call debug,target,v),,.<span class="constant">SILENT</span><span class="symbol">:</span> <span class="variable">$$</span>(target/stamp-prereq))
+
+.<span class="constant">PRECIOUS</span><span class="symbol">:</span> <span class="variable">$$</span>(target/stamp-prereq) <span class="comment"># work around a make bug</span>
+
+target/<span class="regexp">/clean:=target/stamp</span>-prereq/clean
+target/stamp-prereq/<span class="symbol">clean:</span> <span class="constant">FORCE</span>
+  <span class="variable">@rm</span> -f <span class="variable">$$</span>(target/stamp-prereq)
+</code></pre><p>所以可以简单的看作：(eval(call stampfile,(curdir),target,prereq,.config))生成了目标(target/stamp-prereq)</p>
+<pre><code>对于<span class="keyword">target</span>分别生成了：(<span class="keyword">target</span>/stamp-preq)，(<span class="keyword">target</span>/stamp-copile)， $(<span class="keyword">target</span>/stamp-install)
+toolchain : $(toolchain/stamp-install)
+<span class="keyword">package</span> : (<span class="keyword">package</span>/stamp-preq),(<span class="keyword">package</span>/stamp-cleanup), (<span class="keyword">package</span>/stamp-compile),(<span class="keyword">package</span>/stamp-install)
+tools : $(tools/stamp-install)
+</code></pre><h2 id="OpenWrt的主Makefile工作过程">OpenWrt的主Makefile工作过程</h2><h2 id="subdir">subdir</h2><p>subdir这个函数写了一大堆东西，看起来很复杂 。</p>
+<p>$(call subdir, target) 会遍历下的子目录，执行 make -C 操作。这样就切入子目录中去了。</p>
+<h2 id="目录变量">目录变量</h2><p>几个重要的目录路径：</p>
+<p>KERNEL_BUILD_DIR</p>
+<pre><code>build_dir/<span class="keyword">target</span>-mipsel_24kec+dsp_uClibc-<span class="number">0.9</span>.33.2/linux-ramips_mt7620a/linux-<span class="number">3.14</span>.18
+</code></pre><p>LINUX_DIR</p>
+<pre><code>build_dir/<span class="keyword">target</span>-mipsel_24kec+dsp_uClibc-<span class="number">0.9</span>.33.2/linux-ramips_mt7620a/linux-<span class="number">3.14</span>.18
+</code></pre><p>KDIR</p>
+<pre><code>build_dir/<span class="keyword">target</span>-mipsel_24kec+dsp_uClibc-<span class="number">0.9</span>.33.2/linux-ramips_mt7620a
+</code></pre><p>BIN_DIR</p>
+<pre><code>bin/ramips
+Makefile中包含了rules.<span class="keyword">mk</span>, target.<span class="keyword">mk</span>等.<span class="keyword">mk</span>文件，这些文件中定义了许多变量，有些是路径相关的，有些是软件相关的。这些变量在整个Makefile工程中经常被用到，
+</code></pre><p>TARGET_ROOTFS_DIR</p>
+<pre><code>build_dir/<span class="keyword">target</span>-mipsel_24kec+dsp_uClibc-<span class="number">0.9</span>.33.2
+</code></pre><p>BUILD_DIR</p>
+<pre><code>build_dir/<span class="keyword">target</span>-mipsel_24kec+dsp_uClibc-<span class="number">0.9</span>.33.2
+</code></pre><p>STAGING_DIR_HOST</p>
+<pre><code>staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2
+</code></pre><p>TARGET_DIR</p>
+<pre><code>build_dir/<span class="literal">target</span>-mipsel_24kec+dsp_uClibc-<span class="number">0</span>.<span class="number">9.33</span>.<span class="number">2</span>/<span class="literal">root</span>-ramips
+</code></pre><h2 id="kernel_编译：">kernel 编译：</h2><p>target/linux/ramips/Makefile: <code>$(eval $(call BuildTarget))</code></p>
+<p>target/linux/Makefile : <code>export TARGET_BUILD=1</code></p>
+<pre><code>根目录中<span class="constant">Makefile：</span><span class="keyword">include</span> target/<span class="constant">Makefile </span>--&gt;
+target/<span class="constant">Makefile中</span>：<span class="variable">$(</span>curdir)/<span class="symbol">builddirs:</span>=linux sdk imagebuilder toolchain --&gt;
+target/linux中<span class="constant">Makefile:</span> @+<span class="variable">$(</span><span class="constant">NO_TRACE_MAKE)</span> -<span class="constant">C </span><span class="variable">$(</span><span class="constant">BOARD)</span> <span class="variable">$@</span>  --&gt;显然这里<span class="constant">BOARD是</span>ramips
+target/linux/ramips中<span class="constant">Makefile:</span>    <span class="keyword">include</span> <span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/target.mk
+</code></pre><p>include/target.mk中如下内容:</p>
+<pre><code>ifeq (<span class="variable">$(</span><span class="constant">TARGET_BUILD)</span>,<span class="number">1</span>)
+  <span class="keyword">include</span> <span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/kernel-build.mk
+  <span class="constant">BuildTarget?</span>=<span class="variable">$(</span><span class="constant">BuildKernel)</span>
+endif
+<span class="constant">BuildKernel是</span><span class="keyword">include</span>/kernel-build.
+</code></pre><p>mk定义的一个多行变量，其中描述了如何编译内核, 主要关注其中install规则的依赖链：</p>
+<pre><code>  <span class="variable">$(</span><span class="constant">KERNEL_BUILD_DIR)</span>/symtab.<span class="symbol">h:</span> <span class="constant">FORCE</span>
+    rm -f <span class="variable">$(</span><span class="constant">KERNEL_BUILD_DIR)</span>/symtab.h
+    touch <span class="variable">$(</span><span class="constant">KERNEL_BUILD_DIR)</span>/symtab.h
+    +<span class="variable">$(</span><span class="constant">MAKE)</span> <span class="variable">$(</span><span class="constant">KERNEL_MAKEOPTS)</span> vmlinux
+    ...
+
+  <span class="variable">$(</span><span class="constant">LINUX_DIR)</span>/.<span class="symbol">image:</span> <span class="variable">$(</span><span class="constant">STAMP_CONFIGURED)</span> <span class="variable">$(</span>if <span class="variable">$(</span><span class="constant">CONFIG_STRIP_KERNEL_EXPORTS)</span>,<span class="variable">$(</span><span class="constant">KERNEL_BUILD_DIR)</span>/symtab.h) <span class="constant">FORCE</span>
+    <span class="variable">$(</span><span class="constant">Kernel/CompileImage)</span>
+    <span class="variable">$(</span><span class="constant">Kernel/CollectDebug)</span>
+    touch <span class="variable">$$</span>@
+
+
+  <span class="symbol">install:</span> <span class="variable">$(</span><span class="constant">LINUX_DIR)</span>/.image
+    +<span class="variable">$(</span><span class="constant">MAKE)</span> -<span class="constant">C </span>image compile install <span class="constant">TARGET_BUILD=</span>
+<span class="number">1</span>. 触发make vmlinux命令生成vmlinux： install --&gt; <span class="variable">$(</span><span class="constant">LINUX_DIR)</span>/.image --&gt; <span class="variable">$(</span><span class="constant">KERNEL_BUILD_DIR)</span>/symtab.h --&gt; `<span class="variable">$(</span><span class="constant">MAKE)</span> <span class="variable">$(</span><span class="constant">KERNEL_MAKEOPTS)</span> vmlinux`
+
+<span class="number">2</span>. 对vmlinux做objcopy, strip操作<span class="symbol">:</span> <span class="variable">$(</span><span class="constant">LINUX_DIR)</span>/.image --&gt; <span class="variable">$(</span><span class="constant">Kernel/CompileImage)</span> --&gt; <span class="variable">$(</span>call <span class="constant">Kernel/CompileImage/Default)</span> --&gt; <span class="variable">$(</span>call <span class="constant">Kernel/CompileImage/Default)</span>
+
+    <span class="variable">$(</span><span class="constant">KERNEL_CROSS)</span>objcopy -<span class="constant">O </span>binary <span class="variable">$(</span><span class="constant">OBJCOPY_STRIP)</span> -<span class="constant">S </span><span class="variable">$(</span><span class="constant">LINUX_DIR)</span>/vmlinux <span class="variable">$(</span><span class="constant">LINUX_KERNEL)</span><span class="variable">$(</span><span class="number">1</span>)
+        --&gt; build_dir/target-mipsel_24kec+dsp_uClibc-<span class="number">0</span>.<span class="number">9.33</span>.<span class="number">2</span>/linux-ramips_mt7620a/vmlinux
+
+    <span class="variable">$(</span><span class="constant">KERNEL_CROSS)</span>objcopy <span class="variable">$(</span><span class="constant">OBJCOPY_STRIP)</span> -<span class="constant">S </span><span class="variable">$(</span><span class="constant">LINUX_DIR)</span>/vmlinux <span class="variable">$(</span><span class="constant">KERNEL_BUILD_DIR)</span>/vmlinux<span class="variable">$(</span><span class="number">1</span>).elf
+        --&gt; build_dir/target-mipsel_24kec+dsp_uClibc-<span class="number">0</span>.<span class="number">9.33</span>.<span class="number">2</span>/linux-ramips_mt7620a/vmlinux.elf
+
+    <span class="variable">$(</span><span class="constant">CP)</span> <span class="variable">$(</span><span class="constant">LINUX_DIR)</span>/vmlinux <span class="variable">$(</span><span class="constant">KERNEL_BUILD_DIR)</span>/vmlinux.debug
+        --&gt; build_dir/target-mipsel_24kec+dsp_uClibc-<span class="number">0</span>.<span class="number">9.33</span>.<span class="number">2</span>/linux-ramips_mt7620a/vmlinux.debug
+</code></pre><h2 id="生成firmware">生成firmware</h2><p>firmware由kernel和rootfs两个部分组成，要对两个部分先分别处理，然后再合并成一个.bin文件。先看一下这个流程。</p>
+<p>“target/linux/ramips/image/Makefile” 文件中的最后一句：$(eval $(call BuildImage))，将BuildImage展开在这里。BuildImage定义在 include/image.mk 文件中，其中定义了数个目标的规则。</p>
+<pre><code>define BuildImage
+
+    compile: compile-targets FORCE
+        **$(<span class="operator"><span class="keyword">call</span> Build/Compile)**
+
+    <span class="keyword">install</span>: compile <span class="keyword">install</span>-targets <span class="keyword">FORCE</span>
+        ...
+        $(<span class="keyword">call</span> Image/BuildKernel) ## 处理vmlinux
+        ...
+        $(<span class="keyword">call</span> Image/mkfs/squashfs) ## 生成squashfs，并与vmlinux合并成一个.<span class="keyword">bin</span>文件
+        ...
+
+endef</span>
+</code></pre><h2 id="处理vmlinux:_Image/BuildKernel">处理vmlinux: Image/BuildKernel</h2><p>target/linux/ramips/image/Makefile:</p>
+<pre><code>define <span class="constant">Image/BuildKernel</span>
+    cp <span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux.elf <span class="variable">$(</span><span class="constant">BIN_DIR)</span>/<span class="variable">$(</span><span class="constant">VMLINUX)</span>.elf
+    cp <span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux <span class="variable">$(</span><span class="constant">BIN_DIR)</span>/<span class="variable">$(</span><span class="constant">VMLINUX)</span>.bin
+    <span class="variable">$(</span>call <span class="constant">CompressLzma,</span><span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux,<span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux.bin.lzma)
+    <span class="variable">$(</span>call <span class="constant">MkImage,</span>lzma,<span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux.bin.lzma,<span class="variable">$(</span><span class="constant">KDIR)</span>/uImage.lzma)
+    cp <span class="variable">$(</span><span class="constant">KDIR)</span>/uImage.lzma <span class="variable">$(</span><span class="constant">BIN_DIR)</span>/<span class="variable">$(</span><span class="constant">UIMAGE)</span>.bin
+ifneq (<span class="variable">$(</span><span class="constant">CONFIG_TARGET_ROOTFS_INITRAMFS)</span>,)
+    cp <span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux-initramfs.elf <span class="variable">$(</span><span class="constant">BIN_DIR)</span>/<span class="variable">$(</span><span class="constant">VMLINUX)</span>-initramfs.elf
+    cp <span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux-initramfs <span class="variable">$(</span><span class="constant">BIN_DIR)</span>/<span class="variable">$(</span><span class="constant">VMLINUX)</span>-initramfs.bin
+    <span class="variable">$(</span>call <span class="constant">CompressLzma,</span><span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux-initramfs,<span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux-initramfs.bin.lzma)
+    <span class="variable">$(</span>call <span class="constant">MkImage,</span>lzma,<span class="variable">$(</span><span class="constant">KDIR)</span>/vmlinux-initramfs.bin.lzma,<span class="variable">$(</span><span class="constant">KDIR)</span>/uImage-initramfs.lzma)
+    cp <span class="variable">$(</span><span class="constant">KDIR)</span>/uImage-initramfs.lzma <span class="variable">$(</span><span class="constant">BIN_DIR)</span>/<span class="variable">$(</span><span class="constant">UIMAGE)</span>-initramfs.bin
+endif
+    <span class="variable">$(</span>call <span class="constant">Image/Build/Initramfs)</span>
+endef
+</code></pre><h2 id="lzma压缩内核">lzma压缩内核</h2><pre><code>build_dir/target-mipsel_24kec+dsp_uClibc-<span class="number">0.9</span>.<span class="number">33.2</span>/linux-ramips_mt7620a/ 目录中:
+
+lzma e vmlinux -lc1 -lp2 -pb2 vmlinux<span class="class">.bin</span><span class="class">.lzma</span>
+</code></pre><h2 id="MkImage">MkImage</h2><pre><code>build_dir/target-mipsel_24kec+dsp_uClibc-<span class="number">0.9</span>.<span class="number">33.2</span>/linux-ramips_mt7620a/ 目录中：
+
+mkimage -A mips -O linux -T  kernel -C lzma -<span class="tag">a</span> <span class="number">0</span>x80000000 -e <span class="number">0</span>x80000000 -n <span class="string">"MIPS OpenWrt Linux-3.14.18"</span> -d vmlinux<span class="class">.bin</span><span class="class">.lzma</span> uImage<span class="class">.lzma</span>
+copy
+VMLINUX:=$(IMG_PREFIX)-vmlinux --&gt; openwrt-ramips-mt7620a-vmlinux
+UIMAGE:=$(IMG_PREFIX)-uImage --&gt; openwrt-ramips-mt7620a-uImage
+cp $(KDIR)/uImage<span class="class">.lzma</span> $(BIN_DIR)/$(UIMAGE)<span class="class">.bin</span>
+把uImage.lzma复制到bin/ramips/目录下：
+cp $(KDIR)/uImage<span class="class">.lzma</span> bin/ramips/openwrt-ramips-mt7620a-uImage
+</code></pre><h2 id="制作squashfs，生成-bin:_$(call_Image/mkfs/squashfs)">制作squashfs，生成.bin: $(call Image/mkfs/squashfs)</h2><pre><code>define <span class="constant">Image</span>/mkfs/squashfs
+    <span class="variable">@mkdir</span> -p <span class="variable">$(</span><span class="constant">TARGET_DIR</span>)/overlay
+    <span class="variable">$(</span><span class="constant">STAGING_DIR_HOST</span>)/bin/mksquashfs4 <span class="variable">$(</span><span class="constant">TARGET_DIR</span>) <span class="variable">$(</span><span class="constant">KDIR</span>)/root.squashfs -nopad -noappend -root-owned -comp <span class="variable">$(</span><span class="constant">SQUASHFSCOMP</span>) <span class="variable">$(</span><span class="constant">SQUASHFSOPT</span>) -processors <span class="variable">$(</span><span class="keyword">if</span> <span class="variable">$(</span><span class="constant">CONFIG_PKG_BUILD_JOBS</span>),<span class="variable">$(</span><span class="constant">CONFIG_PKG_BUILD_JOBS</span>),<span class="number">1</span>)
+    <span class="variable">$(</span>call <span class="constant">Image</span>/<span class="constant">Build</span>,squashfs)
+endif
+</code></pre><h2 id="mkdir_-p_$(TARGET_DIR)/overlay">mkdir -p $(TARGET_DIR)/overlay</h2><pre><code><span class="title">mkdir</span> -p build_dir/target-mipsel_24kec+dsp_uClibc-<span class="number">0.9.33.2</span>/root-ramips/overlay
+</code></pre><h2 id="mksquashfs4">mksquashfs4</h2><pre><code><span class="variable">$(</span><span class="constant">STAGING_DIR_HOST</span>)/bin/mksquashfs4 <span class="variable">$(</span><span class="constant">TARGET_DIR</span>) <span class="variable">$(</span><span class="constant">KDIR</span>)/root.squashfs -nopad -noappend -root-owned -comp <span class="variable">$(</span><span class="constant">SQUASHFSCOMP</span>) <span class="variable">$(</span><span class="constant">SQUASHFSOPT</span>) -processors <span class="variable">$(</span><span class="keyword">if</span> <span class="variable">$(</span><span class="constant">CONFIG_PKG_BUILD_JOBS</span>),<span class="variable">$(</span><span class="constant">CONFIG_PKG_BUILD_JOBS</span>),<span class="number">1</span>)
+</code></pre><h2 id="制作squashfs文件系统，生成root-squashfs:">制作squashfs文件系统，生成root.squashfs:</h2><pre><code>mksquashfs4 root-ramips root<span class="class">.squashfs</span> -nopad -noappend -root-owned -comp gzip -<span class="tag">b</span> <span class="number">256</span>k -<span class="tag">p</span> <span class="string">'/dev d 755 0 0'</span> -<span class="tag">p</span> <span class="string">'/dev/console c 600 0 0 5 1'</span> -processors <span class="number">1</span>
+$(call Image/Build,squashfs)
+</code></pre><p>在 target/linux/ramips/image/Makefile 中：</p>
+<pre><code>define Image/Build
+    $(call Image/Build/$(<span class="number">1</span>))
+    dd <span class="keyword">if</span>=$(KDIR)/root.$(<span class="number">1</span>) <span class="keyword">of</span>=$(BIN_DIR)/$(IMG_PREFIX)-root.$(<span class="number">1</span>) bs=<span class="number">128</span>k conv=sync
+    $(call Image/Build/Profile/$(PROFILE),$(<span class="number">1</span>))
+endef
+</code></pre><p>dd if=(KDIR)/root.squashfsof=(BIN_DIR)/$(IMG_PREFIX)-root.squashfs bs=128k conv=sync<br>dd if=build_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/linux-ramips_mt7620a/root.squashfs of=bin/ramips/openwrt-ramips-mt7620-root.squashfs bs=128k conv=sync</p>
+<p>(callImage/Build/Profile/(PROFILE),squashfs)<br>target/linux/ramips/mt7620a/profiles/00-default.mk, 中调用 Profile 函数：<code>$(eval $(call Profile,Default))</code></p>
+<p>include/target.mk 中定义了 Profile 函数， 其中令 PROFILE=Default</p>
+<pre><code><span class="class"><span class="keyword">define</span> <span class="title">Image</span>/<span class="title">Build</span>/<span class="title">Profile</span>/<span class="title">Default</span>
+    $</span>(call Image/Build/Profile/MT7620a,$(<span class="number">1</span>))
+    <span class="attribute">...</span>
+endef
+</code></pre><p>规则依赖序列如下：</p>
+<pre><code>$<span class="function"><span class="params">(call Image<span class="pi">/Build/Profile/</span>$(PROFILE),squashfs)</span>
+  --&gt;</span> $<span class="function"><span class="params">(call BuildFirmware/Default8M/squashfs,squashfs,mt7620a,MT7620a)</span>
+      --&gt;</span> $<span class="function"><span class="params">(call BuildFirmware/OF,squashfs,mt7620a,MT7620a,<span class="number">8060928</span>)</span>
+          --&gt;</span> $<span class="function"><span class="params">(call MkImageLzmaDtb,mt7620a,MT7620a)</span>
+              --&gt;</span> $<span class="function"><span class="params">(call PatchKernelLzmaDtb,mt7620a,MT7620a)</span>
+              --&gt;</span> $<span class="function"><span class="params">(call MkImage,lzma,$(KDIR)/vmlinux-mt7620a.bin.lzma,$(KDIR)/vmlinux-mt7620a.uImage)</span>
+      --&gt;</span> $(call MkImageSysupgrade/squashfs,squashfs,mt7620a,<span class="number">8060928</span>)
+</code></pre><p>其中的主要步骤：</p>
+<ul>
+<li>复制： cp (KDIR)/vmlinux(KDIR)/vmlinux-mt7620a</li>
+<li>生成dtb文件：(LINUXDIR)/scripts/dtc/dtc-Odtb-o(KDIR)/MT7620a.dtb ../dts/MT7620a.dts</li>
+<li>将内核与dtb文件合并：(STAGINGDIRHOST)/bin/patch-dtb(KDIR)/vmlinux-mt7620a $(KDIR)/MT</li>
+<li><p>使用lzma压缩：(callCompressLzma,(KDIR)/vmlinux-mt7620a,$(KDIR)/vmlinux-mt7620a.bin.lzma)<br>将lzma压缩后的文件经过mkimage工具处理，即在头部添加uboot可识别的信息。<br>接下来就是合并生成firmware固件了：</p>
+<p>  MkImageSysupgrade/squashfs, squashfs, mt7620a,8060928</p>
+<p>  cat vmlinux-mt7620a.uImage root.squashfs &gt; openwrt-ramips-mt7620-mt7620a-squashfs-sysupgrade.bin<br>  —&gt; 制作squashfs bin文档, 并确认它的大小 &lt; 8060928 才是有效的，否则报错。</p>
+</li>
+</ul>
+<p>总结： 整个流程下来，其实最烦索的还是对内核生成文件vmlinux的操作，经过了objcopy, patch-dtb, lzma, mkimage 等过程生成一个uImage，再与mksquashfs工具制作的文件系统rootfs.squashfs合并。</p>
+<h1 id="主MakeFile文件">主MakeFile文件</h1><p>OpenWrt的主Makefile文件只有100行，可以简单分为三部分，1~17行为前导部分，19~31为首次执行部分，33~101为再次执行部分。</p>
+<h2 id="前导部分">前导部分</h2><pre><code><span class="constant">CURDIR为</span>make默认变量，默认值为当前目录。
+前导部分主要把变量<span class="constant">TOPDIR赋</span>值为当前目录，把变量<span class="constant">LC_ALL、LANG赋</span>值为<span class="constant">C，</span>并使用变量延伸指示符export，把上述三个变量延伸到下层<span class="constant">Makefile。</span>
+
+使用文件使用指示符<span class="keyword">include</span>引入<span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>/host.mk。在<span class="constant">OpenWrt的</span>主<span class="constant">Makefile文</span>件使用了多次<span class="keyword">include</span>指示符，说明主<span class="constant">Makefile文</span>件被拆分成多个文件，被拆分的文件放在不同的目录。拆分的目的是明确各部分的功能，而且增加其灵活性。
+在前导部分比较费解的是使用world目标，在makefile中基本规则为：
+<span class="constant">TARGETS </span><span class="symbol">:</span> <span class="constant">PREREQUISITES</span>
+<span class="constant">COMMAND</span>
+...
+
+即makefile规则由目标、依赖、命令三部分组成，在<span class="constant">OpenWrt的</span>主<span class="constant">Makefile文</span>件的第一个目标world没有依赖和命令。它主要起到指示当make命令不带目标时所要执行的目标，没有设定依赖和命令部分表明此目标在此后将会有其他依赖关系或命令。world目标的命令需要进一步参考<span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>/toplevel.mk和主<span class="constant">Makefile文</span>件的再次执行部分。
+
+<span class="comment">##首次执行部分</span>
+<span class="constant">OPENWRT_BUILD是</span>区分首次执行与再次执行的变量。在首次执行时使用强制赋值指示符override把<span class="constant">OPENWRT_BUILD赋</span>值为<span class="number">1</span>，并使用变量延伸指示符export把<span class="constant">OPENWRT_BUILD延</span>伸。在<span class="constant">OPENWRT_BUILD使</span>用强制赋值指示符override意味着make命令行可能引入<span class="constant">OPENWRT_BUILD参</span>数。
+
+引入<span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>/debug.mk、<span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>/depends.mk、<span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>/toplevel.mk三个文件，由于<span class="constant">TOPDIR是</span>固定的，所以三个文件也是固定的。其中<span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>/toplevel.mk的<span class="number">135</span>行%<span class="symbol">:</span><span class="symbol">:</span>有效解释首次执行时world目标的规则。
+</code></pre><h2 id="再次执行部分">再次执行部分</h2><pre><code>引入rules.mk、<span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/depends.mk、<span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/subdir.mk、target/<span class="constant">Makefile、</span>package/<span class="constant">Makefile、</span>tools/<span class="constant">Makefile、</span>toolchain/<span class="constant">Makefile七</span>个文件，rules.mk没有目录名，即引入与主<span class="constant">Makefile文</span>件目录相同的rules.mk。在rules.mk定义了<span class="constant">INCLUDE_DIR为</span><span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>，所以<span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/depends.mk实际上与首次执行时引入的<span class="variable">$(</span><span class="constant">TOPDIR)</span>/<span class="keyword">include</span>/depends.mk是同一个文件。
+
+四个子目录下的<span class="constant">Makefile实</span>际上是不能独立执行。主要利用<span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/subdir.mk动态建立规则，诸如<span class="variable">$(</span>toolchain/stamp-install)目标是靠<span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/subdir.mk的stampfile函数动态建立。在package/<span class="constant">Makefile动</span>态建立了<span class="variable">$(</span>package/ stamp-prereq)、<span class="variable">$(</span>package/ stamp-cleanup)、<span class="variable">$(</span>package/ stamp-compile)、<span class="variable">$(</span>package/ stamp-install)、<span class="variable">$(</span>package/ stamp-rootfs-prepare)目标。
+
+定义一些使用变量命名的目标，其变量的赋值位置在<span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/subdir.mk的stampfile函数中。目标只有依赖关系，可能说明其工作顺序，在<span class="variable">$(</span><span class="constant">INCLUDE_DIR)</span>/subdir.mk的stampfile函数中有进一步说明其目标执行的命令，并为目标建立一个空文件，即使用变量命名的目标为真实的文件。
+</code></pre><h2 id="定义一些使用固定的目标规则">定义一些使用固定的目标规则</h2><pre><code>其中：clean是清除编译结果的目标，清除<span class="variable">$(</span><span class="constant">BUILD_DIR)</span> <span class="variable">$(</span><span class="constant">BIN_DIR)</span> <span class="variable">$(</span><span class="constant">BUILD_LOG_DIR)</span>三个目录的用意是十分明确。暂时不知道为什么执行make target/linux/clean。
+
+dirclean是删除所有编译过程产生的目录和文件的目标，执行dirclean目标依赖于clean，因此将执行clean目标所执行的命令，然后删除<span class="variable">$(</span><span class="constant">STAGING_DIR)</span> <span class="variable">$(</span><span class="constant">STAGING_DIR_HOST)</span> <span class="variable">$(</span><span class="constant">STAGING_DIR_TOOLCHAIN)</span> <span class="variable">$(</span><span class="constant">TOOLCHAIN_DIR)</span> <span class="variable">$(</span><span class="constant">BUILD_DIR_HOST)</span> <span class="variable">$(</span><span class="constant">BUILD_DIR_TOOLCHAIN)</span>目录，以及删除<span class="variable">$(</span><span class="constant">TMP_DIR)</span>目录。上述目录的变量均在rules.mk定义。好像删除staging_dir目录就意味着删除staging_dir目录下的所有子目录，不知道为什么要强调删除<span class="variable">$(</span><span class="constant">STAGING_DIR_HOST)</span> <span class="variable">$(</span><span class="constant">STAGING_DIR_TOOLCHAIN)</span> <span class="variable">$(</span><span class="constant">TOOLCHAIN_DIR)</span>目录。同样删除builde_dir目录就意味着删除builde_dir目录下的所有子目录，不知道为什么要强调删除<span class="variable">$(</span><span class="constant">BUILD_DIR_TOOLCHAIN)</span>目录。
+
+tmp/.prereq_packages目标是对所需软件包的预处理。目标依赖于.config，即执行make menuconfig后将会进行一次所需软件包的预处理。不知什么原因在编译前删除tmp目录，执行时无法建立tmp/.prereq_packages文件。
+
+prereq应该是预请求目标，在<span class="constant">OpenWrt执</span>行<span class="constant">Makefile时</span>好像都要先执行prereq目标。
+
+prepare应该是准备目标，是world依赖的一个伪目标。依赖于文件.config和<span class="variable">$(</span>tools/stamp-install) <span class="variable">$(</span>toolchain/stamp-install)目标。
+
+world就是编译的目标。依赖于prepare为目标和前面提到的变量命名目标。采用取消隐含规则方式执行package/index目标。package/index目标在package/<span class="constant">Makefile的</span><span class="number">92</span>行定义。
+
+package/symlinks和package/symlinks-install是更新或安装软件包来源的目标，使用<span class="variable">$(</span><span class="constant">SCRIPT_DIR)</span>/feeds脚本文件完成。
+
+package/symlinks-clean是清除软件包来源的目标，也是使用<span class="variable">$(</span><span class="constant">SCRIPT_DIR)</span>/feeds脚本文件完成。
+
+最后使用伪目标.<span class="constant">PHONY说</span>明clean dirclean prereq prepare world package/symlinks package/symlinks-install package/symlinks-clean属于伪目标。通过伪目标说明可以知道可以执行的目标。
+</code></pre>
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Makefile/"> #Makefile </a>
+          
+            <a href="/tags/Openwrt/"> #Openwrt </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/08/Openwrt-New-Makefile/">Openwrt Makefile写作格式</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/07/Image-Builder/">利用Image Builder编译Openwrt固件</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/07/08/Openwrt-Makefile/"
+               data-title="Openwrt编译过程" data-url="http://masukio.tk/2015/07/08/Openwrt-Makefile/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Openwrt目录结构"><span class="nav-number">1.</span> <span class="nav-text">Openwrt目录结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Openwrt编译过程"><span class="nav-number">2.</span> <span class="nav-text">Openwrt编译过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#main_Makefile"><span class="nav-number">2.1.</span> <span class="nav-text">main Makefile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第一个逻辑"><span class="nav-number">2.2.</span> <span class="nav-text">第一个逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二逻辑"><span class="nav-number">2.3.</span> <span class="nav-text">第二逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stampfile"><span class="nav-number">2.4.</span> <span class="nav-text">stampfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenWrt的主Makefile工作过程"><span class="nav-number">2.5.</span> <span class="nav-text">OpenWrt的主Makefile工作过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#subdir"><span class="nav-number">2.6.</span> <span class="nav-text">subdir</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录变量"><span class="nav-number">2.7.</span> <span class="nav-text">目录变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kernel_编译："><span class="nav-number">2.8.</span> <span class="nav-text">kernel 编译：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成firmware"><span class="nav-number">2.9.</span> <span class="nav-text">生成firmware</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理vmlinux:_Image/BuildKernel"><span class="nav-number">2.10.</span> <span class="nav-text">处理vmlinux: Image/BuildKernel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lzma压缩内核"><span class="nav-number">2.11.</span> <span class="nav-text">lzma压缩内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MkImage"><span class="nav-number">2.12.</span> <span class="nav-text">MkImage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#制作squashfs，生成-bin:_$(call_Image/mkfs/squashfs)"><span class="nav-number">2.13.</span> <span class="nav-text">制作squashfs，生成.bin: $(call Image/mkfs/squashfs)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mkdir_-p_$(TARGET_DIR)/overlay"><span class="nav-number">2.14.</span> <span class="nav-text">mkdir -p $(TARGET_DIR)/overlay</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mksquashfs4"><span class="nav-number">2.15.</span> <span class="nav-text">mksquashfs4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#制作squashfs文件系统，生成root-squashfs:"><span class="nav-number">2.16.</span> <span class="nav-text">制作squashfs文件系统，生成root.squashfs:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#主MakeFile文件"><span class="nav-number">3.</span> <span class="nav-text">主MakeFile文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前导部分"><span class="nav-number">3.1.</span> <span class="nav-text">前导部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#再次执行部分"><span class="nav-number">3.2.</span> <span class="nav-text">再次执行部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义一些使用固定的目标规则"><span class="nav-number">3.3.</span> <span class="nav-text">定义一些使用固定的目标规则</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>

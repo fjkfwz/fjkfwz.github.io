@@ -1,0 +1,1152 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="LUCI,Openwrt,开发," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> Openwrt开发与Luci介绍 // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Openwrt开发与Luci介绍
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2014-12-03
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Openwrt开发笔记/">Openwrt开发笔记</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2014/12/04/Luci-Developing/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2014/12/04/Luci-Developing/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：Lua作为一门方便嵌入(其它应用程序)并可扩展的轻量级脚本语言来设计的，因此她一直遵从着简单、小巧、可移植、快速的原则，官方实现完全采用ANSI C编写，能以C程序库的形式嵌入到宿主程序中。Lua的每个版本都保持着开放源码的传统，不过各版采用的许可协议并不相同，自5.0版(最新版是5.1)开始她采用的是著名的MIT许可协议。正由于上述特点，所以Lua在游戏开发、机器人控制、分布式应用、图像处理、生物信息学等各种各样的领域中得到了越来越广泛的应用。<br><a id="more"></a></p>
+<hr>
+<h1 id="Luci介绍">Luci介绍</h1><p>　　Luci是 Lua ConﬁgurationInterface的简称，意在OpenWrt整个系统的配置集中化。见链接：<br><a href="http://wiki.openwrt.org/zh-cn/doc/uci" target="_blank" rel="external"><code>http://wiki.openwrt.org/zh-cn/doc/uci</code></a></p>
+<h2 id="Luci_的启动—uhttpd">Luci 的启动—uhttpd</h2><p>uhttpd是一个简单的web服务器程序，主要就是cgi的处理，openwrt是利用uhttpd作为web服务器，实现客户端web页面配置功能。对于request处理方式，采用的是cgi，而所用的cgi程序就是luci。</p>
+<h2 id="Luci_的启动—luci">Luci 的启动—luci</h2><p>　　在web server中的cgi-bin目录下，运行 luci 文件（权限一般是 755 ），luci的代码如下：</p>
+<pre><code>　　<span class="comment">#!/usr/bin/lua      --cgi的执行命令的路径 </span>
+
+　　<span class="built_in">require</span><span class="string">"luci.cacheloader"</span>    <span class="comment">--导入cacheloader包 </span>
+
+　　<span class="built_in">require</span><span class="string">"luci.sgi.cgi"</span>         <span class="comment">--导入sgi.cgi包  </span>
+
+　　luci.dispatcher.indexcache = <span class="string">"/tmp/luci-indexcache"</span>  <span class="comment">--cache缓存路径地址 </span>
+
+　　luci.sgi.cgi.run()  <span class="comment">--执行run，此方法位于*/luci/sgi/cgi.lua中</span>
+</code></pre><h2 id="Luci—_Web">Luci— Web</h2><pre><code>　　<span class="tag">a</span>.登录
+
+　　输入： http:<span class="comment">//x.x.x.x/ 登录LuCI.</span>
+
+　　Calling /www/cgi-bin/luci.
+
+　　<span class="tag">b</span>. 进入主菜单‘status’
+
+　　输入： http:<span class="comment">//x.x.x.x/cgi-bin/luci/admin/status/即可访问status页面。Luci则会calling /luci/admin/目录下的status.lua脚本：</span>
+
+　　<span class="function"><span class="title">module</span><span class="params">(<span class="string">"luci.controller.admin.status"</span>, package.seeall)</span></span>
+
+　　/usr/lib/lua/luci/controller/admin/status.lua-&gt;<span class="function"><span class="title">index</span><span class="params">()</span></span>
+</code></pre><h2 id="以status模块为例进行说明">以status模块为例进行说明</h2><p>　　模块入口文件status.lua在目录<code>lua\luci\controller\admin</code>下在index()函数中，使用entry函数来完成每个模块函数的注册：</p>
+<pre><code>entry(path, target, title=<span class="keyword">nil</span>, <span class="keyword">order</span>=<span class="keyword">nil</span>)
+</code></pre><h2 id="entry()函数">entry()函数</h2><pre><code>　　第一个参数是定义菜单的显示（Virtual path）。
+
+　　第二个参数定义相应的处理方式(target)。
+
+　　<span class="keyword">alias</span>是指向别的entry的别名，<span class="keyword">from</span>调用的某一个view，cbi调用某一个model，<span class="keyword">call</span>直接调用函数。
+
+　　第三个参数是菜单的文本，_(“<span class="built_in">string</span>”),国际化。
+
+　　第四个参数是是同级菜单下，此菜单项的位置，从大到小
+</code></pre><h2 id="target主要分为三类：call，template_和cbi。">target主要分为三类：<code>call，template 和cbi</code>。</h2><h3 id="call用来调用函数。即语句">call用来调用函数。即语句</h3><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">entry</span><span class="params">(&#123;<span class="string">"admin"</span>, <span class="string">"status"</span>, <span class="string">"iptables"</span>&#125;, call(<span class="string">"action_iptables"</span>)</span></span>, _(<span class="string">"Firewall"</span>), <span class="number">2</span>)</span><br><span class="line">Firewall模块调用了action_iptables函数</span><br></pre></td></tr></table></figure>
+<h3 id="template调用">template调用</h3><p>template用来调用已有的htm模版，模版目录在lua\luci\view目录下。即语句</p>
+<figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entry(&#123;<span class="string">"admin"</span>,<span class="string">"status"</span>,<span class="string">"overview"</span>&#125;,<span class="keyword">template</span>(<span class="string">"admin_status/index"</span>),_(<span class="string">"Overview"</span>), <span class="number">1</span>)</span><br><span class="line">调用lua\luci\view\admin_status\index.htm文件来显示。</span><br></pre></td></tr></table></figure>
+<h2 id="CBI调用">CBI调用</h2><p>　　a. CBI了解 –- Configuration Binding Interface</p>
+<p>　　CBI模型是Lua文件描述UCI配置文件的结构和由此产生的HTML表单来评估CBI解析器，所有CBI luci.cbi.Map类型的模型文件必须返回一个map对象，在cbi模块中定义各种控件，Luci系统会自动执行大部分处理工作。其链接目录在<code>lua\luci\model\cbi</code>下 </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">entry</span><span class="params">(&#123;<span class="string">"admin"</span>, <span class="string">"status"</span>, <span class="string">"processes"</span>&#125;, cbi(<span class="string">"admin_status/processes"</span>)</span></span>, _(<span class="string">"Processes"</span>), <span class="number">6</span>)</span><br><span class="line">调用\lua\luci\model\cbi\admin_status\processes.lua来实现模块。</span><br></pre></td></tr></table></figure>
+<h2 id="Luci_API的使用">Luci API的使用</h2><p>　　官方文档介绍：<a href="http://luci.subsignal.org/api/luci/" target="_blank" rel="external">http://luci.subsignal.org/api/luci/</a></p>
+<p>　　比如：luci.sys luci.sys.net等对应的解析，由Luci源码结构中的<code>/luci-0.11/libs/sys/luasrc/sys.lua</code>完成。</p>
+<h1 id="OpenWrt的UCI系统">OpenWrt的UCI系统</h1><p>UCI是Unified Configuration Interface的缩写，翻译成中文就是统一配置接口，用途就是为OpenWrt提供一个集中控制的接口。OpenWrt实现的这个工具，能够让你的不管是Lua还是PHP程序，或者SHELL程序或C程序，只要执行命令传输参数就能达到修改系统参数的目的，请参考本文后面的命令行实用工具。</p>
+<h2 id="UCI系统的优势">UCI系统的优势</h2><p>系统的配置应该简单直接，UCI的设计初衷即是这样的，它是NVRAM-based配置方法的继承者（基于NVRAM的配置方法起源于OpenWrt的White Russian系列，该版本目前不再更新，最后发布于2007年，版本号为0.9）。UCI可以视为OpenWrt系统功能设置的主要用户配置接口，通常来说这些配置与系统的功能关联性较大，想像一样我们平常所使用的路由器或嵌入式设备中的WEB界面中的那些配置项，就是路由器或嵌入式设备系统所集成了的功能。常见的例子如路由器的网络接口设置，无线参数设置，logging设置和远程登录设置等。</p>
+<h2 id="UCI统一标准">UCI统一标准</h2><p>UCI目前已经支持有一小部分应用程序，因而对这些应用程序的控制会变得更加简单一些。这些第三方应用程序都会有自己的配置文件，不同的语法，不同的文件位置，如</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/etc/</span>network/interfaces</span><br><span class="line"><span class="regexp">/etc/</span>exports</span><br><span class="line"><span class="regexp">/etc/</span>dnsmasq.conf</span><br><span class="line">或<span class="regexp">/etc/</span>samba/samba.conf</span><br></pre></td></tr></table></figure>
+<p>由于UCI统一配置接口的出现，对这些第三方应用程序的配置只需要修改UCI的配置文件即可，就不必再去找不同的目录，写不同的语法了。当然，你安装的大多数第三方应用程序都没有提供UCI配置接口，很可能是因为这些应用程序本身就不需要向普通用户提供应用程序接口，配置文件是给开发者使用的，从这个角度上来看，没有提供UCI接口反而更好。因而，OpenWrt包维护人员只选定了一小部分必需的程序实现了UCI配置接口，下面有列出（Therefore, only a few selected programs which benefit from availability of a centralised configuration have been made UCI-compatible by the OpenWrt package maintainers (see the UCI configuration file list below)）。</p>
+<p>许多第三方程序是根据它自己对应于/etc/config下的UCI配置文件的选项去设置程序的原始配置文件，这样就实现了程序对UCI配置的兼容，然后执行一次/etc/init.d脚本完成一次配置。因而当你启动一个某个程序的UCI兼容的进程脚本时，该脚本应该不只是修改/etc/config下对应的UCI配置文件，同时也应该覆盖程序自己的原配置文件。比如Samba/CIFS程序，其原配置文件是在/etc/samba/smb.conf，而对应的UCI文件是/etc/config/samba，当/etc/config/samba文件被修改了之后，需要运行一次</p>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/samba <span class="built_in">start</span></span><br></pre></td></tr></table></figure>
+<p>之后UCI文件中的设置才会更新到原配置文件中去。</p>
+<p><img src="http://picture-lotors.qiniudn.com/UCI1.png" alt="UCI统一标准方法"><br>除此之外，应用程序的配置文件常常是存放在RAM而不是FLASH中，因为它不需要每次修改参数之后就去写非易性闪存了，而只在应用改变的时候它才会根据UCI文件去写非易性闪存（原文：In addition, the application’s configuration file is often stored in RAM instead of in flash, because it does not need to be stored in non-volatile memory and it is rewritten after every change, based on the UCI file.）。</p>
+<p>OpenWrt的wiki里有一篇文章NotUCI Configuration列举了一些与UCI不兼容的自带程序，而其它的第三方程序，你得自己去查阅程序的说明了。</p>
+<h2 id="一般规则">一般规则</h2><p>UCI的配置文件被分割成/etc/config下的多个独立的文件，各个文件按名字含义对应系统的不同的功能配置。你可以通过文本编译器或者uci实用程序去修改这些配置文件，同时uci还提供了C语言/脚本/Lua等语言的应用程序接口，WEB配置页面例如Luci就是利用了uci所提供的API而实现对UCI配置文件的修改的。</p>
+<p>不管你是采用文本编辑器还是通过命令行的方式修改了UCI配置文件，相应的服务或应用程序不会自动更新状态，这时你都必须调用一次<code>/etc/init.d (re)start</code>才能使刚刚对UCI配置文件的修改生效。许多兼容UCI的程序采用这样的方法来应用更新：在init.d脚本执行流中去修改自己程序的配置文件。具体说来，init.d脚本先去修改自己程序的原配置文件中的信息（如/etc/samba/smb.conf），之后重启一次应用程序，应用程序就会去读自己的配置文件（刚刚被init.d更新过的）再启动，这样应用程序的状态就更新了。仅仅重启应用程序，而不执行init.d脚本的话，/etc/config下的UCI配置文件是不会应用于应用程序的，新配置也就不生效了。<br>举个例子：</p>
+<p>先登录到路由器的WEB页面把WiFi给禁用掉，这个时候你的手机搜索到你的路由器发送的SSID了，我这儿是NGTestRouter。<br><img src="http://picture-lotors.qiniudn.com/UCI2.png" alt="UCI统一标准方法"></p>
+<p>这时我们准备通过使用文本编辑器修改UCI再应用的方法来现使能WiFi，步骤如下：</p>
+<p>编辑wireless文件把disabled这个项注释掉（也就是enable WiFi了）<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="id">#vi</span> /etc/config/wireless</span><br></pre></td></tr></table></figure></p>
+<p>然后运行一次<br><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#/etc/init.d/network restart</span></span><br></pre></td></tr></table></figure></p>
+<p>这时你的手机又可以看到NGTestRouter这个热点了！<br><img src="http://picture-lotors.qiniudn.com/UCI3.png" alt="UCI统一标准方法"></p>
+<h2 id="文件语法">文件语法</h2><p>uci配置文件通常包含有一个或多个语句。所谓段（section），包含有一个或多个option语句，这些语句定义了实际的值。</p>
+<p>下面是一个简单的配置文件：<br><figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">package <span class="symbol">'example'</span></span><br><span class="line"></span><br><span class="line">config <span class="symbol">'example'</span> <span class="symbol">'test'</span></span><br><span class="line">        <span class="built_in">option</span>   <span class="symbol">'string'</span>      <span class="symbol">'some</span> value'</span><br><span class="line">        <span class="built_in">option</span>   <span class="symbol">'boolean'</span>     <span class="char">'1'</span></span><br><span class="line">        <span class="built_in">list</span>     <span class="symbol">'collection'</span>  <span class="symbol">'first</span> item'</span><br><span class="line">        <span class="built_in">list</span>     <span class="symbol">'collection'</span>  <span class="symbol">'second</span> item'</span><br></pre></td></tr></table></figure></p>
+<p><code>config &#39;example&#39; &#39;test&#39;</code>表示一个段的开始，其中<code>example</code>是段的类型，<code>test</code>为段的名字。段也可以没有名字，像<code>config &#39;example&#39;</code>，但是必须要有类型，类型指示了uci程序怎么去处理后面的option内容；<br><code>option &#39;string&#39; &#39;some value&#39;</code>和<code>option &#39;boolean&#39; &#39;1&#39;</code>两个语句定义了段内的两个标识符的值，虽然它们一个是<code>string</code>一个是<code>boolean</code>，但是在语法没有任何区别。<code>boolean</code>后面可以跟<code>&#39;0&#39;, &#39;no&#39;, &#39;off&#39;, &#39;false&#39;</code>中的一个作为否的值，或者<code>&#39;1&#39;, &#39;yes&#39;, &#39;on&#39;, &#39;true&#39;</code>作为逻辑是的值；<br>后面两行以<code>list</code>开头的语句，是为某个有多种选项值的<code>option</code>所定义的，在同一<code>option</code>中的选项值，它们应该有同样的名字，在这里的名字为<code>collection</code>。最张这两个值为收纳到同一个<code>list</code>表中，表中出现的顺序即你这里所定义的；<br>标识符<code>option</code>和<code>list</code>是为了更易读而加上的，没有它们也是可以的；<br>如果某个<code>option</code>没有但它不是必须的，那么uci处理程序会假定一个默认值；如果该option是必须的，而文件中没有定义，那么uci会报错或者显现出奇怪的结果；<br>语句中的标识和值可不必使用引号引起，除非你的字段值含有空格或者tab键。如果使用引号，那你可以随意使用单引号或者双引号。比如这样子：<br><figure class="highlight rsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">option</span> example value</span><br><span class="line"><span class="built_in">option</span> <span class="string">'example'</span> value</span><br><span class="line"><span class="built_in">option</span> example <span class="string">"value"</span></span><br><span class="line"><span class="built_in">option</span> <span class="string">"example"</span> <span class="string">'value'</span></span><br><span class="line"><span class="built_in">option</span> <span class="string">'example'</span> <span class="string">"value"</span></span><br></pre></td></tr></table></figure></p>
+<p>不过不能这样子（引号混用，字段中有空格但未用引号引起来）：<br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">option <span class="string">'example" "value'</span> (quotes are unbalanced)</span><br><span class="line">option example some <span class="built_in">value</span> <span class="operator">with</span> <span class="constant">space</span> (note <span class="operator">the</span> missing quotes around <span class="operator">the</span> <span class="built_in">value</span>)</span><br></pre></td></tr></table></figure></p>
+<p>UCI的文件名和标识符（像option example value中的example即为标识符，value为option的值）可以使用a-z, 0-9和下划线_组合的任意字符串，不允许使用横杠线-，而option的值可以傅任意字符（像空格这样子的字段值需要用引号引起）。</p>
+<h2 id="命令行实用工具">命令行实用工具</h2><p>修改配置的一种方法是直接去修改UCI配置文件。不过，UCI配置文件读和写操作都可以通过uci命令行实用工具来完成，因而如果你自己去写一个脚本来解析或写入UCI配置文件不是一个明智的选择，既浪费时间又不一定写得好。以下介绍如何使用uci命令行实用工具，并伴有一些实例参考：</p>
+<p>在学习该工具前需要注意：uci会把先读到UCI文件，其中不认识的所有命令参数和注释会被删除！所以，像uhttpd这样安装地有详细注释的文件，在使用uci操作之后其中的注释就会被抹掉的。OpenWrt的默认WEB界面Luci就是采用了uci来写UCI文件！</p>
+<h2 id="Uci的使用">Uci的使用</h2><p>　　Uci命令的使用</p>
+<pre><code>Usage: uci <span class="annotation">[&lt;options&gt;]</span> &lt;command&gt; <span class="annotation">[&lt;arguments&gt;]</span>
+
+Commands:
+        batch
+        export     <span class="annotation">[&lt;config&gt;]</span>
+        import     <span class="annotation">[&lt;config&gt;]</span>
+        changes    <span class="annotation">[&lt;config&gt;]</span>
+        commit     <span class="annotation">[&lt;config&gt;]</span>
+        add        &lt;config&gt; &lt;section-<span class="class"><span class="keyword">type</span>&gt;</span>
+        add_list   &lt;config&gt;.&lt;section&gt;.&lt;option&gt;=&lt;string&gt;
+        del_list   &lt;config&gt;.&lt;section&gt;.&lt;option&gt;=&lt;string&gt;
+        show       <span class="annotation">[&lt;config&gt;[.&lt;section&gt;[.&lt;option&gt;]</span>]]
+        get        &lt;config&gt;.&lt;section&gt;[.&lt;option&gt;]
+        set        &lt;config&gt;.&lt;section&gt;[.&lt;option&gt;]=&lt;value&gt;
+        delete     &lt;config&gt;[.&lt;section&gt;[[.&lt;option&gt;][=&lt;id&gt;]]]
+        rename     &lt;config&gt;.&lt;section&gt;[.&lt;option&gt;]=&lt;name&gt;
+        revert     &lt;config&gt;[.&lt;section&gt;[.&lt;option&gt;]]
+        reorder    &lt;config&gt;.&lt;section&gt;=&lt;position&gt;
+
+Options:
+        -c &lt;path&gt;  set the search path <span class="keyword">for</span> config files (<span class="keyword">default</span>: /etc/config)
+        -d &lt;str&gt;   set the delimiter <span class="keyword">for</span> list values <span class="keyword">in</span> uci show
+        -f &lt;file&gt;  <span class="keyword">use</span> &lt;file&gt; <span class="keyword">as</span> input instead <span class="keyword">of</span> stdin
+        -m         <span class="keyword">when</span> importing, merge data into an existing package
+        -n         name unnamed sections on export (<span class="keyword">default</span>)
+        -N         don't name unnamed sections
+        -p &lt;path&gt;  add a search path <span class="keyword">for</span> config change files
+        -P &lt;path&gt;  add a search path <span class="keyword">for</span> config change files <span class="keyword">and</span> <span class="keyword">use</span> <span class="keyword">as</span> <span class="keyword">default</span>
+        -q         quiet mode (don't print error messages)
+        -s         force strict mode (stop on parser errors, <span class="keyword">default</span>)
+        -S         disable strict mode
+        -X         <span class="keyword">do</span> not <span class="keyword">use</span> extended syntax on 'show'
+</code></pre><h3 id="例子">例子</h3><p>设置一个值</p>
+<pre><code><span class="comment">#把uhttpd的监听端口从80换成8080</span>
+root<span class="property">@OpenWrt</span>:~<span class="comment"># uci set uhttpd.main.listen_http=8080 </span>
+root<span class="property">@OpenWrt</span>:~<span class="comment"># uci commit uhttpd </span>
+root<span class="property">@OpenWrt</span>:~<span class="comment"># /etc/init.d/uhttpd restart </span>
+root<span class="property">@OpenWrt</span>:~<span class="comment">#</span>
+
+<span class="comment">#导出整体配置信息</span>
+root<span class="property">@OpenWrt</span>:~<span class="comment"># uci export httpd </span>
+package <span class="string">'httpd'</span> 
+config <span class="string">'httpd'</span> 
+    option <span class="string">'port'</span> <span class="string">'80'</span> 
+    option <span class="string">'home'</span> <span class="string">'/www'</span> 
+root<span class="property">@OpenWrt</span>:~<span class="comment">#</span>
+
+<span class="comment">#显示一个给定配置的树</span>
+root<span class="property">@OpenWrt</span>:~<span class="comment"># uci show httpd </span>
+httpd.<span class="property">@httpd</span>[<span class="number">0</span>]=httpd 
+httpd.<span class="property">@httpd</span>[<span class="number">0</span>].port=<span class="number">80</span> 
+httpd.<span class="property">@httpd</span>[<span class="number">0</span>].home=/www 
+root<span class="property">@OpenWrt</span>:~<span class="comment">#</span>
+
+<span class="comment">#显示一个option的值</span>
+root<span class="property">@OpenWrt</span>:~<span class="comment"># uci get httpd.@httpd[0].port </span>
+<span class="number">80</span> 
+root<span class="property">@OpenWrt</span>:~<span class="comment">#</span>
+
+<span class="comment">#追加list的一个条目</span>
+uci add_list system.ntp.server=<span class="string">'0.de.pool.ntp.org'</span>
+
+<span class="comment">#替换一个list</span>
+uci <span class="keyword">delete</span> system.ntp.server 
+uci add_list system.ntp.server=<span class="string">'0.de.pool.ntp.org'</span> 
+uci add_list system.ntp.server=<span class="string">'1.de.pool.ntp.org'</span> 
+uci add_list system.ntp.server=<span class="string">'2.de.pool.ntp.org'</span>
+
+<span class="comment">/**
+*UCI路径
+*假设有下面的UCI文件
+*/</span>etc/config/foo 
+**/
+
+config bar <span class="string">'first'</span> 
+    option name <span class="string">'Mr. First'</span> 
+config bar 
+    option name <span class="string">'Mr. Second'</span> 
+config bar <span class="string">'third'</span> 
+    option name <span class="string">'Mr. Third'</span>
+那么下面三组路径的执行得到的值分别各自相等
+
+<span class="comment"># Mr. First </span>
+uci get foo.<span class="property">@bar</span>[<span class="number">0</span>].name 
+uci get foo.<span class="property">@bar</span>[-<span class="number">0</span>].name 
+uci get foo.<span class="property">@bar</span>[-<span class="number">3</span>].name 
+uci get foo.first.name 
+<span class="comment"># Mr. Second </span>
+uci get foo.<span class="property">@bar</span>[<span class="number">1</span>].name 
+uci get foo.<span class="property">@bar</span>[-<span class="number">2</span>].name 
+<span class="comment"># uci get foo.second.name 本条语句不工作，因为second没有定义 </span>
+<span class="comment"># Mr. Third </span>
+uci get foo.<span class="property">@bar</span>[<span class="number">2</span>].name 
+uci get foo.<span class="property">@bar</span>[-<span class="number">1</span>].name 
+uci get foo.third.name
+如果show，则会得到这样的值
+
+<span class="comment"># uci show foo </span>
+foo.first=bar 
+foo.first.name=Mr. First 
+foo.<span class="property">@bar</span>[<span class="number">0</span>]=bar 
+foo.<span class="property">@bar</span>[<span class="number">0</span>].name=Mr. Second 
+foo.third=bar 
+foo.third.name=Mr. Third
+执行uci show foo.<span class="property">@bar</span>[<span class="number">0</span>]得到
+
+<span class="comment"># uci show foo.@bar[0] </span>
+foo.first=bar 
+foo.first.name=Mr. First
+查询输出
+root<span class="property">@OpenWrt</span>:~<span class="comment"># uci -P/var/state show network.wan</span>
+<span class="attribute">uci</span>: Entry <span class="keyword">not</span> found
+network.loopback=interface
+network.loopback.ifname=lo
+network.loopback.proto=static
+network.loopback.ipaddr=<span class="number">127.0</span>.<span class="number">0.1</span>
+network.loopback.netmask=<span class="number">255.0</span>.<span class="number">0.0</span>
+network.loopback.up=<span class="number">1</span>
+network.loopback.connect_time=<span class="number">10749</span>
+network.loopback.device=lo
+network.lan=interface
+network.lan.type=bridge
+network.lan.proto=static
+network.lan.netmask=<span class="number">255.255</span>.<span class="number">255.0</span>
+network.lan.ipaddr=<span class="number">10.0</span>.<span class="number">11.233</span>
+network.lan.gateway=<span class="number">10.0</span>.<span class="number">11.254</span>
+network.lan.dns=<span class="number">8.8</span>.<span class="number">8.8</span>
+network.lan.up=<span class="number">1</span>
+network.lan.connect_time=<span class="number">10747</span>
+network.lan.device=eth0
+network.lan.ifname=br-lan
+</code></pre><p>添加防火墙规则<br>这个例子不仅演示了如何添加TCP SSH防火墙规则，同时也演示uci的negative (-1)语法。</p>
+<h2 id="Uci_c_API的使用">Uci c API的使用</h2><p>　　在脚本中使用uci config文件：<a href="http://wiki.openwrt.org/doc/devel/config-scripting" target="_blank" rel="external">http://wiki.openwrt.org/doc/devel/config-scripting</a></p>
+<p>　　总结一下Luci、Lua、Uci、CBI的关系图，如下图：<br><img src="http://picture-lotors.qiniudn.com/LUCI.jpg" alt="luci关系图"></p>
+<p>　　以上为最近研究Luci开发的相关资料整理，同时自己也动手做了几个测试页面并通过luci.sys.call实现了脚本、系统程序的调用。</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/LUCI/"> #LUCI </a>
+          
+            <a href="/tags/Openwrt/"> #Openwrt </a>
+          
+            <a href="/tags/开发/"> #开发 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/05/20/Reading-System/">搭建高效的碎片化阅读系统</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/08/16/Openwrt-Compiling/">Openwrt编译入门</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2014/12/04/Luci-Developing/"
+               data-title="Openwrt开发与Luci介绍" data-url="http://masukio.tk/2014/12/04/Luci-Developing/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Luci介绍"><span class="nav-number">1.</span> <span class="nav-text">Luci介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Luci_的启动—uhttpd"><span class="nav-number">1.1.</span> <span class="nav-text">Luci 的启动—uhttpd</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Luci_的启动—luci"><span class="nav-number">1.2.</span> <span class="nav-text">Luci 的启动—luci</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Luci—_Web"><span class="nav-number">1.3.</span> <span class="nav-text">Luci— Web</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以status模块为例进行说明"><span class="nav-number">1.4.</span> <span class="nav-text">以status模块为例进行说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#entry()函数"><span class="nav-number">1.5.</span> <span class="nav-text">entry()函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#target主要分为三类：call，template_和cbi。"><span class="nav-number">1.6.</span> <span class="nav-text">target主要分为三类：call，template 和cbi。</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#call用来调用函数。即语句"><span class="nav-number">1.6.1.</span> <span class="nav-text">call用来调用函数。即语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#template调用"><span class="nav-number">1.6.2.</span> <span class="nav-text">template调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CBI调用"><span class="nav-number">1.7.</span> <span class="nav-text">CBI调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Luci_API的使用"><span class="nav-number">1.8.</span> <span class="nav-text">Luci API的使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenWrt的UCI系统"><span class="nav-number">2.</span> <span class="nav-text">OpenWrt的UCI系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#UCI系统的优势"><span class="nav-number">2.1.</span> <span class="nav-text">UCI系统的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UCI统一标准"><span class="nav-number">2.2.</span> <span class="nav-text">UCI统一标准</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一般规则"><span class="nav-number">2.3.</span> <span class="nav-text">一般规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件语法"><span class="nav-number">2.4.</span> <span class="nav-text">文件语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令行实用工具"><span class="nav-number">2.5.</span> <span class="nav-text">命令行实用工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Uci的使用"><span class="nav-number">2.6.</span> <span class="nav-text">Uci的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#例子"><span class="nav-number">2.6.1.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Uci_c_API的使用"><span class="nav-number">2.7.</span> <span class="nav-text">Uci c API的使用</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>

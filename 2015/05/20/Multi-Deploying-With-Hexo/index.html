@@ -1,0 +1,1454 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
+
+
+
+  <meta name="keywords" content="gitcafe,github,hexo,随笔," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?71aa842f083e84e236b454b1cbee2581";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  <title> Hexo Multiple deployer托管Github和GitCafe博客 // 格物志 </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">格物志</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Hexo Multiple deployer托管Github和GitCafe博客
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-05-20
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/hexo笔记/">hexo笔记</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/05/20/Multi-Deploying-With-Hexo/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/05/20/Multi-Deploying-With-Hexo/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p><strong>摘要</strong>：通过将Hexo同时部署到Github和GitCafe，使用Dnspod对来自国内外的流量分别DNS解析至GitCafe及Github从而优化博客的访问速度，本篇文章包括（1）修改hexo deployer配置，Dnspod做定向解析（2）Hexo 2.x升至3.x(3)备份关键配置到Github/GitCafe Backup分支（4）关于主题及多说评论框样式及USER ANGENT（6）添加文章目录及版权信息<br><a id="more"></a><br>写这篇文章时已经距离上篇文章已经过去快半年了，健壮的拖延君死而复生把刚刚在襁褓中的勤奋君给赶跑了（其实就是懒，写写废话我还是很乐意的嘛），主要是因为每篇文章的学习量太大，每做完一个项目做一个总结难免会照成数据的丢失，所以我放弃以前每篇文章一个项目，转向由一个时间窗口一个主题，把每天所学习到的一切知识随时记录随时使用，以前觉得建一个知识仓库把每天看的信息堆积到脑海里总会越积越多的，但是事实却正好相反，虽然往一个水潭中加水可以增加它的体谅，但是所吸收的信息就好像水面上的涟漪，如果一股脑的掀翻它或与能够卷起一阵海啸，但是随着水面的涟漪越来越多，最后其产生波相互叠加最终由趋于水平，不懂得思考和事件的知识就好像累加的音乐最终却成了噪音，在脑子里没有发酵成为可口的泡菜却成了坨屎。<br>所以既然发粪涂墙，就必须利其器，把博客改造一番还是必要的，至少被Jonathan的Flattened Design强奸了一番眼球后就再也看不惯以前Landscape主题的拟物的光线和阴影了，另外之前的博客托管在Github，利用全球的CDN自然能够加速不少，当然这是在没有墙的前提下，在加上Github上敏感的信息越来越多，受到特别关照也不可避免（<a href="http://www.jianshu.com/p/21b2d751444e" target="_blank" rel="external">中国GFW可能是使GitHub瘫痪的DDoS攻击源</a>），所以为了加快在国内的访问速度以及避免某些原因Github无法访问，所以决定将博客托管一份至GitCafe上。<br>同时在Github和GitCafe部署Hexo的主要优势如下：</p>
+<blockquote>
+<p>1.利用Dnspod A记录将国内流量导向Gitcafe地址，而国外流量默认走Github地址从而加快国内访问的速度。<br>2.起到对称备份的作用，以免一方托管方发生奔溃时，另一方可以接替访问。<br>3.Github和GitCafe均支持自定义域名，A记录支持两条记录，因此两边的托管使用同一个域名地址，不过CName只能支持一条记录。<br>4.国内访问路线短速度快，可以不需要CDN。</p>
+</blockquote>
+<h1 id="使用Github和GitCafe同时托管博客">使用Github和GitCafe同时托管博客</h1><h2 id="修改部署配置文件">修改部署配置文件</h2><blockquote>
+<p>假设你已经在Github和GitCafe创建了博客的repo，Github项目名为<code>User.github.io</code>使用master分子,GitCafe就直接使用你的用户名作为你的项目名使用gitcafe-pages分支。</p>
+</blockquote>
+<p>要使Hexo支持同时发布到多个git仓库中。需要修hexo根目录下的改<code>_config.yml</code>。<br>原来的配置:<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">deploy:</span></span><br><span class="line"><span class="string">type:</span> github</span><br><span class="line"><span class="string">repo:</span> <span class="string">github:</span> <span class="string">https:</span><span class="comment">//github.com/&lt;username&gt;/&lt;username&gt;.github.io.git</span></span><br><span class="line"><span class="string">branch:</span> master</span><br></pre></td></tr></table></figure></p>
+<p>改成</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">deploy</span>:</span><br><span class="line">   <span class="attribute">type</span>: git</span><br><span class="line">   <span class="attribute">repo</span>: </span><br><span class="line">      <span class="attribute">github</span>: <span class="attribute">https</span>:<span class="comment">//github.com/&lt;username&gt;/&lt;username&gt;.github.io.git,master</span></span><br><span class="line">      <span class="attribute">gitcafe</span>: <span class="attribute">https</span>:<span class="comment">//gitcafe.com/&lt;username&gt;/&lt;username&gt;.git,gitcafe-pages</span></span><br></pre></td></tr></table></figure>
+<p>或者按照Hexo Document的参考可以支持不同type类型的deploy   <code>Available Types:
+  git, github, heroku, openshift, rsync</code></p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">You can use multiple deployers. Hexo will<span class="instruction"> execute </span>each deployer in sequence.</span><br><span class="line"></span><br><span class="line">deployer:</span><br><span class="line">- type: git</span><br><span class="line">  repo:</span><br><span class="line">- type: heroku</span><br><span class="line">  repo:</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>关于部署的相关说明可以参考Hexo的官方文档  <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment | Hexo</a></p>
+</blockquote>
+<p>之后运行<code>hexo d -g</code>分别输入GitHub和GitCafe的用户名和密码即可完成部署工作，GitCafe上更新内容需要一段时间。</p>
+<h2 id="Dnspod做定向DNS解析">Dnspod做定向DNS解析</h2><p>在<a href="https://www.dnspod.com" target="_blank" rel="external">Dnspod国际版</a>中选择自己的域名，添加两条A记录，国内路线使用GitCafe（A地址：207.226.141.135 CName:gitcafe.io）国外走Github线路（A地址192.30.252.153及192.30.252.154）</p>
+<p><img src="http://picture-lotors.qiniudn.com/domain.PNG" alt="Dnspod配置"></p>
+<blockquote>
+<p>Github绑定域名需要Hexo init根目录下source目录下的CNAME文件中我写入了lotors.me，也就是说CNAME应该在子目录source下，而不是在Hexo init根目录下。Github不支持多域名绑定，只能写入一个，如需多个其实是可以在域名解析处自己设定的(显式URL等)。Gitcafe则可以绑定多个域名(<a href="https://gitcafe.com/GitCafe/Help/wiki/Pages-%E7%9B%B8%E5%85%B3%E5%B8%AE%E5%8A%A9" target="_blank" rel="external">参考Gitcafe的Pages帮助</a>)，在博客项目页面下<code>项目管理-&gt;Pages服务-&gt;添加自定义域名</code>添加自己的域名。</p>
+</blockquote>
+<h1 id="Hexo_2-x升至3-x">Hexo 2.x升至3.x</h1><p>半年多没关注hexo，今天逛Github发现已近更新到3.1Released了，身为一个升级狂魔怎么能忍受low version呢，于是果断开始折腾更新至3.x版本，由于该版本将不同的内核组件拆分出来(<a href="https://github.com/hexojs/hexo/wiki/Breaking-Changes-in-Hexo-3.0" target="_blank" rel="external">Breaking Changes in Hexo 3.0</a>)，于是无法直接<code>npm update hexo</code>只好进行重新安装，根据Github上的Wiki(<a href="https://github.com/hexojs/hexo/wiki/Migrating-from-2.x-to-3.0" target="_blank" rel="external">Migrating from 2.x to 3.0</a>)成功更新。<br>首先修改hexo根目录下的<code>package.json</code>，添加以下字段</p>
+<pre><code><span class="collection">{
++  <span class="string">"hexo"</span>: <span class="collection">{
++    <span class="string">"version"</span>: <span class="string">""</span>
++  }</span>
+}</span>
+</code></pre><p>执行以下升级命令<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#Clean <span class="operator"><span class="keyword">cache</span></span><br><span class="line">hexo clean</span><br><span class="line">#<span class="keyword">Install</span> hexo-cli安装命令行界面</span><br><span class="line">npm <span class="keyword">install</span> hexo-cli -g</span><br><span class="line">#<span class="keyword">Install</span> Hexo安装hexo</span><br><span class="line">npm <span class="keyword">install</span> hexo <span class="comment">--save</span></span><br><span class="line">#<span class="keyword">Install</span> generators安装服务器</span><br><span class="line">npm <span class="keyword">install</span> hexo-generator-<span class="keyword">index</span> <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-generator-archive <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-generator-category <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-generator-tag <span class="comment">--save</span></span><br><span class="line">#<span class="keyword">Install</span> <span class="keyword">server</span>安装服务器</span><br><span class="line">npm <span class="keyword">install</span> hexo-<span class="keyword">server</span> <span class="comment">--save</span></span><br><span class="line">#<span class="keyword">Install</span> deployers安装部署器</span><br><span class="line">npm <span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-deployer-heroku <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-deployer-rsync <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-deployer-openshift <span class="comment">--save</span></span><br><span class="line">#<span class="keyword">Update</span> plugins更新插件</span><br><span class="line">npm <span class="keyword">install</span> hexo-renderer-marked@<span class="number">0.2</span> <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-renderer-stylus@<span class="number">0.2</span> <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-generator-feed@<span class="number">1</span> <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="number">1</span> <span class="comment">--save</span></span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Hexo_3-x将至2-x">Hexo 3.x将至2.x</h2><h1 id="备份关键配置">备份关键配置</h1><p>由于hexo是在本地生成静态文件后上传到repo中，所以定期的备份本地hexo的关键配置，主题以及博文Markdown文件就十分必要，可以将文件备份到Github的一个branch,这里我备份资源路径<code>source/</code>，模板文件<code>scaffolds/</code>,主题路径<code>themes/</code>,hexo 配置文件<code>_config.yml</code><br><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#启动git</span></span><br><span class="line">git init</span><br><span class="line"><span class="preprocessor">#创建并切换一个备份分支</span></span><br><span class="line">git checkout -b backup</span><br><span class="line"><span class="preprocessor">#添加跟踪文件</span></span><br><span class="line">git add source/ scaffolds/ themes/ _config.yml</span><br><span class="line"><span class="preprocessor">#第一次提交</span></span><br><span class="line">git commit -m <span class="string">"first backup"</span></span><br><span class="line"><span class="preprocessor">#添加远程版本库</span></span><br><span class="line">git add origin https:<span class="comment">//github.com/fjkfwz/fjkfwz.github.io.git</span></span><br><span class="line"><span class="preprocessor">#push到Github的backup分支</span></span><br><span class="line">git push origin backup</span><br></pre></td></tr></table></figure></p>
+<h1 id="主题及多说评论框样式及USER_ANGENT">主题及多说评论框样式及USER ANGENT</h1><h2 id="yilia主题">yilia主题</h2><p>现在这款主题模板叫做<code>yilia</code>，Github上的开源项目<a href="https://github.com/litten/hexo-theme-yilia" target="_blank" rel="external">yilia</a>，或者使用我修改过的<a href="https://github.com/fjkfwz/fjkfwz.github.io/tree/dev" target="_blank" rel="external">主题文件</a><br>修改<code>_config.yml</code>为<br><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">theme</span>: <span class="string">yilia</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="多说评论框样式">多说评论框样式</h2><h2 id="多说评论框UA显示/博主标记">多说评论框UA显示/博主标记</h2><h3 id="embed-js多说核心库本地化">embed.js多说核心库本地化</h3><p>多说社会化评论框核心脚本embed.js文件是个多说官方提供的公用文件，如果官方渠道过于拥挤，或者服务器故障，就可能导致页面加载过慢或者完全无法加载，如果我们将其下载下来，放到我们自己的空间，就会使加载速度有一定的提升，同时也可以对多说评论框做一些个性化调整，因为我们使用的多说评论框主体代码全部都在这里面。下载我修改过的embed.js文件放在主题目录的<code>source\js</code>中。</p>
+<p></p><p><a class="dl" href="http://picture-lotors.qiniudn.com/embed.js" target="_blank" rel="nofollow">embed.js下载</a><br></p>
+<blockquote>
+<p>需要修改 e.user_id == 你的多说的ID<br>多看ID可以在多说-&gt;个人资料-&gt;点击用户名转到个人主页<br><code>url http://duoshuo.com/profile/3731202/ 3731202为你的多说ID</code></p>
+</blockquote>
+<h3 id="应用本地embed-js文件">应用本地embed.js文件</h3><p>修改主题目录下<code>layout_partical\post\duosuo.ejs中的ds.src</code>为</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ds.src = (document.location.protocol == <span class="string">'https:'</span> ? 'https:<span class="string">' : '</span><span class="string">http:</span><span class="string">') + '</span><span class="regexp">/js/</span>embed.js<span class="string">';</span></span><br></pre></td></tr></table></figure>
+<h1 id="添加文章目录及版权信息">添加文章目录及版权信息</h1><h2 id="添加文章目录及版权信息结构">添加文章目录及版权信息结构</h2><p>打开 <code>\themes\your-theme\layout_partial\post</code> 目录下的 <code>article.ejs</code> 文件</p>
+<pre><code><span class="xml">/-----------\theme\your-theme\layout_partial\post\article.ejs---------/
+<span class="comment">&lt;!-- 文章内容 --&gt;</span>
+<span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"article-entry"</span> <span class="attribute">itemprop</span>=<span class="value">"articleBody"</span>&gt;</span>
+  </span>&lt;%<span class="ruby"> <span class="keyword">if</span> (post.excerpt &amp;&amp; index){ </span>%&gt;<span class="xml">
+    </span>&lt;%-<span class="ruby"> post.excerpt </span>%&gt;<span class="xml">
+    </span>&lt;%<span class="ruby"> <span class="keyword">if</span> (theme.excerpt_link){ </span>%&gt;<span class="xml">
+      <span class="tag">&lt;<span class="title">p</span> <span class="attribute">class</span>=<span class="value">"article-more-link"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"</span></span></span>&lt;%-<span class="ruby"> config.root </span>%&gt;<span class="xml"><span class="tag"><span class="value"></span></span></span>&lt;%-<span class="ruby"> post.path </span>%&gt;<span class="xml"><span class="tag"><span class="value">#more"</span>&gt;</span></span>&lt;%=<span class="ruby"> _<span class="number">_</span>(<span class="string">'excerpt_link'</span>) </span>%&gt;<span class="xml"><span class="tag">&lt;/<span class="title">a</span>&gt;</span>
+      <span class="tag">&lt;/<span class="title">p</span>&gt;</span>
+    </span>&lt;%<span class="ruby"> } </span>%&gt;<span class="xml">
+  </span>&lt;%<span class="ruby"> } <span class="keyword">else</span> { </span>%&gt;<span class="xml">
++    <span class="comment">&lt;!-- 文章目录开始 --&gt;</span>
++    </span>&lt;%<span class="ruby"> <span class="keyword">if</span> (!index){ </span>%&gt;<span class="xml">
++        <span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"toc"</span> <span class="attribute">class</span>=<span class="value">"toc-article"</span>&gt;</span>
++            <span class="tag">&lt;<span class="title">strong</span> <span class="attribute">class</span>=<span class="value">"toc-title"</span>&gt;</span></span>&lt;%=<span class="ruby"> _<span class="number">_</span>(<span class="string">'contents'</span>) </span>%&gt;<span class="xml"><span class="tag">&lt;/<span class="title">strong</span>&gt;</span>
++        </span>&lt;%-<span class="ruby"> toc(page.content) </span>%&gt;<span class="xml">
++        <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
++    </span>&lt;%<span class="ruby"> } </span>%&gt;<span class="xml">
++    <span class="comment">&lt;!-- 文章目录结束 --&gt;</span>
+    </span>&lt;%-<span class="ruby"> post.content </span>%&gt;<span class="xml">
++    <span class="comment">&lt;!--版权信息开始--&gt;</span>
++    </span>&lt;%-<span class="ruby"> partial(<span class="string">'post/copyright'</span>) </span>%&gt;<span class="xml">
++    <span class="comment">&lt;!--版权信息结束--&gt;</span>
+  </span>&lt;%<span class="ruby"> } </span>%&gt;<span class="xml">
+<span class="tag">&lt;/<span class="title">div</span>&gt;</span></span>
+</code></pre><h2 id="添加版权信息模块">添加版权信息模块</h2><p>在<code>\themes\your-theme\layout_partial\post</code>下建立版权模块<code>copyright.ejs</code>,将<code>lotors.me</code>替换为你的域名</p>
+<pre><code><span class="xml">/-----------\theme\your-theme\layout_partial\post\copyright.ejs---------/
+<span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"copyright"</span>&gt;</span>
+  <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"claim"</span>&gt;</span>版权声明：自由转载-非商用-无演绎-保持署名 @ lotors.me<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
+  <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"from-link"</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">em</span>&gt;</span>本文链接地址:<span class="tag">&lt;/<span class="title">em</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"</span></span></span>&lt;%-<span class="ruby"> url_for(path) </span>%&gt;<span class="xml"><span class="tag"><span class="value">"</span>&gt;</span>
+      http://lotors.me</span>&lt;%-<span class="ruby"> url_for(path) </span>%&gt;<span class="xml">
+    <span class="tag">&lt;/<span class="title">a</span>&gt;</span>
+  <span class="tag">&lt;/<span class="title">span</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">div</span>&gt;</span></span>
+</code></pre><h2 id="添加文件样式CSS">添加文件样式CSS</h2><p>在<code>\themes\your-theme\source\css_partial</code> 目录下的 <code>article.styl</code> 文件<br>在最后加入以下样式</p>
+<pre><code>/--------\themes\your-theme\source\css_partial\article.styl------/
+
+<span class="comment">//版权信息CSS</span>
+.<span class="keyword">copyright</span> {
+  <span class="keyword">display</span>: block;
+  padding: 10px 20px;
+  margin: 35px 0 25px;
+  <span class="keyword">line</span>-height: 24px;
+  font-size: 14px;
+  background-color: #FFFF33;
+}
+.<span class="keyword">copyright</span> .claim {
+  font-size: 15px;
+  font-weight: 600;
+  zoom: 1;
+}
+.<span class="keyword">copyright</span> .claim:before,
+.<span class="keyword">copyright</span> .claim:after {
+  content: <span class="string">""</span>;
+  <span class="keyword">display</span>: <span class="keyword">table</span>;
+}
+.<span class="keyword">copyright</span> .claim:after {
+  <span class="keyword">clear</span>: both;
+}
+.<span class="keyword">copyright</span> em,
+.<span class="keyword">post</span>-nav em {
+  font-style: normal;
+  color: #808080;
+}
+.<span class="keyword">copyright</span> a:hover,
+.<span class="keyword">post</span>-nav a:hover {
+  color: #c40000;
+  text-decoration: none;
+}    
+
+<span class="comment">//目录CSS</span>
+.toc-article
+  background color-toc-bg
+  margin 2em 0 0 0.5em
+  padding 1em
+  strong
+    padding 0.3em 0
+
+#toc
+  <span class="keyword">line</span>-height 1em
+  font-size 1.0em
+  float right <span class="comment">// 如果想在左边，则把这里改成left即可</span>
+  .toc
+    padding 0
+    <span class="keyword">li</span>
+      <span class="keyword">list</span>-style-<span class="keyword">type</span> none
+
+  .toc-child 
+    padding-left 0.7em
+</code></pre><h2 id="添加变量">添加变量</h2><p>打开 <code>\themes\your-theme\source\css 目录下的</code>_variables.styl``文件<br>任意一个位置添加以下颜色变量</p>
+<pre><code><span class="attribute">color</span>-toc-bg = <span class="hexcolor">#eee</span>
+</code></pre><h1 id="附录">附录</h1><h2 id="多说评论框UA显示/博主标记javascript">多说评论框UA显示/博主标记javascript</h2><pre><code><span class="comment">//判断是否为博主</span>
+function sskadmin(<span class="keyword">e</span>) {
+    <span class="keyword">var</span> ssk = '';
+    <span class="keyword">if</span>(<span class="keyword">e</span>.user_id==【你的多说id】){
+        ssk = '&lt;span <span class="keyword">class</span>=<span class="string">"sskadmin"</span>&gt;博主【此处可以自定义文字】'
+    }
+    <span class="keyword">return</span> ssk+<span class="string">"&lt;/span&gt; "</span>;
+}
+<span class="comment">//显UA开始</span>
+function ua(<span class="keyword">e</span>) {
+        <span class="keyword">var</span> r = new Array;
+        <span class="keyword">var</span> outputer = '';
+        <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/MSIE\<span class="literal">s</span>([^\s|;]+)/gi)) {
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_ie"</span>&gt;Internet Explorer' + '|' + r[0]<span class="comment">/*.replace('MSIE', '').split('.')[0]*/</span>
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/FireFox\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_firefox"</span>&gt;Mozilla FireFox' + '|' + r1[1]
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/Maxthon([\<span class="keyword">d</span>]*)\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_maxthon"</span>&gt;Maxthon'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/UBrowser([\<span class="keyword">d</span>]*)\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_ucweb"</span>&gt;UCBrowser' + '|' + r1[1]
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/MetaSr/ig)) {
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_sogou"</span>&gt;搜狗浏览器'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/2345Explorer/ig)) {
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_2345explorer"</span>&gt;2345王牌浏览器'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/2345chrome/ig)) {
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_2345chrome"</span>&gt;2345加速浏览器'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/LBBROWSER/ig)) {
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_lbbrowser"</span>&gt;猎豹安全浏览器'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/MicroMessenger\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_qq"</span>&gt;微信' + '|' + r1[1]<span class="comment">/*.split('/')[0]*/</span>
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/QQBrowser\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_qq"</span>&gt;QQ浏览器' + '|' + r1[1]<span class="comment">/*.split('/')[0]*/</span>
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/QQ\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_qq"</span>&gt;QQ浏览器' + '|' + r1[1]<span class="comment">/*.split('/')[0]*/</span>
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/MiuiBrowser\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_mi"</span>&gt;Miui浏览器' + '|' + r1[1]<span class="comment">/*.split('/')[0]*/</span>
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/Chrome([\<span class="keyword">d</span>]*)\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_chrome"</span>&gt;Chrome' + '|' + r1[1]<span class="comment">/*.split('.')[0]*/</span>
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/safari\/([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_apple"</span>&gt;Apple Safari' + '|' + r1[1]
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/Opera[\s|\/]([^\s]+)/ig)) {
+            <span class="keyword">var</span> r1 = r[0].<span class="keyword">split</span>(<span class="string">"/"</span>);
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_opera"</span>&gt;Opera' + '|' + r[1]
+        } <span class="keyword">else</span> <span class="keyword">if</span> (r = <span class="keyword">e</span>.<span class="literal">match</span>(/Trident\/7.0/gi)) {
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_ie"</span>&gt;Internet Explorer 11'
+        } <span class="keyword">else</span> {
+            outputer = '&lt;span <span class="keyword">class</span>=<span class="string">"ua_other"</span>&gt;其它浏览器'
+        }
+        <span class="keyword">return</span> outputer+<span class="string">"&lt;/span&gt; "</span>;
+    }
+    function os(<span class="keyword">e</span>) {
+        <span class="keyword">var</span> os = '';
+        <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/<span class="keyword">win</span>/ig)) {
+            <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/nt 5.1/ig)) {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_xp"</span>&gt;Windows XP'
+            } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/nt 6.1/ig)) {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_7"</span>&gt;Windows 7'
+            } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/nt 6.2/ig)) {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_8"</span>&gt;Windows 8'
+            } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/nt 6.3/ig)) {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_8_1"</span>&gt;Windows 8.1'
+            } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/nt 10.0/ig)) {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_8_1"</span>&gt;Windows 10'
+            } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/nt 6.0/ig)) {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_vista"</span>&gt;Windows Vista'
+            } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/nt 5/ig)) {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_2000"</span>&gt;Windows 2000'
+            } <span class="keyword">else</span> {
+                os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_windows"</span>&gt;Windows'
+            }
+        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/android/ig)) {
+            os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_android"</span>&gt;Android'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/ubuntu/ig)) {
+            os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_ubuntu"</span>&gt;Ubuntu'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/linux/ig)) {
+            os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_linux"</span>&gt;Linux'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/<span class="keyword">mac</span>/ig)) {
+            os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_mac"</span>&gt;<span class="keyword">Mac</span> OS X'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/unix/ig)) {
+            os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_unix"</span>&gt;Unix'
+        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">e</span>.<span class="literal">match</span>(/symbian/ig)) {
+            os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_nokia"</span>&gt;Nokia SymbianOS'
+        } <span class="keyword">else</span> {
+            os = '&lt;span <span class="keyword">class</span>=<span class="string">"os_other"</span>&gt;其它操作系统'
+        }
+        <span class="keyword">return</span> os+<span class="string">"&lt;/span&gt;"</span> ;
+    }
+<span class="comment">//显UA结束</span>
+</code></pre><h2 id="修改多说样式">修改多说样式</h2><blockquote>
+<p>远程：在多说控制中心—&gt;设置-&gt;自定义CSS修改<br>本地：在主题目录<code>source\css_partial\artical.styl</code>中添加</p>
+</blockquote>
+<pre><code><span class="comment">/*
+ * 多说评论的 CSS 样式；
+ * 作者：MinonHeart &lt; http://me.hub.moe &gt;；
+ * 完成时间：2014-09-26；
+ * 最近更新：2015-03-30；
+ * 其他说明：基于 Pagecho &lt; http://www.v2ex.com/t/118650 &gt; 的 CSS 样式修改而来；
+**/</span>
+
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-powered-by</span>, <span class="class">.ds-post-repost</span> <span class="rules">{ <span class="rule"><span class="attribute">display</span>:<span class="value"> none <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-reset</span> <span class="class">.ds-gradient-bg</span>, <span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-textarea-wrapper</span> <span class="rules">{ <span class="rule"><span class="attribute">background</span>:<span class="value"> none <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-reset</span> <span class="class">.ds-like-thread-button</span>, <span class="class">.ds-rounded</span><span class="rules">{
+    <span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="function">rgba</span>(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>,<span class="number">1</span>) <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">1px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.1</span>) <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-reset</span> <span class="class">.ds-sync</span> <span class="rules">{ <span class="rule"><span class="attribute">display</span>:<span class="value"> none <span class="important">!important</span></span></span>; }</span> <span class="comment">/* 隐藏评论框底部分享 */</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-post-button</span> <span class="rules">{
+    <span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#fff</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> none <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">left</span>:<span class="value"> auto <span class="important">!important</span></span></span>; <span class="comment">/* 不必要的语句 */</span>
+    <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#888</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">font-weight</span>:<span class="value"> normal <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">outline</span>:<span class="value"> none</span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="rule"><span class="attribute">.ds-post-button</span>:<span class="value">hover { color: <span class="hexcolor">#333</span> <span class="important">!important</span></span></span>; }
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-textarea-wrapper</span> <span class="tag">textarea</span> <span class="rules">{ <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">54px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="tag">li</span><span class="class">.ds-tab</span> <span class="tag">a</span>, <span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="id">#ds-bubble</span>, <span class="id">#ds-reset</span> <span class="class">.ds-avatar</span> <span class="tag">img</span> <span class="rules">{ <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">1px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="tag">li</span><span class="class">.ds-tab</span> <span class="rule"><span class="attribute">a</span>:<span class="value">hover { background: <span class="hexcolor">#fff</span> <span class="important">!important</span></span></span>; }
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="tag">li</span><span class="class">.ds-tab</span> <span class="tag">a</span><span class="class">.ds-current</span> <span class="rules">{
+    <span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#fff</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> none <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-post-self</span> <span class="rules">{
+    <span class="rule"><span class="attribute">padding-top</span>:<span class="value"> <span class="number">15px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">padding-bottom</span>:<span class="value"> <span class="number">15px</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-reset</span> <span class="class">.ds-avatar</span> <span class="tag">img</span> <span class="rules">{
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> none <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">1px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">2px</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-reset</span> <span class="class">.ds-replybox</span> <span class="class">.ds-avatar</span> <span class="tag">img</span> <span class="rules">{
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">50px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">50px</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="id">#ds-bubble</span> <span class="rules">{
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> none <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-replybox</span> <span class="rules">{ <span class="rule"><span class="attribute">padding-left</span>:<span class="value"> <span class="number">70px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-post-self</span> <span class="rules">{ <span class="rule"><span class="attribute">padding-left</span>:<span class="value"> <span class="number">0</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-inline-replybox</span> <span class="rules">{
+    <span class="rule"><span class="attribute">margin-top</span>:<span class="value"> <span class="number">27px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">margin-left</span>:<span class="value"> <span class="number">0</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="tag">a</span><span class="class">.ds-comment-context</span> <span class="rules">{
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#E3EDF3</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#F7FAFB</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">2px</span> <span class="number">0</span> <span class="number">1px</span> <span class="number">3px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#555</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">margin-right</span>:<span class="value"> <span class="number">5px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">1px</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="tag">li</span><span class="class">.ds-post-placeholder</span> <span class="rules">{ <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">20px</span> <span class="number">0</span> <span class="important">!important</span></span></span>; }</span>
+
+<span class="tag">body</span> <span class="id">#ds-smilies-tooltip</span> <span class="tag">ul</span><span class="class">.ds-smilies-tabs</span> <span class="tag">li</span> <span class="tag">a</span> <span class="rules">{
+    <span class="rule"><span class="attribute">background-image</span>:<span class="value"> <span class="function">-webkit-gradient</span>(linear,left <span class="number">0</span>,left <span class="number">100%</span>,<span class="function">from</span>(<span class="hexcolor">#fff</span>),<span class="function">to</span>(<span class="hexcolor">#fff</span>))</span></span>;
+    <span class="rule"><span class="attribute">background-image</span>:<span class="value"> <span class="function">-webkit-linear-gradient</span>(top,<span class="hexcolor">#fff</span> <span class="number">0</span>,<span class="hexcolor">#fff</span> <span class="number">100%</span>)</span></span>;
+    <span class="rule"><span class="attribute">background-image</span>:<span class="value"> <span class="function">-moz-linear-gradient</span>(top,<span class="hexcolor">#fff</span> <span class="number">0</span>,<span class="hexcolor">#fff</span> <span class="number">100%</span>)</span></span>;
+    <span class="rule"><span class="attribute">background-image</span>:<span class="value"> <span class="function">linear-gradient</span>(to bottom,<span class="hexcolor">#fff</span> <span class="number">0</span>,<span class="hexcolor">#fff</span> <span class="number">100%</span>)</span></span>;
+    <span class="rule"><span class="attribute">border-bottom</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#e9e9e9</span></span></span>;
+}</span>
+<span class="tag">body</span> <span class="id">#ds-smilies-tooltip</span> <span class="rules">{
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">0</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">margin-bottom</span>:<span class="value"> <span class="number">1em</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">15px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.15</span>) <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-smilies-tooltip</span> <span class="class">.ds-smilies-container</span> <span class="rules">{ <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">180px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-smilies-tooltip</span> <span class="tag">ul</span><span class="class">.ds-smilies-tabs</span> <span class="rules">{ <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">180px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-reset</span> <span class="tag">ul</span><span class="class">.ds-children</span> <span class="class">.ds-avatar</span> <span class="tag">img</span> <span class="rules">{
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">35px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">35px</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-comment-body</span> <span class="tag">p</span> <span class="rules">{ <span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">10px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-reset</span> <span class="tag">button</span> <span class="rules">{
+    <span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#fff</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">1px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.2</span>) <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-reset</span> <span class="rule"><span class="attribute">button</span>:<span class="value">hover {
+    background: <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">1px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.2</span>) <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+}
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-user-name</span> <span class="rules">{ <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#0c94de</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-comment-header</span> <span class="rules">{ <span class="rule"><span class="attribute">margin-left</span>:<span class="value"> <span class="number">10px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-login-buttons</span> <span class="class">.ds-more-services</span> <span class="rules">{ <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#777</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-login-buttons</span> <span class="rule"><span class="attribute">.ds-more-services</span>:<span class="value">hover { color: <span class="hexcolor">#333</span> <span class="important">!important</span></span></span>; }
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="tag">ul</span><span class="class">.ds-comments-tabs</span> <span class="class">.ds-highlight</span> <span class="rules">{ <span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">0</span> <span class="number">3px</span> <span class="number">0</span> <span class="number">0</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-time</span> <span class="rules">{ <span class="rule"><span class="attribute">margin-left</span>:<span class="value"> <span class="number">10px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span><span class="class">.ds-narrow</span> <span class="id">#ds-reset</span> <span class="class">.ds-comments</span> <span class="class">.ds-avatar</span> <span class="tag">img</span> <span class="rules">{
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">35px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">35px</span> <span class="important">!important</span></span></span>;
+}</span>
+
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-comment-body</span> <span class="tag">img</span> <span class="rules">{ <span class="rule"><span class="attribute">max-width</span>:<span class="value"> <span class="number">50px</span> <span class="important">!important</span></span></span>; }</span> <span class="comment">/* 复写语句，max-width 的值要与下一句的 width 和 height 的值相同 */</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-inline-replybox</span> <span class="class">.ds-avatar</span> <span class="tag">img</span> <span class="rules">{
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">50px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">50px</span> <span class="important">!important</span></span></span>;
+}</span>
+
+<span class="id">#ds-thread</span><span class="class">.ds-narrow</span> <span class="id">#ds-reset</span> <span class="class">.ds-comments</span> <span class="class">.ds-inline-replybox</span> <span class="class">.ds-avatar</span> <span class="tag">img</span> <span class="rules">{
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">50px</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">50px</span> <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-textarea-wrapper</span> <span class="rules">{
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-bottom</span>:<span class="value"> none <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-post-options</span> <span class="rules">{
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#ddd</span> <span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-right</span>:<span class="value"> none <span class="important">!important</span></span></span>;
+}</span>
+<span class="id">#ds-reset</span> <span class="class">.ds-rounded-top</span> <span class="rules">{ <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">1px</span> <span class="number">1px</span> <span class="number">0</span> <span class="number">0</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-notify</span> <span class="rules">{ <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">2px</span> <span class="important">!important</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="id">#ds-hot-posts</span> <span class="rules">{ <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">12px</span></span></span>; }</span>
+<span class="id">#ds-thread</span> <span class="id">#ds-reset</span> <span class="class">.ds-header</span> <span class="rules">{ <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span></span></span>; }</span> <span class="comment">/* 复写语句，放在后面 */</span>
+<span class="comment">/*多说UA开始*/</span>
+<span class="tag">span</span><span class="class">.ua</span><span class="rules">{
+    <span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">0</span> <span class="number">1px</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">color</span>:<span class="value"><span class="hexcolor">#FFFFFF</span><span class="important">!important</span></span></span>;
+    <span class="comment">/*text-transform: Capitalize!important;
+    float: right!important;
+    line-height: 18px!important;*/</span>
+}</span>
+<span class="class">.ua_other</span><span class="class">.os_other</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#ccc</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#fff</span></span></span>;
+    <span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> solid <span class="hexcolor">#BBB</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+}</span>
+<span class="class">.ua_ie</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#428bca</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#357ebd</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_firefox</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#f0ad4e</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#eea236</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_maxthon</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#7373B9</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#7373B9</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_ucweb</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#FF740F</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#d43f3a</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_sogou</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#78ACE9</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_2345explorer</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#2478B8</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_2345chrome</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#F9D024</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_mi</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#FF4A00</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_lbbrowser</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#FC9D2E</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_chrome</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#EE6252</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_qq</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#3D88A8</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_apple</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#E95620</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#4cae4c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.ua_opera</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#d9534f</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#d43f3a</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+
+
+<span class="class">.os_vista</span>,<span class="class">.os_2000</span>,<span class="class">.os_windows</span>,<span class="class">.os_xp</span>,<span class="class">.os_7</span>,<span class="class">.os_8</span>,<span class="class">.os_8_1</span> <span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#39b3d7</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#46b8da</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+
+<span class="class">.os_android</span> <span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#98C13D</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#01B171</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.os_ubuntu</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#DD4814</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#01B171</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.os_linux</span> <span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#3A3A3A</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#1F1F1F</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.os_mac</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#666666</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#1F1F1F</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.os_unix</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#006600</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#1F1F1F</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.os_nokia</span><span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#014485</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#1F1F1F</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+}</span>
+<span class="class">.sskadmin</span><span class="rules">{
+<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#00a67c</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-color</span>:<span class="value"> <span class="hexcolor">#01B171</span><span class="important">!important</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span> <span class="number">5px</span><span class="important">!important</span></span></span>;
+
+}</span>
+<span class="comment">/*多说UA结束*/</span>
+</code></pre>
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gitcafe/"> #gitcafe </a>
+          
+            <a href="/tags/github/"> #github </a>
+          
+            <a href="/tags/hexo/"> #hexo </a>
+          
+            <a href="/tags/随笔/"> #随笔 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/05/23/Travel-InLinzhong/">林中之旅</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/05/20/Kindle-Tip/">如何粗鲁的使用kindle|kindle折腾指南</a>
+            
+          </div>
+        </div>
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/05/20/Multi-Deploying-With-Hexo/"
+               data-title="Hexo Multiple deployer托管Github和GitCafe博客" data-url="http://masukio.tk/2015/05/20/Multi-Deploying-With-Hexo/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <p class="site-author-name">masukio</p>
+        </div>
+        <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/fjkfwz" target="_blank">github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/andymckees" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="/atom.xml" target="_blank">rss</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/rice-lyn" target="_blank">zhihu</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="fjkfwz@gmail.com" target="_blank">mail</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://www.facebook.com/mckee.andy1" target="_blank">facebook</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://plus.google.com/u/1/115513142719872189331/posts" target="_blank">google</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/AndyMckees" target="_blank">twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用Github和GitCafe同时托管博客"><span class="nav-number">1.</span> <span class="nav-text">使用Github和GitCafe同时托管博客</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改部署配置文件"><span class="nav-number">1.1.</span> <span class="nav-text">修改部署配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dnspod做定向DNS解析"><span class="nav-number">1.2.</span> <span class="nav-text">Dnspod做定向DNS解析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hexo_2-x升至3-x"><span class="nav-number">2.</span> <span class="nav-text">Hexo 2.x升至3.x</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo_3-x将至2-x"><span class="nav-number">2.1.</span> <span class="nav-text">Hexo 3.x将至2.x</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#备份关键配置"><span class="nav-number">3.</span> <span class="nav-text">备份关键配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#主题及多说评论框样式及USER_ANGENT"><span class="nav-number">4.</span> <span class="nav-text">主题及多说评论框样式及USER ANGENT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#yilia主题"><span class="nav-number">4.1.</span> <span class="nav-text">yilia主题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多说评论框样式"><span class="nav-number">4.2.</span> <span class="nav-text">多说评论框样式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多说评论框UA显示/博主标记"><span class="nav-number">4.3.</span> <span class="nav-text">多说评论框UA显示/博主标记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#embed-js多说核心库本地化"><span class="nav-number">4.3.1.</span> <span class="nav-text">embed.js多说核心库本地化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用本地embed-js文件"><span class="nav-number">4.3.2.</span> <span class="nav-text">应用本地embed.js文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加文章目录及版权信息"><span class="nav-number">5.</span> <span class="nav-text">添加文章目录及版权信息</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#添加文章目录及版权信息结构"><span class="nav-number">5.1.</span> <span class="nav-text">添加文章目录及版权信息结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加版权信息模块"><span class="nav-number">5.2.</span> <span class="nav-text">添加版权信息模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加文件样式CSS"><span class="nav-number">5.3.</span> <span class="nav-text">添加文件样式CSS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加变量"><span class="nav-number">5.4.</span> <span class="nav-text">添加变量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#附录"><span class="nav-number">6.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#多说评论框UA显示/博主标记javascript"><span class="nav-number">6.1.</span> <span class="nav-text">多说评论框UA显示/博主标记javascript</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改多说样式"><span class="nav-number">6.2.</span> <span class="nav-text">修改多说样式</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">masukio</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+  //Show Sidebar
+  sidebarShowMotion();
+  isSidebarVisible = !isSidebarVisible;
+
+  function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      
+    });
+  </script>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lotors"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+</body>
+</html>
