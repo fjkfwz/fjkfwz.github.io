@@ -3,32 +3,32 @@
 <head>
   
 
-<meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 
 
 
 
-  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5">
 
 
-<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2">
 
 
-    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
-
-
-
-  <meta name="keywords" content="抽样,算法," />
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜">
 
 
 
-  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+  <meta name="keywords" content="抽样,算法,">
 
 
 
-  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml">
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2">
 
 
 
@@ -70,7 +70,7 @@
       
       <li class="menu-item menu-item-home">
         <a href="/">
-          <i class="menu-item-icon icon-home"></i> <br />
+          <i class="menu-item-icon icon-home"></i> <br>
           首页
         </a>
       </li>
@@ -78,7 +78,7 @@
       
       <li class="menu-item menu-item-categories">
         <a href="/categories">
-          <i class="menu-item-icon icon-categories"></i> <br />
+          <i class="menu-item-icon icon-categories"></i> <br>
           分类
         </a>
       </li>
@@ -86,7 +86,7 @@
       
       <li class="menu-item menu-item-archives">
         <a href="/archives">
-          <i class="menu-item-icon icon-archives"></i> <br />
+          <i class="menu-item-icon icon-archives"></i> <br>
           归档
         </a>
       </li>
@@ -94,7 +94,7 @@
       
       <li class="menu-item menu-item-tags">
         <a href="/tags">
-          <i class="menu-item-icon icon-tags"></i> <br />
+          <i class="menu-item-icon icon-tags"></i> <br>
           标签
         </a>
       </li>
@@ -102,7 +102,7 @@
       
       <li class="menu-item menu-item-about">
         <a href="/about">
-          <i class="menu-item-icon icon-about"></i> <br />
+          <i class="menu-item-icon icon-about"></i> <br>
           关于
         </a>
       </li>
@@ -121,7 +121,7 @@
   <div id="posts" class="posts-expand">
     
 
-  <div class="post post-type-normal ">
+  <div class="post post-type-normal">
     <div class="post-header">
 
       
@@ -158,7 +158,7 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/07/12/Reservoir-Sampling/#comments" >
+            <a href="/2015/07/12/Reservoir-Sampling/#comments">
               <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/12/Reservoir-Sampling/"></span>
             </a>
           </span>
@@ -201,7 +201,6 @@
 <h1 id="Java代码实现">Java代码实现</h1><figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> SAMPLE_COUNT = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">int</span> <span class="keyword">index</span> = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">Object[] samples = <span class="keyword">new</span> Object[SAMPLE_COUNT];</span><br><span class="line">Random rnd = <span class="keyword">new</span> Random();</span><br><span class="line"><span class="keyword">for</span> (Object element in stream) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">index</span> &lt; SAMPLE_COUNT) &#123;</span><br><span class="line">        samples[<span class="keyword">index</span>] = element;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> r = rnd.nextInt(<span class="number">0</span>, <span class="keyword">index</span>);</span><br><span class="line">        <span class="keyword">if</span> (r &lt; SAMPLE_COUNT) &#123;</span><br><span class="line">            samples[r] = element;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">index</span>++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1 id="算法证明">算法证明</h1><p>每个数在水潭中留下的概率</p>
 <p>$$ {1 \over j} \times {j \over {j+1}} \times \dfrac{j+1}{j+2} \times \dfrac{j+2}{j+3} \times {···} \times \dfrac{n-1}{n} = {1 \over k} $$</p>
-
       
     </div>
 
@@ -220,11 +219,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2015/08/15/Navigation-Drawer-001/">Material Design#001：Navigation Drawer</a>
+            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/07/11/Cicada-002/">Program Cicada#002：K-9 Mail源码分析</a>
+              <a href="/2015/07/11/Cicada-002/">Project Cicada#002：K-9 Mail源码分析</a>
             
           </div>
         </div>
@@ -237,8 +238,7 @@
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/07/12/Reservoir-Sampling/"
-               data-title="Algorithms#001：Reservoir Sampling" data-url="http://masukio.tk/2015/07/12/Reservoir-Sampling/">
+          <div class="ds-thread" data-thread-key="2015/07/12/Reservoir-Sampling/" data-title="Algorithms#001：Reservoir Sampling" data-url="http://masukio.tk/2015/07/12/Reservoir-Sampling/">
           </div>
         
       </div>
@@ -275,28 +275,28 @@
 
       <div class="site-overview">
         <div class="site-author motion-element">
-          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio">
           <p class="site-author-name">masukio</p>
         </div>
         <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-count">31</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-count">16</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-count">75</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

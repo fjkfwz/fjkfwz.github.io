@@ -3,32 +3,32 @@
 <head>
   
 
-<meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 
 
 
 
-  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5">
 
 
-<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2">
 
 
-    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜" />
-
-
-
-  <meta name="keywords" content="Android,K-9 Mail," />
+    <meta name="description" content="醉后不知天在水,围着火炉吃西瓜">
 
 
 
-  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml" />
+  <meta name="keywords" content="Android,K-9 Mail,">
 
 
 
-  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2" />
+  <link rel="alternate" href="/atom.xml" title="格物志" type="application/atom+xml">
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.png?v=0.4.2">
 
 
 
@@ -43,7 +43,7 @@
   </script>
 
 
-  <title> Program Cicada#002：K-9 Mail源码分析 // 格物志 </title>
+  <title> Project Cicada#002：K-9 Mail源码分析 // 格物志 </title>
 </head>
 
 <body>
@@ -70,7 +70,7 @@
       
       <li class="menu-item menu-item-home">
         <a href="/">
-          <i class="menu-item-icon icon-home"></i> <br />
+          <i class="menu-item-icon icon-home"></i> <br>
           首页
         </a>
       </li>
@@ -78,7 +78,7 @@
       
       <li class="menu-item menu-item-categories">
         <a href="/categories">
-          <i class="menu-item-icon icon-categories"></i> <br />
+          <i class="menu-item-icon icon-categories"></i> <br>
           分类
         </a>
       </li>
@@ -86,7 +86,7 @@
       
       <li class="menu-item menu-item-archives">
         <a href="/archives">
-          <i class="menu-item-icon icon-archives"></i> <br />
+          <i class="menu-item-icon icon-archives"></i> <br>
           归档
         </a>
       </li>
@@ -94,7 +94,7 @@
       
       <li class="menu-item menu-item-tags">
         <a href="/tags">
-          <i class="menu-item-icon icon-tags"></i> <br />
+          <i class="menu-item-icon icon-tags"></i> <br>
           标签
         </a>
       </li>
@@ -102,7 +102,7 @@
       
       <li class="menu-item menu-item-about">
         <a href="/about">
-          <i class="menu-item-icon icon-about"></i> <br />
+          <i class="menu-item-icon icon-about"></i> <br>
           关于
         </a>
       </li>
@@ -121,7 +121,7 @@
   <div id="posts" class="posts-expand">
     
 
-  <div class="post post-type-normal ">
+  <div class="post post-type-normal">
     <div class="post-header">
 
       
@@ -130,7 +130,7 @@
           
           
             
-              Program Cicada#002：K-9 Mail源码分析
+              Project Cicada#002：K-9 Mail源码分析
             
           
         </h1>
@@ -158,7 +158,7 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/07/11/Cicada-002/#comments" >
+            <a href="/2015/07/11/Cicada-002/#comments">
               <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/11/Cicada-002/"></span>
             </a>
           </span>
@@ -468,7 +468,7 @@ Content<span class="attribute">-Base</span>: http:<span class="comment">//www.da
 <p><code>MassageListFragment</code>再分别调用<code>MessagingController</code>的方法<code>deleteThreads()</code>和<code>deleteMessages()</code>去删除一个会话邮件或是一组邮件,<code>MessageViewFragment</code>调用<code>MessagingController</code>的<code>deleteMessages()</code>方法删除一个邮件</p>
 <figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">onDeleteConfirmed</span><span class="params">(List&lt;LocalMessage&gt; messages)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mThreadedList) &#123;</span><br><span class="line">            mController.deleteThreads(messages);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            mController.deleteMessages(messages, <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>在执行删除操作之前,kmail会<code>disable</code>删除按钮,防止连续误删</p>
-<p><code>MessagingController</code>执行删除操作调用<code>actOnMessages()</code>方法启动后台线程<code>deleteThreadsSynchronous()</code>并把任务压栈道名为mCommands的BlockingQueue<command>类型的队列中</p>
+<p><code>MessagingController</code>执行删除操作调用<code>actOnMessages()</code>方法启动后台线程<code>deleteThreadsSynchronous()</code>并把任务压栈道名为mCommands的BlockingQueue<command>类型的队列中</command></p>
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> putBackground(String <span class="keyword">description</span>, MessagingListener listener, Runnable runnable) &#123;</span><br><span class="line">        putCommand(mCommands, <span class="keyword">description</span>, listener, runnable, <span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
 <p>使在删除过程中，界面仍能够保持正常的响应，在操作过程中通知MessagingListener通知界面</p>
 <p>2.删除邮件之前先通知MessagingListener删除界面邮件，删除邮件时，判断是否存在垃圾箱，当前文件夹为垃圾箱，则将邮件打上<code>Flag.DELETED</code>的标签，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (folder.equals(account.getTrashFolderName()) || !account.hasTrashFolder()) &#123;</span><br><span class="line">    <span class="built_in">local</span>Folder.setFlags(messages, Collections.singleton(Flag.DELETED), <span class="literal">true</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">local</span>TrashFolder = <span class="built_in">local</span>Store.getFolder(account.getTrashFolderName());</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">local</span>TrashFolder.exists()) &#123;</span><br><span class="line">        <span class="built_in">local</span>TrashFolder.create(Folder.FolderType.HOLDS_MESSAGES);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">local</span>TrashFolder.exists()) &#123;</span><br><span class="line">        uidMap = <span class="built_in">local</span>Folder.moveMessages(messages, <span class="built_in">local</span>TrashFolder);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
@@ -535,7 +535,6 @@ Content<span class="attribute">-Base</span>: http:<span class="comment">//www.da
 <p>2.触发器delete_folder<br>该触发器作用于message表，在从folder表中删除记录前起作用，在从folder中删除记录前先将message表中属于待删除的文件夹的所有邮件自动删除<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">db.execSQL("<span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> delete_folder<span class="string">" +</span><br><span class="line">	"</span><span class="keyword">BEFORE</span> <span class="keyword">DELETE</span> <span class="keyword">ON</span> folders<span class="string">" +</span><br><span class="line">	"</span><span class="keyword">BEGIN</span> <span class="keyword">DELETE</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> old.id = folder_id;</span>" +</span><br><span class="line">	"<span class="operator"><span class="keyword">END</span>;</span>");</span><br></pre></td></tr></table></figure></p>
 <p>3.触发器delete_message<br>该触发器作用于message表和hearder表（message_parts表），在从从messages表中删除记录前起作用，用于自动删除邮件的附件头信息<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.execSQL("<span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> delete_message <span class="string">" +</span><br><span class="line">   "</span><span class="keyword">BEFORE</span> <span class="keyword">DELETE</span> <span class="keyword">ON</span> messages <span class="string">" +</span><br><span class="line">   "</span><span class="keyword">BEGIN</span> <span class="string">" +</span><br><span class="line">   "</span><span class="keyword">DELETE</span> <span class="keyword">FROM</span> message_parts <span class="keyword">WHERE</span> root = OLD.message_part_id;</span>" +</span><br><span class="line">   "<span class="operator"><span class="keyword">END</span><span class="string">");</span></span></span><br></pre></td></tr></table></figure></p>
 <h3 id="操作数据库">操作数据库</h3><p>LocalStore是唯一对外公开操作数据库的类，其内部包括9个内部类、1个接口，以邮件、文件夹为核心，提供了以面向对象方式围绕邮件和文件夹的一系列操作，包括向数据表插入新的数据，删除数据，更新数据库，获取数据等方法，k9 mail为不同的内部类设计了基类，即把不同的实体封装成为不同的类，又减少了代码的重复。</p>
-
       
     </div>
 
@@ -560,7 +559,7 @@ Content<span class="attribute">-Base</span>: http:<span class="comment">//www.da
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/07/11/Cicada-001/">Program Cicada#001：Introduction</a>
+              <a href="/2015/07/11/Cicada-001/">Project Cicada#001：Introduction</a>
             
           </div>
         </div>
@@ -573,8 +572,7 @@ Content<span class="attribute">-Base</span>: http:<span class="comment">//www.da
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/07/11/Cicada-002/"
-               data-title="Program Cicada#002：K-9 Mail源码分析" data-url="http://masukio.tk/2015/07/11/Cicada-002/">
+          <div class="ds-thread" data-thread-key="2015/07/11/Cicada-002/" data-title="Project Cicada#002：K-9 Mail源码分析" data-url="http://masukio.tk/2015/07/11/Cicada-002/">
           </div>
         
       </div>
@@ -611,28 +609,28 @@ Content<span class="attribute">-Base</span>: http:<span class="comment">//www.da
 
       <div class="site-overview">
         <div class="site-author motion-element">
-          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio" />
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="masukio">
           <p class="site-author-name">masukio</p>
         </div>
         <p class="site-description motion-element">醉后不知天在水,围着火炉吃西瓜</p>
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-count">31</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-count">16</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-count">75</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
