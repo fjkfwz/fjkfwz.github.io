@@ -3,16 +3,16 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 鹿头社:Masukio
+title: 格物志
 subtitle: 
 description: 醉后不知天在水,围着火炉吃西瓜
-author: Masukio
+author: masukio
 email: fjkfwz@hotmail.com
 language: zh-Hans
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://lotors.me
+url: http://masukio.tk
 root: /
 permalink: :year/:month/:day/:title/
 tag_dir: tags
@@ -41,7 +41,7 @@ highlight:
   tab_replace:
 
 # Category & Tag
-default_category: uncategorized
+#default_category: uncategorized
 category_map:
 tag_map:
 

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "hexo": "^3.0.1",
+    "hexo-clean-css": "0.0.2",
     "hexo-deployer-git": "0.0.4",
     "hexo-deployer-heroku": "0.0.3",
     "hexo-deployer-openshift": "0.0.1",
@@ -14,10 +15,12 @@
     "hexo-generator-index": "^0.1.0",
     "hexo-generator-sitemap": "^1.0.1",
     "hexo-generator-tag": "^0.1.0",
+    "hexo-html-minifier": "0.0.1",
     "hexo-renderer-ejs": "^0.1.0",
     "hexo-renderer-marked": "^0.2.5",
     "hexo-renderer-stylus": "^0.2.3",
-    "hexo-server": "^0.1.2"
+    "hexo-server": "^0.1.2",
+    "hexo-uglify": "0.0.3"
   },
   "hexo": {
     "version": "3.0.1"
