@@ -1,7 +1,3 @@
-title: Resume
-date:
-type: "about"
----
 #基本信息
 
 >- **姓名：** 林国强    *GUOQIANG LIN*
