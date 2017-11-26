@@ -92,7 +92,6 @@ deploy:
    type: git
    repo: 
       github: https://github.com/fjkfwz/fjkfwz.github.io.git,master
-      gitcafe: https://gitcafe.com/fjkfwz/fjkfwz.git,gitcafe-pages    
 #Feed Atom
 feed:
   type: atom

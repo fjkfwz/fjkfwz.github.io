@@ -175,7 +175,6 @@ Android管理器：基于JSON-RPC开发的Android客户端，能够查看Openwrt
 
 ***
 ##Groups:
-
 Microsoft Student Partners(MSP)
 Google Developer Group (GDGxXiamen)
 视觉与学习青年学者研讨会(VALSE)
