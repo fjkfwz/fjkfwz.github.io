@@ -62,8 +62,4 @@ for (Object element in stream) {
 }
 ```
 
-# 算法证明
-每个数在水潭中留下的概率
-
-$$ {1 \over j} \times {j \over {j+1}} \times \dfrac{j+1}{j+2} \times \dfrac{j+2}{j+3} \times {···} \times \dfrac{n-1}{n} = {1 \over k} $$
 
