@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 格物志
+title: Sapientia et Virtus
 subtitle: 
 description: 醉后不知天在水,围着火炉吃西瓜
 author: masukio
@@ -80,7 +80,7 @@ disqus_shortname:
 # Extensions
 ## Plugins: https://github.com/hexojs/hexo/wiki/Plugins
 ## Themes: https://github.com/hexojs/hexo/wiki/Themes
-theme: next
+theme: cactus-dark
 exclude_generator:
 Plugins:
 - hexo-generator-feed
@@ -152,3 +152,4 @@ skip_render: README.md
 # =============================================================================
 # End NexT Theme configuration
 # ==
+
