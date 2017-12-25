@@ -35,7 +35,7 @@ customize:
         linkedin: https://www.linkedin.com/in/andy-mckees-6605204b/
     show_all_posts: false
     post_count: 20
-    highlight: solarized-dark
+    highlight: rainbow
 
 # RSS
 rss: atom.xml
