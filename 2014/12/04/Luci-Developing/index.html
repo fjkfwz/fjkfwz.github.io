@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="摘要：Lua 作为一门方便嵌入(其它应用程序)并可扩展的轻量级脚本语言来设计的，因此她一直遵从着简单、小巧、可移植、快速的原则，官方实现完全采用 ANSI C 编写，能以 C 程序库的形式嵌入到宿主程序中。Lua 的每个版本都保持着开放源码的传统，不过各版采用的许可协议并不相同，自5.0版(最新版是5.1)开始她采用的是著名的 MIT 许可协议。正由于上述特点，所以 Lua 在游戏开发、机器人控制">
+<meta name="keywords" content="Openwrt,开发,LUCI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Openwrt 开发与 Luci 介绍">
+<meta property="og:url" content="https://fjkfwz.github.io/2014/12/04/Luci-Developing/index.html">
+<meta property="og:site_name" content="Sapientia et Virtus">
+<meta property="og:description" content="摘要：Lua 作为一门方便嵌入(其它应用程序)并可扩展的轻量级脚本语言来设计的，因此她一直遵从着简单、小巧、可移植、快速的原则，官方实现完全采用 ANSI C 编写，能以 C 程序库的形式嵌入到宿主程序中。Lua 的每个版本都保持着开放源码的传统，不过各版采用的许可协议并不相同，自5.0版(最新版是5.1)开始她采用的是著名的 MIT 许可协议。正由于上述特点，所以 Lua 在游戏开发、机器人控制">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/UCI1.png">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/UCI2.png">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/UCI3.png">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/LUCI.jpg">
+<meta property="og:updated_time" content="2017-12-25T14:28:22.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Openwrt 开发与 Luci 介绍">
+<meta name="twitter:description" content="摘要：Lua 作为一门方便嵌入(其它应用程序)并可扩展的轻量级脚本语言来设计的，因此她一直遵从着简单、小巧、可移植、快速的原则，官方实现完全采用 ANSI C 编写，能以 C 程序库的形式嵌入到宿主程序中。Lua 的每个版本都保持着开放源码的传统，不过各版采用的许可协议并不相同，自5.0版(最新版是5.1)开始她采用的是著名的 MIT 许可协议。正由于上述特点，所以 Lua 在游戏开发、机器人控制">
+<meta name="twitter:image" content="http://picture-lotors.qiniudn.com/UCI1.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Openwrt 开发与 Luci 介绍</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="Sapientia et Virtus" type="application/atom+xml">
+    
+</head>
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')" style="display:none"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2014/12/04/Graduation/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="$('#share').toggle();return false"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none">Previous post</span>
+      <span id="i-next" class="info" style="display:none">Next post</span>
+      <span id="i-top" class="info" style="display:none">Back to top</span>
+      <span id="i-share" class="info" style="display:none">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Luci-Developing/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&text=Openwrt 开发与 Luci 介绍"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&is_video=false&description=Openwrt 开发与 Luci 介绍"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Openwrt 开发与 Luci 介绍&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Luci-Developing/"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-get-pocket" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-reddit" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-stumbleupon" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-digg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&name=Openwrt 开发与 Luci 介绍&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Lua 作为一门方便嵌入(其它应用程序)并可扩展的轻量级脚本语言来设计的，因此她一直遵从着简单、小巧、可移植、快速的原则，官方实现完全采用 ANSI C 编写，能以 C 程序库的形式嵌入到宿主程序中。Lua 的每个版本都保持着开放源码的传统，不过各版采用的许可协议并不相同，自5.0版(最新版是5.1)开始她采用的是著名的 MIT 许可协议。正由于上述特点，所以 Lua 在游戏开发、机器人控制、分布式应用、图像处理、生物信息学等各种各样的领域中得到了越来越广泛的应用。&lt;br&gt;"><i class="fa fa-tumblr" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Luci-介绍"><span class="toc-number">1.</span> <span class="toc-text"><a href="#Luci-&#x4ECB;&#x7ECD;" class="headerlink" title="Luci &#x4ECB;&#x7ECD;"></a>Luci &#x4ECB;&#x7ECD;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci-的启动–uhttpd"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#Luci-&#x7684;&#x542F;&#x52A8;&#x2013;uhttpd" class="headerlink" title="Luci &#x7684;&#x542F;&#x52A8;&#x2013;uhttpd"></a>Luci &#x7684;&#x542F;&#x52A8;&#x2013;uhttpd</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci-的启动–luci"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#Luci-&#x7684;&#x542F;&#x52A8;&#x2013;luci" class="headerlink" title="Luci &#x7684;&#x542F;&#x52A8;&#x2013;luci"></a>Luci &#x7684;&#x542F;&#x52A8;&#x2013;luci</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci–-Web"><span class="toc-number">1.3.</span> <span class="toc-text"><a href="#Luci&#x2013;-Web" class="headerlink" title="Luci&#x2013; Web"></a>Luci&#x2013; Web</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#以-status-模块为例进行说明"><span class="toc-number">1.4.</span> <span class="toc-text"><a href="#&#x4EE5;-status-&#x6A21;&#x5757;&#x4E3A;&#x4F8B;&#x8FDB;&#x884C;&#x8BF4;&#x660E;" class="headerlink" title="&#x4EE5; status &#x6A21;&#x5757;&#x4E3A;&#x4F8B;&#x8FDB;&#x884C;&#x8BF4;&#x660E;"></a>&#x4EE5; status &#x6A21;&#x5757;&#x4E3A;&#x4F8B;&#x8FDB;&#x884C;&#x8BF4;&#x660E;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#entry-函数"><span class="toc-number">1.5.</span> <span class="toc-text"><a href="#entry-&#x51FD;&#x6570;" class="headerlink" title="entry()&#x51FD;&#x6570;"></a>entry()&#x51FD;&#x6570;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#target-主要分为三类：call，template-和-cbi。"><span class="toc-number">1.6.</span> <span class="toc-text"><a href="#target-&#x4E3B;&#x8981;&#x5206;&#x4E3A;&#x4E09;&#x7C7B;&#xFF1A;call&#xFF0C;template-&#x548C;-cbi&#x3002;" class="headerlink" title="target &#x4E3B;&#x8981;&#x5206;&#x4E3A;&#x4E09;&#x7C7B;&#xFF1A;call&#xFF0C;template &#x548C; cbi&#x3002;"></a>target &#x4E3B;&#x8981;&#x5206;&#x4E3A;&#x4E09;&#x7C7B;&#xFF1A;<code>call&#xFF0C;template &#x548C; cbi</code>&#x3002;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#call-用来调用函数。即语句"><span class="toc-number">1.6.1.</span> <span class="toc-text"><a href="#call-&#x7528;&#x6765;&#x8C03;&#x7528;&#x51FD;&#x6570;&#x3002;&#x5373;&#x8BED;&#x53E5;" class="headerlink" title="call &#x7528;&#x6765;&#x8C03;&#x7528;&#x51FD;&#x6570;&#x3002;&#x5373;&#x8BED;&#x53E5;"></a>call &#x7528;&#x6765;&#x8C03;&#x7528;&#x51FD;&#x6570;&#x3002;&#x5373;&#x8BED;&#x53E5;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#template-调用"><span class="toc-number">1.6.2.</span> <span class="toc-text"><a href="#template-&#x8C03;&#x7528;" class="headerlink" title="template &#x8C03;&#x7528;"></a>template &#x8C03;&#x7528;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CBI-调用"><span class="toc-number">1.7.</span> <span class="toc-text"><a href="#CBI-&#x8C03;&#x7528;" class="headerlink" title="CBI &#x8C03;&#x7528;"></a>CBI &#x8C03;&#x7528;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci-API-的使用"><span class="toc-number">1.8.</span> <span class="toc-text"><a href="#Luci-API-&#x7684;&#x4F7F;&#x7528;" class="headerlink" title="Luci API &#x7684;&#x4F7F;&#x7528;"></a>Luci API &#x7684;&#x4F7F;&#x7528;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenWrt-的-UCI-系统"><span class="toc-number">2.</span> <span class="toc-text"><a href="#OpenWrt-&#x7684;-UCI-&#x7CFB;&#x7EDF;" class="headerlink" title="OpenWrt &#x7684; UCI &#x7CFB;&#x7EDF;"></a>OpenWrt &#x7684; UCI &#x7CFB;&#x7EDF;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#UCI-系统的优势"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#UCI-&#x7CFB;&#x7EDF;&#x7684;&#x4F18;&#x52BF;" class="headerlink" title="UCI &#x7CFB;&#x7EDF;&#x7684;&#x4F18;&#x52BF;"></a>UCI &#x7CFB;&#x7EDF;&#x7684;&#x4F18;&#x52BF;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UCI-统一标准"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#UCI-&#x7EDF;&#x4E00;&#x6807;&#x51C6;" class="headerlink" title="UCI &#x7EDF;&#x4E00;&#x6807;&#x51C6;"></a>UCI &#x7EDF;&#x4E00;&#x6807;&#x51C6;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一般规则"><span class="toc-number">2.3.</span> <span class="toc-text"><a href="#&#x4E00;&#x822C;&#x89C4;&#x5219;" class="headerlink" title="&#x4E00;&#x822C;&#x89C4;&#x5219;"></a>&#x4E00;&#x822C;&#x89C4;&#x5219;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件语法"><span class="toc-number">2.4.</span> <span class="toc-text"><a href="#&#x6587;&#x4EF6;&#x8BED;&#x6CD5;" class="headerlink" title="&#x6587;&#x4EF6;&#x8BED;&#x6CD5;"></a>&#x6587;&#x4EF6;&#x8BED;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令行实用工具"><span class="toc-number">2.5.</span> <span class="toc-text"><a href="#&#x547D;&#x4EE4;&#x884C;&#x5B9E;&#x7528;&#x5DE5;&#x5177;" class="headerlink" title="&#x547D;&#x4EE4;&#x884C;&#x5B9E;&#x7528;&#x5DE5;&#x5177;"></a>&#x547D;&#x4EE4;&#x884C;&#x5B9E;&#x7528;&#x5DE5;&#x5177;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Uci-的使用"><span class="toc-number">2.6.</span> <span class="toc-text"><a href="#Uci-&#x7684;&#x4F7F;&#x7528;" class="headerlink" title="Uci &#x7684;&#x4F7F;&#x7528;"></a>Uci &#x7684;&#x4F7F;&#x7528;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#例子"><span class="toc-number">2.6.1.</span> <span class="toc-text"><a href="#&#x4F8B;&#x5B50;" class="headerlink" title="&#x4F8B;&#x5B50;"></a>&#x4F8B;&#x5B50;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Uci-c-API-的使用"><span class="toc-number">2.7.</span> <span class="toc-text"><a href="#Uci-c-API-&#x7684;&#x4F7F;&#x7528;" class="headerlink" title="Uci c API &#x7684;&#x4F7F;&#x7528;"></a>Uci c API &#x7684;&#x4F7F;&#x7528;</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 class="posttitle" itemprop="name headline">
+        Openwrt 开发与 Luci 介绍
+    </h1>
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Sapientia et Virtus</span>
+      </span>
+      <div class="postdate">
+        <time datetime="2014-12-04T00:00:00.000Z" itemprop="datePublished">Dec 4 2014</time>
+    </div>
+      <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/LUCI/">LUCI</a>, <a class="tag-link" href="/tags/Openwrt/">Openwrt</a>, <a class="tag-link" href="/tags/开发/">开发</a>
+    </div>
+    </div>
+  </header>
+  
+  <div class="content" itemprop="articleBody">
+    <p><strong>摘要</strong>：Lua 作为一门方便嵌入(其它应用程序)并可扩展的轻量级脚本语言来设计的，因此她一直遵从着简单、小巧、可移植、快速的原则，官方实现完全采用 ANSI C 编写，能以 C 程序库的形式嵌入到宿主程序中。Lua 的每个版本都保持着开放源码的传统，不过各版采用的许可协议并不相同，自5.0版(最新版是5.1)开始她采用的是著名的 MIT 许可协议。正由于上述特点，所以 Lua 在游戏开发、机器人控制、分布式应用、图像处理、生物信息学等各种各样的领域中得到了越来越广泛的应用。<br><a id="more"></a></p>
+<hr>
+<h1 id="Luci-介绍"><a href="#Luci-介绍" class="headerlink" title="Luci 介绍"></a>Luci 介绍</h1><p>　　Luci 是 Lua ConﬁgurationInterface 的简称，意在 OpenWrt 整个系统的配置集中化。见链接：<br><a href="http://wiki.openwrt.org/zh-cn/doc/uci" target="_blank" rel="noopener"><code>http://wiki.openwrt.org/zh-cn/doc/uci</code></a></p>
+<h2 id="Luci-的启动–uhttpd"><a href="#Luci-的启动–uhttpd" class="headerlink" title="Luci 的启动–uhttpd"></a>Luci 的启动–uhttpd</h2><p>uhttpd 是一个简单的 web 服务器程序，主要就是 cgi 的处理，openwrt 是利用 uhttpd 作为 web 服务器，实现客户端 web 页面配置功能。对于 request 处理方式，采用的是 cgi，而所用的 cgi 程序就是 luci。</p>
+<h2 id="Luci-的启动–luci"><a href="#Luci-的启动–luci" class="headerlink" title="Luci 的启动–luci"></a>Luci 的启动–luci</h2><p>　　在 web server 中的 cgi-bin 目录下，运行 luci 文件（权限一般是 755 ），luci 的代码如下：</p>
+<pre><code>　　# !/usr/bin/lua      --cgi 的执行命令的路径 
+
+　　require&quot;luci.cacheloader&quot;    --导入 cacheloader 包 
+
+　　require&quot;luci.sgi.cgi&quot;         --导入 sgi.cgi 包  
+
+　　luci.dispatcher.indexcache = &quot;/tmp/luci-indexcache&quot;  --cache 缓存路径地址 
+
+　　luci.sgi.cgi.run()  --执行 run，此方法位于*/luci/sgi/cgi.lua 中
+</code></pre><h2 id="Luci–-Web"><a href="#Luci–-Web" class="headerlink" title="Luci– Web"></a>Luci– Web</h2><pre><code>　　a.登录
+
+　　输入： http://x.x.x.x/ 登录 LuCI.
+
+　　Calling /www/cgi-bin/luci.
+
+　　b. 进入主菜单‘status’
+
+　　输入： http://x.x.x.x/cgi-bin/luci/admin/status/即可访问 status 页面。Luci 则会 calling /luci/admin/目录下的 status.lua 脚本：
+
+　　module(&quot;luci.controller.admin.status&quot;, package.seeall)
+
+　　/usr/lib/lua/luci/controller/admin/status.lua-&gt;index()
+</code></pre><h2 id="以-status-模块为例进行说明"><a href="#以-status-模块为例进行说明" class="headerlink" title="以 status 模块为例进行说明"></a>以 status 模块为例进行说明</h2><p>　　模块入口文件 status.lua 在目录<code>lua\luci\controller\admin</code>下在 index()函数中，使用 entry 函数来完成每个模块函数的注册：</p>
+<pre><code>entry(path, target, title=nil, order=nil)
+</code></pre><h2 id="entry-函数"><a href="#entry-函数" class="headerlink" title="entry()函数"></a>entry()函数</h2><pre><code>　　第一个参数是定义菜单的显示（Virtual path）。
+
+　　第二个参数定义相应的处理方式(target)。
+
+　　alias 是指向别的 entry 的别名，from 调用的某一个 view，cbi 调用某一个 model，call 直接调用函数。
+
+　　第三个参数是菜单的文本，_(“string”),国际化。
+
+　　第四个参数是是同级菜单下，此菜单项的位置，从大到小
+</code></pre><h2 id="target-主要分为三类：call，template-和-cbi。"><a href="#target-主要分为三类：call，template-和-cbi。" class="headerlink" title="target 主要分为三类：call，template 和 cbi。"></a>target 主要分为三类：<code>call，template 和 cbi</code>。</h2><h3 id="call-用来调用函数。即语句"><a href="#call-用来调用函数。即语句" class="headerlink" title="call 用来调用函数。即语句"></a>call 用来调用函数。即语句</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entry(&#123;&quot;admin&quot;, &quot;status&quot;, &quot;iptables&quot;&#125;, call(&quot;action_iptables&quot;), _(&quot;Firewall&quot;), 2)</span><br><span class="line">Firewall 模块调用了 action_iptables 函数</span><br></pre></td></tr></table></figure>
+<h3 id="template-调用"><a href="#template-调用" class="headerlink" title="template 调用"></a>template 调用</h3><p>template 用来调用已有的 htm 模版，模版目录在 lua\luci\view 目录下。即语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entry(&#123;&quot;admin&quot;,&quot;status&quot;,&quot;overview&quot;&#125;,template(&quot;admin_status/index&quot;),_(&quot;Overview&quot;), 1)</span><br><span class="line">调用 lua\luci\view\admin_status\index.htm 文件来显示。</span><br></pre></td></tr></table></figure>
+<h2 id="CBI-调用"><a href="#CBI-调用" class="headerlink" title="CBI 调用"></a>CBI 调用</h2><p>　　a. CBI 了解 –- Configuration Binding Interface</p>
+<p>　　CBI 模型是 Lua 文件描述 UCI 配置文件的结构和由此产生的 HTML 表单来评估 CBI 解析器，所有 CBI luci.cbi.Map 类型的模型文件必须返回一个 map 对象，在 cbi 模块中定义各种控件，Luci 系统会自动执行大部分处理工作。其链接目录在<code>lua\luci\model\cbi</code>下 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entry(&#123;&quot;admin&quot;, &quot;status&quot;, &quot;processes&quot;&#125;, cbi(&quot;admin_status/processes&quot;), _(&quot;Processes&quot;), 6)</span><br><span class="line">调用\lua\luci\model\cbi\admin_status\processes.lua 来实现模块。</span><br></pre></td></tr></table></figure>
+<h2 id="Luci-API-的使用"><a href="#Luci-API-的使用" class="headerlink" title="Luci API 的使用"></a>Luci API 的使用</h2><p>　　官方文档介绍：<a href="http://luci.subsignal.org/api/luci/" target="_blank" rel="noopener">http://luci.subsignal.org/api/luci/</a></p>
+<p>　　比如：luci.sys luci.sys.net 等对应的解析，由 Luci 源码结构中的<code>/luci-0.11/libs/sys/luasrc/sys.lua</code>完成。</p>
+<h1 id="OpenWrt-的-UCI-系统"><a href="#OpenWrt-的-UCI-系统" class="headerlink" title="OpenWrt 的 UCI 系统"></a>OpenWrt 的 UCI 系统</h1><p>UCI 是 Unified Configuration Interface 的缩写，翻译成中文就是统一配置接口，用途就是为 OpenWrt 提供一个集中控制的接口。OpenWrt 实现的这个工具，能够让你的不管是 Lua 还是 PHP 程序，或者 SHELL 程序或 C 程序，只要执行命令传输参数就能达到修改系统参数的目的，请参考本文后面的命令行实用工具。</p>
+<h2 id="UCI-系统的优势"><a href="#UCI-系统的优势" class="headerlink" title="UCI 系统的优势"></a>UCI 系统的优势</h2><p>系统的配置应该简单直接，UCI 的设计初衷即是这样的，它是 NVRAM-based 配置方法的继承者（基于 NVRAM 的配置方法起源于 OpenWrt 的 White Russian 系列，该版本目前不再更新，最后发布于2007年，版本号为0.9）。UCI 可以视为 OpenWrt 系统功能设置的主要用户配置接口，通常来说这些配置与系统的功能关联性较大，想像一样我们平常所使用的路由器或嵌入式设备中的 WEB 界面中的那些配置项，就是路由器或嵌入式设备系统所集成了的功能。常见的例子如路由器的网络接口设置，无线参数设置，logging 设置和远程登录设置等。</p>
+<h2 id="UCI-统一标准"><a href="#UCI-统一标准" class="headerlink" title="UCI 统一标准"></a>UCI 统一标准</h2><p>UCI 目前已经支持有一小部分应用程序，因而对这些应用程序的控制会变得更加简单一些。这些第三方应用程序都会有自己的配置文件，不同的语法，不同的文件位置，如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/etc/network/interfaces</span><br><span class="line">/etc/exports</span><br><span class="line">/etc/dnsmasq.conf</span><br><span class="line">或/etc/samba/samba.conf</span><br></pre></td></tr></table></figure>
+<p>由于 UCI 统一配置接口的出现，对这些第三方应用程序的配置只需要修改 UCI 的配置文件即可，就不必再去找不同的目录，写不同的语法了。当然，你安装的大多数第三方应用程序都没有提供 UCI 配置接口，很可能是因为这些应用程序本身就不需要向普通用户提供应用程序接口，配置文件是给开发者使用的，从这个角度上来看，没有提供 UCI 接口反而更好。因而，OpenWrt 包维护人员只选定了一小部分必需的程序实现了 UCI 配置接口，下面有列出（Therefore, only a few selected programs which benefit from availability of a centralised configuration have been made UCI-compatible by the OpenWrt package maintainers (see the UCI configuration file list below)）。</p>
+<p>许多第三方程序是根据它自己对应于/etc/config 下的 UCI 配置文件的选项去设置程序的原始配置文件，这样就实现了程序对 UCI 配置的兼容，然后执行一次/etc/init.d 脚本完成一次配置。因而当你启动一个某个程序的 UCI 兼容的进程脚本时，该脚本应该不只是修改/etc/config 下对应的 UCI 配置文件，同时也应该覆盖程序自己的原配置文件。比如 Samba/CIFS 程序，其原配置文件是在/etc/samba/smb.conf，而对应的 UCI 文件是/etc/config/samba，当/etc/config/samba 文件被修改了之后，需要运行一次</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/samba start</span><br></pre></td></tr></table></figure>
+<p>之后 UCI 文件中的设置才会更新到原配置文件中去。</p>
+<p><img src="http://picture-lotors.qiniudn.com/UCI1.png" alt="UCI 统一标准方法"><br>除此之外，应用程序的配置文件常常是存放在 RAM 而不是 FLASH 中，因为它不需要每次修改参数之后就去写非易性闪存了，而只在应用改变的时候它才会根据 UCI 文件去写非易性闪存（原文：In addition, the application’s configuration file is often stored in RAM instead of in flash, because it does not need to be stored in non-volatile memory and it is rewritten after every change, based on the UCI file.）。</p>
+<p>OpenWrt 的 wiki 里有一篇文章 NotUCI Configuration 列举了一些与 UCI 不兼容的自带程序，而其它的第三方程序，你得自己去查阅程序的说明了。</p>
+<h2 id="一般规则"><a href="#一般规则" class="headerlink" title="一般规则"></a>一般规则</h2><p>UCI 的配置文件被分割成/etc/config 下的多个独立的文件，各个文件按名字含义对应系统的不同的功能配置。你可以通过文本编译器或者 uci 实用程序去修改这些配置文件，同时 uci 还提供了 C 语言/脚本/Lua 等语言的应用程序接口，WEB 配置页面例如 Luci 就是利用了 uci 所提供的 API 而实现对 UCI 配置文件的修改的。</p>
+<p>不管你是采用文本编辑器还是通过命令行的方式修改了 UCI 配置文件，相应的服务或应用程序不会自动更新状态，这时你都必须调用一次<code>/etc/init.d (re)start</code>才能使刚刚对 UCI 配置文件的修改生效。许多兼容 UCI 的程序采用这样的方法来应用更新：在 init.d 脚本执行流中去修改自己程序的配置文件。具体说来，init.d 脚本先去修改自己程序的原配置文件中的信息（如/etc/samba/smb.conf），之后重启一次应用程序，应用程序就会去读自己的配置文件（刚刚被 init.d 更新过的）再启动，这样应用程序的状态就更新了。仅仅重启应用程序，而不执行 init.d 脚本的话，/etc/config 下的 UCI 配置文件是不会应用于应用程序的，新配置也就不生效了。<br>举个例子：</p>
+<p>先登录到路由器的 WEB 页面把 WiFi 给禁用掉，这个时候你的手机搜索到你的路由器发送的 SSID 了，我这儿是 NGTestRouter。<br><img src="http://picture-lotors.qiniudn.com/UCI2.png" alt="UCI 统一标准方法"></p>
+<p>这时我们准备通过使用文本编辑器修改 UCI 再应用的方法来现使能 WiFi，步骤如下：</p>
+<p>编辑 wireless 文件把 disabled 这个项注释掉（也就是 enable WiFi 了）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># vi /etc/config/wireless</span><br></pre></td></tr></table></figure></p>
+<p>然后运行一次<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># /etc/init.d/network restart</span><br></pre></td></tr></table></figure></p>
+<p>这时你的手机又可以看到 NGTestRouter 这个热点了！<br><img src="http://picture-lotors.qiniudn.com/UCI3.png" alt="UCI 统一标准方法"></p>
+<h2 id="文件语法"><a href="#文件语法" class="headerlink" title="文件语法"></a>文件语法</h2><p>uci 配置文件通常包含有一个或多个语句。所谓段（section），包含有一个或多个 option 语句，这些语句定义了实际的值。</p>
+<p>下面是一个简单的配置文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">package &apos;example&apos;</span><br><span class="line"></span><br><span class="line">config &apos;example&apos; &apos;test&apos;</span><br><span class="line">        option   &apos;string&apos;      &apos;some value&apos;</span><br><span class="line">        option   &apos;boolean&apos;     &apos;1&apos;</span><br><span class="line">        list     &apos;collection&apos;  &apos;first item&apos;</span><br><span class="line">        list     &apos;collection&apos;  &apos;second item&apos;</span><br></pre></td></tr></table></figure></p>
+<p><code>config &#39;example&#39; &#39;test&#39;</code>表示一个段的开始，其中<code>example</code>是段的类型，<code>test</code>为段的名字。段也可以没有名字，像<code>config &#39;example&#39;</code>，但是必须要有类型，类型指示了 uci 程序怎么去处理后面的 option 内容；<br><code>option &#39;string&#39; &#39;some value&#39;</code>和<code>option &#39;boolean&#39; &#39;1&#39;</code>两个语句定义了段内的两个标识符的值，虽然它们一个是<code>string</code>一个是<code>boolean</code>，但是在语法没有任何区别。<code>boolean</code>后面可以跟<code>&#39;0&#39;, &#39;no&#39;, &#39;off&#39;, &#39;false&#39;</code>中的一个作为否的值，或者<code>&#39;1&#39;, &#39;yes&#39;, &#39;on&#39;, &#39;true&#39;</code>作为逻辑是的值；<br>后面两行以<code>list</code>开头的语句，是为某个有多种选项值的<code>option</code>所定义的，在同一<code>option</code>中的选项值，它们应该有同样的名字，在这里的名字为<code>collection</code>。最张这两个值为收纳到同一个<code>list</code>表中，表中出现的顺序即你这里所定义的；<br>标识符<code>option</code>和<code>list</code>是为了更易读而加上的，没有它们也是可以的；<br>如果某个<code>option</code>没有但它不是必须的，那么 uci 处理程序会假定一个默认值；如果该 option 是必须的，而文件中没有定义，那么 uci 会报错或者显现出奇怪的结果；<br>语句中的标识和值可不必使用引号引起，除非你的字段值含有空格或者 tab 键。如果使用引号，那你可以随意使用单引号或者双引号。比如这样子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">option example value</span><br><span class="line">option &apos;example&apos; value</span><br><span class="line">option example &quot;value&quot;</span><br><span class="line">option &quot;example&quot; &apos;value&apos;</span><br><span class="line">option &apos;example&apos; &quot;value&quot;</span><br></pre></td></tr></table></figure></p>
+<p>不过不能这样子（引号混用，字段中有空格但未用引号引起来）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">option &apos;example&quot; &quot;value&apos; (quotes are unbalanced)</span><br><span class="line">option example some value with space (note the missing quotes around the value)</span><br></pre></td></tr></table></figure></p>
+<p>UCI 的文件名和标识符（像 option example value 中的 example 即为标识符，value 为 option 的值）可以使用 a-z, 0-9和下划线_组合的任意字符串，不允许使用横杠线-，而 option 的值可以傅任意字符（像空格这样子的字段值需要用引号引起）。</p>
+<h2 id="命令行实用工具"><a href="#命令行实用工具" class="headerlink" title="命令行实用工具"></a>命令行实用工具</h2><p>修改配置的一种方法是直接去修改 UCI 配置文件。不过，UCI 配置文件读和写操作都可以通过 uci 命令行实用工具来完成，因而如果你自己去写一个脚本来解析或写入 UCI 配置文件不是一个明智的选择，既浪费时间又不一定写得好。以下介绍如何使用 uci 命令行实用工具，并伴有一些实例参考：</p>
+<p>在学习该工具前需要注意：uci 会把先读到 UCI 文件，其中不认识的所有命令参数和注释会被删除！所以，像 uhttpd 这样安装地有详细注释的文件，在使用 uci 操作之后其中的注释就会被抹掉的。OpenWrt 的默认 WEB 界面 Luci 就是采用了 uci 来写 UCI 文件！</p>
+<h2 id="Uci-的使用"><a href="#Uci-的使用" class="headerlink" title="Uci 的使用"></a>Uci 的使用</h2><p>　　Uci 命令的使用</p>
+<pre><code>Usage: uci [&lt;options&gt;] &lt;command&gt; [&lt;arguments&gt;]
+
+Commands:
+        batch
+        export     [&lt;config&gt;]
+        import     [&lt;config&gt;]
+        changes    [&lt;config&gt;]
+        commit     [&lt;config&gt;]
+        add        &lt;config&gt; &lt;section-type&gt;
+        add_list   &lt;config&gt;.&lt;section&gt;.&lt;option&gt;=&lt;string&gt;
+        del_list   &lt;config&gt;.&lt;section&gt;.&lt;option&gt;=&lt;string&gt;
+        show       [&lt;config&gt;[.&lt;section&gt;[.&lt;option&gt;]]]
+        get        &lt;config&gt;.&lt;section&gt;[.&lt;option&gt;]
+        set        &lt;config&gt;.&lt;section&gt;[.&lt;option&gt;]=&lt;value&gt;
+        delete     &lt;config&gt;[.&lt;section&gt;[[.&lt;option&gt;][=&lt;id&gt;]]]
+        rename     &lt;config&gt;.&lt;section&gt;[.&lt;option&gt;]=&lt;name&gt;
+        revert     &lt;config&gt;[.&lt;section&gt;[.&lt;option&gt;]]
+        reorder    &lt;config&gt;.&lt;section&gt;=&lt;position&gt;
+
+Options:
+        -c &lt;path&gt;  set the search path for config files (default: /etc/config)
+        -d &lt;str&gt;   set the delimiter for list values in uci show
+        -f &lt;file&gt;  use &lt;file&gt; as input instead of stdin
+        -m         when importing, merge data into an existing package
+        -n         name unnamed sections on export (default)
+        -N         don&apos;t name unnamed sections
+        -p &lt;path&gt;  add a search path for config change files
+        -P &lt;path&gt;  add a search path for config change files and use as default
+        -q         quiet mode (don&apos;t print error messages)
+        -s         force strict mode (stop on parser errors, default)
+        -S         disable strict mode
+        -X         do not use extended syntax on &apos;show&apos;
+</code></pre><h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>设置一个值</p>
+<pre><code># 把 uhttpd 的监听端口从80换成8080
+root@OpenWrt:~#  uci set uhttpd.main.listen_http=8080 
+root@OpenWrt:~#  uci commit uhttpd 
+root@OpenWrt:~#  /etc/init.d/uhttpd restart 
+root@OpenWrt:~# 
+
+# 导出整体配置信息
+root@OpenWrt:~#  uci export httpd 
+package &apos;httpd&apos; 
+config &apos;httpd&apos; 
+    option &apos;port&apos; &apos;80&apos; 
+    option &apos;home&apos; &apos;/www&apos; 
+root@OpenWrt:~# 
+
+# 显示一个给定配置的树
+root@OpenWrt:~#  uci show httpd 
+httpd.@httpd[0]=httpd 
+httpd.@httpd[0].port=80 
+httpd.@httpd[0].home=/www 
+root@OpenWrt:~# 
+
+# 显示一个 option 的值
+root@OpenWrt:~#  uci get httpd.@httpd[0].port 
+80 
+root@OpenWrt:~# 
+
+# 追加 list 的一个条目
+uci add_list system.ntp.server=&apos;0.de.pool.ntp.org&apos;
+
+# 替换一个 list
+uci delete system.ntp.server 
+uci add_list system.ntp.server=&apos;0.de.pool.ntp.org&apos; 
+uci add_list system.ntp.server=&apos;1.de.pool.ntp.org&apos; 
+uci add_list system.ntp.server=&apos;2.de.pool.ntp.org&apos;
+
+/**
+*UCI 路径
+*假设有下面的 UCI 文件
+*/etc/config/foo 
+**/
+
+config bar &apos;first&apos; 
+    option name &apos;Mr. First&apos; 
+config bar 
+    option name &apos;Mr. Second&apos; 
+config bar &apos;third&apos; 
+    option name &apos;Mr. Third&apos;
+那么下面三组路径的执行得到的值分别各自相等
+
+#  Mr. First 
+uci get foo.@bar[0].name 
+uci get foo.@bar[-0].name 
+uci get foo.@bar[-3].name 
+uci get foo.first.name 
+#  Mr. Second 
+uci get foo.@bar[1].name 
+uci get foo.@bar[-2].name 
+#  uci get foo.second.name 本条语句不工作，因为 second 没有定义 
+#  Mr. Third 
+uci get foo.@bar[2].name 
+uci get foo.@bar[-1].name 
+uci get foo.third.name
+如果 show，则会得到这样的值
+
+#  uci show foo 
+foo.first=bar 
+foo.first.name=Mr. First 
+foo.@bar[0]=bar 
+foo.@bar[0].name=Mr. Second 
+foo.third=bar 
+foo.third.name=Mr. Third
+执行 uci show foo.@bar[0]得到
+
+#  uci show foo.@bar[0] 
+foo.first=bar 
+foo.first.name=Mr. First
+查询输出
+root@OpenWrt:~#  uci -P/var/state show network.wan
+uci: Entry not found
+network.loopback=interface
+network.loopback.ifname=lo
+network.loopback.proto=static
+network.loopback.ipaddr=127.0.0.1
+network.loopback.netmask=255.0.0.0
+network.loopback.up=1
+network.loopback.connect_time=10749
+network.loopback.device=lo
+network.lan=interface
+network.lan.type=bridge
+network.lan.proto=static
+network.lan.netmask=255.255.255.0
+network.lan.ipaddr=10.0.11.233
+network.lan.gateway=10.0.11.254
+network.lan.dns=8.8.8.8
+network.lan.up=1
+network.lan.connect_time=10747
+network.lan.device=eth0
+network.lan.ifname=br-lan
+</code></pre><p>添加防火墙规则<br>这个例子不仅演示了如何添加 TCP SSH 防火墙规则，同时也演示 uci 的 negative (-1)语法。</p>
+<h2 id="Uci-c-API-的使用"><a href="#Uci-c-API-的使用" class="headerlink" title="Uci c API 的使用"></a>Uci c API 的使用</h2><p>　　在脚本中使用 uci config 文件：<a href="http://wiki.openwrt.org/doc/devel/config-scripting" target="_blank" rel="noopener">http://wiki.openwrt.org/doc/devel/config-scripting</a></p>
+<p>　　总结一下 Luci、Lua、Uci、CBI 的关系图，如下图：<br><img src="http://picture-lotors.qiniudn.com/LUCI.jpg" alt="luci 关系图"></p>
+<p>　　以上为最近研究 Luci 开发的相关资料整理，同时自己也动手做了几个测试页面并通过 luci.sys.call 实现了脚本、系统程序的调用。</p>
+  </div>
+</article>
+<div class="blog-post-comments">
+	<div class="wildfire_thread"></div>
+</div>
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Luci-介绍"><span class="toc-number">1.</span> <span class="toc-text"><a href="#Luci-&#x4ECB;&#x7ECD;" class="headerlink" title="Luci &#x4ECB;&#x7ECD;"></a>Luci &#x4ECB;&#x7ECD;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci-的启动–uhttpd"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#Luci-&#x7684;&#x542F;&#x52A8;&#x2013;uhttpd" class="headerlink" title="Luci &#x7684;&#x542F;&#x52A8;&#x2013;uhttpd"></a>Luci &#x7684;&#x542F;&#x52A8;&#x2013;uhttpd</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci-的启动–luci"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#Luci-&#x7684;&#x542F;&#x52A8;&#x2013;luci" class="headerlink" title="Luci &#x7684;&#x542F;&#x52A8;&#x2013;luci"></a>Luci &#x7684;&#x542F;&#x52A8;&#x2013;luci</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci–-Web"><span class="toc-number">1.3.</span> <span class="toc-text"><a href="#Luci&#x2013;-Web" class="headerlink" title="Luci&#x2013; Web"></a>Luci&#x2013; Web</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#以-status-模块为例进行说明"><span class="toc-number">1.4.</span> <span class="toc-text"><a href="#&#x4EE5;-status-&#x6A21;&#x5757;&#x4E3A;&#x4F8B;&#x8FDB;&#x884C;&#x8BF4;&#x660E;" class="headerlink" title="&#x4EE5; status &#x6A21;&#x5757;&#x4E3A;&#x4F8B;&#x8FDB;&#x884C;&#x8BF4;&#x660E;"></a>&#x4EE5; status &#x6A21;&#x5757;&#x4E3A;&#x4F8B;&#x8FDB;&#x884C;&#x8BF4;&#x660E;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#entry-函数"><span class="toc-number">1.5.</span> <span class="toc-text"><a href="#entry-&#x51FD;&#x6570;" class="headerlink" title="entry()&#x51FD;&#x6570;"></a>entry()&#x51FD;&#x6570;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#target-主要分为三类：call，template-和-cbi。"><span class="toc-number">1.6.</span> <span class="toc-text"><a href="#target-&#x4E3B;&#x8981;&#x5206;&#x4E3A;&#x4E09;&#x7C7B;&#xFF1A;call&#xFF0C;template-&#x548C;-cbi&#x3002;" class="headerlink" title="target &#x4E3B;&#x8981;&#x5206;&#x4E3A;&#x4E09;&#x7C7B;&#xFF1A;call&#xFF0C;template &#x548C; cbi&#x3002;"></a>target &#x4E3B;&#x8981;&#x5206;&#x4E3A;&#x4E09;&#x7C7B;&#xFF1A;<code>call&#xFF0C;template &#x548C; cbi</code>&#x3002;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#call-用来调用函数。即语句"><span class="toc-number">1.6.1.</span> <span class="toc-text"><a href="#call-&#x7528;&#x6765;&#x8C03;&#x7528;&#x51FD;&#x6570;&#x3002;&#x5373;&#x8BED;&#x53E5;" class="headerlink" title="call &#x7528;&#x6765;&#x8C03;&#x7528;&#x51FD;&#x6570;&#x3002;&#x5373;&#x8BED;&#x53E5;"></a>call &#x7528;&#x6765;&#x8C03;&#x7528;&#x51FD;&#x6570;&#x3002;&#x5373;&#x8BED;&#x53E5;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#template-调用"><span class="toc-number">1.6.2.</span> <span class="toc-text"><a href="#template-&#x8C03;&#x7528;" class="headerlink" title="template &#x8C03;&#x7528;"></a>template &#x8C03;&#x7528;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CBI-调用"><span class="toc-number">1.7.</span> <span class="toc-text"><a href="#CBI-&#x8C03;&#x7528;" class="headerlink" title="CBI &#x8C03;&#x7528;"></a>CBI &#x8C03;&#x7528;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Luci-API-的使用"><span class="toc-number">1.8.</span> <span class="toc-text"><a href="#Luci-API-&#x7684;&#x4F7F;&#x7528;" class="headerlink" title="Luci API &#x7684;&#x4F7F;&#x7528;"></a>Luci API &#x7684;&#x4F7F;&#x7528;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenWrt-的-UCI-系统"><span class="toc-number">2.</span> <span class="toc-text"><a href="#OpenWrt-&#x7684;-UCI-&#x7CFB;&#x7EDF;" class="headerlink" title="OpenWrt &#x7684; UCI &#x7CFB;&#x7EDF;"></a>OpenWrt &#x7684; UCI &#x7CFB;&#x7EDF;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#UCI-系统的优势"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#UCI-&#x7CFB;&#x7EDF;&#x7684;&#x4F18;&#x52BF;" class="headerlink" title="UCI &#x7CFB;&#x7EDF;&#x7684;&#x4F18;&#x52BF;"></a>UCI &#x7CFB;&#x7EDF;&#x7684;&#x4F18;&#x52BF;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UCI-统一标准"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#UCI-&#x7EDF;&#x4E00;&#x6807;&#x51C6;" class="headerlink" title="UCI &#x7EDF;&#x4E00;&#x6807;&#x51C6;"></a>UCI &#x7EDF;&#x4E00;&#x6807;&#x51C6;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一般规则"><span class="toc-number">2.3.</span> <span class="toc-text"><a href="#&#x4E00;&#x822C;&#x89C4;&#x5219;" class="headerlink" title="&#x4E00;&#x822C;&#x89C4;&#x5219;"></a>&#x4E00;&#x822C;&#x89C4;&#x5219;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件语法"><span class="toc-number">2.4.</span> <span class="toc-text"><a href="#&#x6587;&#x4EF6;&#x8BED;&#x6CD5;" class="headerlink" title="&#x6587;&#x4EF6;&#x8BED;&#x6CD5;"></a>&#x6587;&#x4EF6;&#x8BED;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令行实用工具"><span class="toc-number">2.5.</span> <span class="toc-text"><a href="#&#x547D;&#x4EE4;&#x884C;&#x5B9E;&#x7528;&#x5DE5;&#x5177;" class="headerlink" title="&#x547D;&#x4EE4;&#x884C;&#x5B9E;&#x7528;&#x5DE5;&#x5177;"></a>&#x547D;&#x4EE4;&#x884C;&#x5B9E;&#x7528;&#x5DE5;&#x5177;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Uci-的使用"><span class="toc-number">2.6.</span> <span class="toc-text"><a href="#Uci-&#x7684;&#x4F7F;&#x7528;" class="headerlink" title="Uci &#x7684;&#x4F7F;&#x7528;"></a>Uci &#x7684;&#x4F7F;&#x7528;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#例子"><span class="toc-number">2.6.1.</span> <span class="toc-text"><a href="#&#x4F8B;&#x5B50;" class="headerlink" title="&#x4F8B;&#x5B50;"></a>&#x4F8B;&#x5B50;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Uci-c-API-的使用"><span class="toc-number">2.7.</span> <span class="toc-text"><a href="#Uci-c-API-&#x7684;&#x4F7F;&#x7528;" class="headerlink" title="Uci c API &#x7684;&#x4F7F;&#x7528;"></a>Uci c API &#x7684;&#x4F7F;&#x7528;</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Luci-Developing/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&text=Openwrt 开发与 Luci 介绍"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&is_video=false&description=Openwrt 开发与 Luci 介绍"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Openwrt 开发与 Luci 介绍&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Luci-Developing/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&title=Openwrt 开发与 Luci 介绍"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Luci-Developing/&name=Openwrt 开发与 Luci 介绍&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Lua 作为一门方便嵌入(其它应用程序)并可扩展的轻量级脚本语言来设计的，因此她一直遵从着简单、小巧、可移植、快速的原则，官方实现完全采用 ANSI C 编写，能以 C 程序库的形式嵌入到宿主程序中。Lua 的每个版本都保持着开放源码的传统，不过各版采用的许可协议并不相同，自5.0版(最新版是5.1)开始她采用的是著名的 MIT 许可协议。正由于上述特点，所以 Lua 在游戏开发、机器人控制、分布式应用、图像处理、生物信息学等各种各样的领域中得到了越来越广泛的应用。&lt;br&gt;"><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 masukio
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+<script>
+  // 你可以自定义一些配置
+  //
+  // databaseProvider: 必须为 'wilddog' 或者 'firebase'
+  // databaseConfig: 请从你的数据库控制台复制过来。
+  // pageURL(可选): 默认为当前页面的 URL。
+  // pageTitle(可选): 默认为当前页面的 title。
+  // theme(可选): 'light'（默认）或者 'dark'。
+  // locale(可选): 'en'（默认）或者 'zh-CN'
+  // defaultAvatarURL(可选): 默认头像是一个可爱的消防员 :-D
+  var wildfireConfig = () => ({
+    databaseProvider: 'wilddog',
+    databaseConfig: {
+        siteId: "wd2882084211dpgrir"
+    },
+    theme: 'dark',
+    locale: 'zh-CN',
+    defaultAvatarURL: 'https://image.flaticon.com/icons/svg/621/621863.svg'
+  })
+</script>
+<script src="https://unpkg.com/wildfire/dist/wildfire.auto.js"></script>

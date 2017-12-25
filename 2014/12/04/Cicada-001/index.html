@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="摘要：Cicada 中文名「蝉」，是我的第一款 Android 应用，它是基于开源软件 K-9 Mail 库开发的 TO-DO 应用，它的特点在于其基于 E-Mail 协议，支持跨平台，无需注册即可实现任务的共享，即使没有安装 APP，也可以通过邮件来实现大部分功能。本篇为概览，介绍软件的实现的功能，系统架构，UI 及交互。">
+<meta name="keywords" content="Android,交互,架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Project Cicada# 001：Introduction">
+<meta property="og:url" content="https://fjkfwz.github.io/2014/12/04/Cicada-001/index.html">
+<meta property="og:site_name" content="Sapientia et Virtus">
+<meta property="og:description" content="摘要：Cicada 中文名「蝉」，是我的第一款 Android 应用，它是基于开源软件 K-9 Mail 库开发的 TO-DO 应用，它的特点在于其基于 E-Mail 协议，支持跨平台，无需注册即可实现任务的共享，即使没有安装 APP，也可以通过邮件来实现大部分功能。本篇为概览，介绍软件的实现的功能，系统架构，UI 及交互。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/Cidaca.PNG">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/Table.PNG">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/业务逻辑.PNG">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/cicada002.png">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/done.PNG">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/new.PNG">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/scale.PNG">
+<meta property="og:updated_time" content="2017-12-25T14:28:22.318Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Project Cicada# 001：Introduction">
+<meta name="twitter:description" content="摘要：Cicada 中文名「蝉」，是我的第一款 Android 应用，它是基于开源软件 K-9 Mail 库开发的 TO-DO 应用，它的特点在于其基于 E-Mail 协议，支持跨平台，无需注册即可实现任务的共享，即使没有安装 APP，也可以通过邮件来实现大部分功能。本篇为概览，介绍软件的实现的功能，系统架构，UI 及交互。">
+<meta name="twitter:image" content="http://7nar5o.com1.z0.glb.clouddn.com/Cidaca.PNG">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Project Cicada# 001：Introduction</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="Sapientia et Virtus" type="application/atom+xml">
+    
+</head>
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')" style="display:none"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/12/04/Graduation/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle()" onmouseout="$('#i-prev').toggle()"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/12/04/Cicada-002/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="$('#share').toggle();return false"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none">Previous post</span>
+      <span id="i-next" class="info" style="display:none">Next post</span>
+      <span id="i-top" class="info" style="display:none">Back to top</span>
+      <span id="i-share" class="info" style="display:none">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Cicada-001/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&text=Project Cicada# 001：Introduction"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&is_video=false&description=Project Cicada# 001：Introduction"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Project Cicada# 001：Introduction&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Cicada-001/"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-get-pocket" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-reddit" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-stumbleupon" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-digg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&name=Project Cicada# 001：Introduction&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Cicada 中文名「蝉」，是我的第一款 Android 应用，它是基于开源软件 K-9 Mail 库开发的 TO-DO 应用，它的特点在于其基于 E-Mail 协议，支持跨平台，无需注册即可实现任务的共享，即使没有安装 APP，也可以通过邮件来实现大部分功能。本篇为概览，介绍软件的实现的功能，系统架构，UI 及交互。&lt;br&gt;"><i class="fa fa-tumblr" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#清单"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x6E05;&#x5355;" class="headerlink" title="&#x6E05;&#x5355;"></a>&#x6E05;&#x5355;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TO-DO-应用"><span class="toc-number">2.</span> <span class="toc-text"><a href="#TO-DO-&#x5E94;&#x7528;" class="headerlink" title="TO-DO &#x5E94;&#x7528;"></a>TO-DO &#x5E94;&#x7528;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#弃之不用"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#&#x5F03;&#x4E4B;&#x4E0D;&#x7528;" class="headerlink" title="&#x5F03;&#x4E4B;&#x4E0D;&#x7528;"></a>&#x5F03;&#x4E4B;&#x4E0D;&#x7528;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#奇妙清单"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#&#x5947;&#x5999;&#x6E05;&#x5355;" class="headerlink" title="&#x5947;&#x5999;&#x6E05;&#x5355;"></a>&#x5947;&#x5999;&#x6E05;&#x5355;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cicada-优点"><span class="toc-number">2.3.</span> <span class="toc-text"><a href="#Cicada-&#x4F18;&#x70B9;" class="headerlink" title="Cicada &#x4F18;&#x70B9;"></a>Cicada &#x4F18;&#x70B9;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实现目标"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x5B9E;&#x73B0;&#x76EE;&#x6807;" class="headerlink" title="&#x5B9E;&#x73B0;&#x76EE;&#x6807;"></a>&#x5B9E;&#x73B0;&#x76EE;&#x6807;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#系统构建"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x7CFB;&#x7EDF;&#x6784;&#x5EFA;" class="headerlink" title="&#x7CFB;&#x7EDF;&#x6784;&#x5EFA;"></a>&#x7CFB;&#x7EDF;&#x6784;&#x5EFA;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#电子邮件系统"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#&#x7535;&#x5B50;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;" class="headerlink" title="&#x7535;&#x5B50;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;"></a>&#x7535;&#x5B50;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#原因"><span class="toc-number">4.1.1.</span> <span class="toc-text"><a href="#&#x539F;&#x56E0;" class="headerlink" title="&#x539F;&#x56E0;"></a>&#x539F;&#x56E0;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#底层实现"><span class="toc-number">4.1.2.</span> <span class="toc-text"><a href="#&#x5E95;&#x5C42;&#x5B9E;&#x73B0;" class="headerlink" title="&#x5E95;&#x5C42;&#x5B9E;&#x73B0;"></a>&#x5E95;&#x5C42;&#x5B9E;&#x73B0;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#获取待办事项"><span class="toc-number">4.1.2.1.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;&#x5F85;&#x529E;&#x4E8B;&#x9879;" class="headerlink" title="&#x83B7;&#x53D6;&#x5F85;&#x529E;&#x4E8B;&#x9879;"></a>&#x83B7;&#x53D6;&#x5F85;&#x529E;&#x4E8B;&#x9879;</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#共享代办事项"><span class="toc-number">4.1.2.2.</span> <span class="toc-text"><a href="#&#x5171;&#x4EAB;&#x4EE3;&#x529E;&#x4E8B;&#x9879;" class="headerlink" title="&#x5171;&#x4EAB;&#x4EE3;&#x529E;&#x4E8B;&#x9879;"></a>&#x5171;&#x4EAB;&#x4EE3;&#x529E;&#x4E8B;&#x9879;</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#类-MVC-模型"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x7C7B;-MVC-&#x6A21;&#x578B;" class="headerlink" title="&#x7C7B; MVC &#x6A21;&#x578B;"></a>&#x7C7B; MVC &#x6A21;&#x578B;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#View-层"><span class="toc-number">4.2.1.</span> <span class="toc-text"><a href="#View-&#x5C42;" class="headerlink" title="View &#x5C42;"></a>View &#x5C42;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Controller-层"><span class="toc-number">4.2.2.</span> <span class="toc-text"><a href="#Controller-&#x5C42;" class="headerlink" title="Controller &#x5C42;"></a>Controller &#x5C42;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Model-层"><span class="toc-number">4.2.3.</span> <span class="toc-text"><a href="#Model-&#x5C42;" class="headerlink" title="Model &#x5C42;"></a>Model &#x5C42;</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#交互设计"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x4EA4;&#x4E92;&#x8BBE;&#x8BA1;" class="headerlink" title="&#x4EA4;&#x4E92;&#x8BBE;&#x8BA1;"></a>&#x4EA4;&#x4E92;&#x8BBE;&#x8BA1;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#完成任务"><span class="toc-number">5.1.</span> <span class="toc-text"><a href="#&#x5B8C;&#x6210;&#x4EFB;&#x52A1;" class="headerlink" title="&#x5B8C;&#x6210;&#x4EFB;&#x52A1;"></a>&#x5B8C;&#x6210;&#x4EFB;&#x52A1;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新建任务"><span class="toc-number">5.2.</span> <span class="toc-text"><a href="#&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;" class="headerlink" title="&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;"></a>&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查看详细任务"><span class="toc-number">5.3.</span> <span class="toc-text"><a href="#&#x67E5;&#x770B;&#x8BE6;&#x7EC6;&#x4EFB;&#x52A1;" class="headerlink" title="&#x67E5;&#x770B;&#x8BE6;&#x7EC6;&#x4EFB;&#x52A1;"></a>&#x67E5;&#x770B;&#x8BE6;&#x7EC6;&#x4EFB;&#x52A1;</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 class="posttitle" itemprop="name headline">
+        Project Cicada# 001：Introduction
+    </h1>
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Sapientia et Virtus</span>
+      </span>
+      <div class="postdate">
+        <time datetime="2014-12-04T00:00:00.000Z" itemprop="datePublished">Dec 4 2014</time>
+    </div>
+      <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Android/">Android</a>, <a class="tag-link" href="/tags/交互/">交互</a>, <a class="tag-link" href="/tags/架构/">架构</a>
+    </div>
+    </div>
+  </header>
+  
+  <div class="content" itemprop="articleBody">
+    <p><strong>摘要</strong>：Cicada 中文名「蝉」，是我的第一款 Android 应用，它是基于开源软件 K-9 Mail 库开发的 TO-DO 应用，它的特点在于其基于 E-Mail 协议，支持跨平台，无需注册即可实现任务的共享，即使没有安装 APP，也可以通过邮件来实现大部分功能。本篇为概览，介绍软件的实现的功能，系统架构，UI 及交互。<br><a id="more"></a><br><img src="http://7nar5o.com1.z0.glb.clouddn.com/Cidaca.PNG" alt=""></p>
+<h1 id="清单"><a href="#清单" class="headerlink" title="清单"></a>清单</h1><p>很多人显然意识到了「一个脑子记不过来」这一惨痛的事实，开始寻求一些解决之道，于是开始接触时间管理、GTD 等概念。然而，这些概念要不过于复杂，不适用于自己的实际生活，要么过于理论，很难套用到具体的行为中去。</p>
+<p>而清单则是一个恰到好处的解决方案。一方面，清单充当了思维导图的角色，但你把不同的事项分别存放在不同的清单列表中，实际上已经是对这些事项的第一次梳理，明确了大致分类，方便对自己的日程和时间作出具体的分配和规划。另一方面，清单可以督促我们的行动。很多实验都已经证明了，无论你有没有强迫症，在清单上留有尚待完成的事项，都会激发一个人的行动欲，提高我们的办事效率。</p>
+<h1 id="TO-DO-应用"><a href="#TO-DO-应用" class="headerlink" title="TO-DO 应用"></a>TO-DO 应用</h1><p>Android 平台上已经有不少 TO-DO 类应用，例如大名鼎鼎的 OmniFocus、Things,TO-DO 和最近很火的 Wunderlist 都是众多 Power User 的必备。</p>
+<h2 id="弃之不用"><a href="#弃之不用" class="headerlink" title="弃之不用"></a>弃之不用</h2><p>其中 GTD 老牌软件 OmniFocus、Things，你可以为每个事项设定不同的情景，关联不同的人物，在不同的透视下查看，当然，如果你每天都有上百个待办事项，OmniFocus 才是你唯一正确的选择。然而对于我们一般人，这些过于简单或复杂的设定，其实并不适用于大多数人的普通生活。</p>
+<h2 id="奇妙清单"><a href="#奇妙清单" class="headerlink" title="奇妙清单"></a>奇妙清单</h2><p>「奇妙清单」接近我理想中的清单软件，我也一直将其作为日常生产力软件在使用，它没有复杂的情景设置，也没有任务的无限层级，事实上，从推出到现在，整体的设计和使用理念都没有发生过重大的改变。层级只有「清单 - 事项 - 子任务」三级，它只支持设置到期时间和一次提醒，可以对优先级高的任务打上星标，一款无所不能的 App，往往大多数人会因为学习成本过高而放弃。但「奇妙清单」非常巧妙地把握了这个平衡，在使用时一切功能都恰到好处。</p>
+<h2 id="Cicada-优点"><a href="#Cicada-优点" class="headerlink" title="Cicada 优点"></a>Cicada 优点</h2><pre><code>1.不是每个人都是 Wunderlist「奇妙清单」的用户，但每个人都有电子邮箱，
+  Cicada 基于用户现有的邮箱系统即可实现，任务的存储，分享，通过电子邮箱自动导入关系链
+2.「奇妙清单」缺少聚合清单的清单流，导致有的事项容易错过，
+  而 Cicada 通过算法进行重要性和任务周期进行事项的颜色标记和智能排序，
+    优先安排重要度-周期比高的任务和紧急任务
+3.分布式加 Group，可以通过清单 ID 或二维码加入清单而不用一个一个的添加，例如办公室同事或同班同学清单
+4.没有客户端也可以使用，跨平台
+5.利用邮件的文件传输功能实现文件传输
+</code></pre><h1 id="实现目标"><a href="#实现目标" class="headerlink" title="实现目标"></a>实现目标</h1><pre><code>1.实现个人事项的参加，持久化与云同步
+2.支持事项的分类、检索与锁定（PIN）
+3.支持基于邮件协议的事项分享
+4.支持创建、加入清单群（Group），群二维码的生成
+5.对邮件内容进行封装，即使在邮件客户端中也能够有良好的阅读体验
+6.Material Design 化,并使用 Design Support Library 向下兼容至 Android V2.1
+7.Private List 专属隐私列表，并使用 PIN 码保护
+8.直接解析 E-Mail 中的联系人，并创建联系人列表
+9.过期事项自动存档至回收箱中
+10.任务按紧急程度，事项结束日期，持续时间自动排序
+11.联系人的管理、分组，消息的接收、退出机制
+12.邮件内容的解析，封装与呈现
+</code></pre><h1 id="系统构建"><a href="#系统构建" class="headerlink" title="系统构建"></a>系统构建</h1><h2 id="电子邮件系统"><a href="#电子邮件系统" class="headerlink" title="电子邮件系统"></a>电子邮件系统</h2><h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><pre><code>1.Cicada 使用电子邮件系统进行事项的分享，而无需搭建自己的服务器后台
+2.使用互联网分布式的邮件系统可以将事项发布给地球上的任何人，而不用担心其是否安装客户端
+3.电子邮件自带用户关系链，可以直接导入邮箱联系人
+4.用户使用现有系统而无需使用一项新服务
+5.邮件格式适合于群发，群组讨论
+6.与平台无关，电子邮件是一个跨平台的数据协议
+7.电子邮件适合长周期重要的事件，事项是对将来事件的计划无需实现即时通讯
+</code></pre><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/Table.PNG" alt="I/T Rate"></p>
+<h3 id="底层实现"><a href="#底层实现" class="headerlink" title="底层实现"></a>底层实现</h3><p>Cicada 使用 K-9 Mail 作为底层框架，支持 SMTP/POP3/IMAP，即使团队成员没有使用客户端也可以发布待办任务和查看推送的代办事项</p>
+<h4 id="获取待办事项"><a href="#获取待办事项" class="headerlink" title="获取待办事项"></a>获取待办事项</h4><p>Cicada 通过搜索邮件特定邮件解析成 XML 数据格式通过 Adapter 绑定到 RecyclerView 上实现将邮件解析成可操作的数据，可以实现任务的紧急的排序，任务的搜索，加入 tag，时间提醒，代办实现的广播等操作</p>
+<h4 id="共享代办事项"><a href="#共享代办事项" class="headerlink" title="共享代办事项"></a>共享代办事项</h4><p>Cicada 通过解析器将事项信息封装成 HTML 格式的邮件，通过邮件服务器发到各成员的邮箱，如果有安装客户端则用客户端进行解析，否则则按照正常邮件存在。</p>
+<h2 id="类-MVC-模型"><a href="#类-MVC-模型" class="headerlink" title="类 MVC 模型"></a>类 MVC 模型</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/业务逻辑.PNG" alt="MVC 模型"><br>MVC 模式（Model-View-Controller）将软件系统分为三个基本部分：模型（Model）、视图（View）和控制器（Controller）</p>
+<p>MVC 模式的目的是实现一种动态的程序设计，使后续对程序的修改和扩展简化，并且使程序某一部分的重复利用成为可能。除此之外，此模式通过对复杂度的简化，使程序结构更加直观。软件系统通过对自身基本部分分离的同时也赋予了各个基本部分应有的功能：</p>
+<pre><code>（控制器 Controller）-负责转发请求，对请求进行处理
+（视图 View）-图形界面设计
+（模型 Model） -数据库数据管理和数据库设计
+</code></pre><p>Cicada 将业务逻辑打包为 Model，UI 层设计使用 Material Design 进行呈现，Controller 通过 Activity，Service，Broadcast 和 Receiver 等等机制将用户请求转向 Model 层</p>
+<h3 id="View-层"><a href="#View-层" class="headerlink" title="View 层"></a>View 层</h3><p>View 层是采用 XML 文件进行界面的描述，包括各种界面组件、动画、交互的设计，分辨率、语言支持，UI 遵循 Material Design<br><img src="http://7nar5o.com1.z0.glb.clouddn.com/cicada002.png" alt=""></p>
+<h3 id="Controller-层"><a href="#Controller-层" class="headerlink" title="Controller 层"></a>Controller 层</h3><p>Android 的控制层的重任通常落在了众多的 Acitvity 的肩上，这句话也就暗含了不要在 Acitivity 中写代码，Acitivity 负责对 UI 进行控制，要通过 Activity 交割 Model 业务逻辑层处理，这样做的另外一个原因是 Android 中的 Acitivity 的响应时间是5s，如果耗时的操作放在这里，程序就很容易被回收掉，Controller 可以通过 Activity，Service，Broadcast 和 Receiver 等等机制将用户请求转向 Model 层</p>
+<h3 id="Model-层"><a href="#Model-层" class="headerlink" title="Model 层"></a>Model 层</h3><p>Model 层用于对数据库的操作、对网络等的操作，Cicada 的 Model 层包括 K-9Mail 库，包括 TCP，Socket 连接管理，邮件数据的封装，数据库的操作，IMAP 服务器响应类，搜索功能及添加的数据解析模块，Group 用户模块，响应来自 Controller 的请求</p>
+<h1 id="交互设计"><a href="#交互设计" class="headerlink" title="交互设计"></a>交互设计</h1><h2 id="完成任务"><a href="#完成任务" class="headerlink" title="完成任务"></a>完成任务</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/done.PNG" alt="完成任务"><br>当任务的时间到达 TimeLine 后，这个任务会从主清单中消失，消失过程为该 TextView 由长方形缩小为一个逐渐缩小旋转着的的圆，最后消失</p>
+<p>用户可以选择 Doned 该任务，长按改 TextView，这个 Item 会 Float 起来，阴影范围扩大，此时处于可上下移动的状态，若移动下边的 Item 会跑上来以便改 Item 的插入，等待5000ms，若 Item 不发生移动，着产生水波的动画，将 Item 标绿然后消失</p>
+<h2 id="新建任务"><a href="#新建任务" class="headerlink" title="新建任务"></a>新建任务</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/new.PNG" alt="新建任务"><br>用户点击 FAB，由 FAB 的位置出现黄色水波填充整个长方形最后出现整个新建任务的 Activity，该层下方的区域为不可编辑状态，FAB 变为分享状态，点击后编辑区域向上滑动，下方出现添加分享人的区域，可以输入邮箱地址或用户名进行添加，添加分享人时，右边的 Button 为 Add，若为空则该按钮变为 Done，点击 Done 则新建任务界面打钩变绿，向下滑出，返回主清单列表，任务出现动画与消失时相反</p>
+<h2 id="查看详细任务"><a href="#查看详细任务" class="headerlink" title="查看详细任务"></a>查看详细任务</h2><p><img src="http://7nar5o.com1.z0.glb.clouddn.com/scale.PNG" alt="查看详细任务"><br>点击该 Item，改 Item 向四周展开覆盖全页，同时底部 Item 消失，同时处于可编辑状态，点击 Back Button 这返回</p>
+  </div>
+</article>
+<div class="blog-post-comments">
+	<div class="wildfire_thread"></div>
+</div>
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#清单"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x6E05;&#x5355;" class="headerlink" title="&#x6E05;&#x5355;"></a>&#x6E05;&#x5355;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TO-DO-应用"><span class="toc-number">2.</span> <span class="toc-text"><a href="#TO-DO-&#x5E94;&#x7528;" class="headerlink" title="TO-DO &#x5E94;&#x7528;"></a>TO-DO &#x5E94;&#x7528;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#弃之不用"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#&#x5F03;&#x4E4B;&#x4E0D;&#x7528;" class="headerlink" title="&#x5F03;&#x4E4B;&#x4E0D;&#x7528;"></a>&#x5F03;&#x4E4B;&#x4E0D;&#x7528;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#奇妙清单"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#&#x5947;&#x5999;&#x6E05;&#x5355;" class="headerlink" title="&#x5947;&#x5999;&#x6E05;&#x5355;"></a>&#x5947;&#x5999;&#x6E05;&#x5355;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cicada-优点"><span class="toc-number">2.3.</span> <span class="toc-text"><a href="#Cicada-&#x4F18;&#x70B9;" class="headerlink" title="Cicada &#x4F18;&#x70B9;"></a>Cicada &#x4F18;&#x70B9;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实现目标"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x5B9E;&#x73B0;&#x76EE;&#x6807;" class="headerlink" title="&#x5B9E;&#x73B0;&#x76EE;&#x6807;"></a>&#x5B9E;&#x73B0;&#x76EE;&#x6807;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#系统构建"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x7CFB;&#x7EDF;&#x6784;&#x5EFA;" class="headerlink" title="&#x7CFB;&#x7EDF;&#x6784;&#x5EFA;"></a>&#x7CFB;&#x7EDF;&#x6784;&#x5EFA;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#电子邮件系统"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#&#x7535;&#x5B50;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;" class="headerlink" title="&#x7535;&#x5B50;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;"></a>&#x7535;&#x5B50;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#原因"><span class="toc-number">4.1.1.</span> <span class="toc-text"><a href="#&#x539F;&#x56E0;" class="headerlink" title="&#x539F;&#x56E0;"></a>&#x539F;&#x56E0;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#底层实现"><span class="toc-number">4.1.2.</span> <span class="toc-text"><a href="#&#x5E95;&#x5C42;&#x5B9E;&#x73B0;" class="headerlink" title="&#x5E95;&#x5C42;&#x5B9E;&#x73B0;"></a>&#x5E95;&#x5C42;&#x5B9E;&#x73B0;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#获取待办事项"><span class="toc-number">4.1.2.1.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;&#x5F85;&#x529E;&#x4E8B;&#x9879;" class="headerlink" title="&#x83B7;&#x53D6;&#x5F85;&#x529E;&#x4E8B;&#x9879;"></a>&#x83B7;&#x53D6;&#x5F85;&#x529E;&#x4E8B;&#x9879;</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#共享代办事项"><span class="toc-number">4.1.2.2.</span> <span class="toc-text"><a href="#&#x5171;&#x4EAB;&#x4EE3;&#x529E;&#x4E8B;&#x9879;" class="headerlink" title="&#x5171;&#x4EAB;&#x4EE3;&#x529E;&#x4E8B;&#x9879;"></a>&#x5171;&#x4EAB;&#x4EE3;&#x529E;&#x4E8B;&#x9879;</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#类-MVC-模型"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x7C7B;-MVC-&#x6A21;&#x578B;" class="headerlink" title="&#x7C7B; MVC &#x6A21;&#x578B;"></a>&#x7C7B; MVC &#x6A21;&#x578B;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#View-层"><span class="toc-number">4.2.1.</span> <span class="toc-text"><a href="#View-&#x5C42;" class="headerlink" title="View &#x5C42;"></a>View &#x5C42;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Controller-层"><span class="toc-number">4.2.2.</span> <span class="toc-text"><a href="#Controller-&#x5C42;" class="headerlink" title="Controller &#x5C42;"></a>Controller &#x5C42;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Model-层"><span class="toc-number">4.2.3.</span> <span class="toc-text"><a href="#Model-&#x5C42;" class="headerlink" title="Model &#x5C42;"></a>Model &#x5C42;</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#交互设计"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x4EA4;&#x4E92;&#x8BBE;&#x8BA1;" class="headerlink" title="&#x4EA4;&#x4E92;&#x8BBE;&#x8BA1;"></a>&#x4EA4;&#x4E92;&#x8BBE;&#x8BA1;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#完成任务"><span class="toc-number">5.1.</span> <span class="toc-text"><a href="#&#x5B8C;&#x6210;&#x4EFB;&#x52A1;" class="headerlink" title="&#x5B8C;&#x6210;&#x4EFB;&#x52A1;"></a>&#x5B8C;&#x6210;&#x4EFB;&#x52A1;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新建任务"><span class="toc-number">5.2.</span> <span class="toc-text"><a href="#&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;" class="headerlink" title="&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;"></a>&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查看详细任务"><span class="toc-number">5.3.</span> <span class="toc-text"><a href="#&#x67E5;&#x770B;&#x8BE6;&#x7EC6;&#x4EFB;&#x52A1;" class="headerlink" title="&#x67E5;&#x770B;&#x8BE6;&#x7EC6;&#x4EFB;&#x52A1;"></a>&#x67E5;&#x770B;&#x8BE6;&#x7EC6;&#x4EFB;&#x52A1;</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Cicada-001/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&text=Project Cicada# 001：Introduction"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&is_video=false&description=Project Cicada# 001：Introduction"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Project Cicada# 001：Introduction&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Cicada-001/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&title=Project Cicada# 001：Introduction"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Cicada-001/&name=Project Cicada# 001：Introduction&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Cicada 中文名「蝉」，是我的第一款 Android 应用，它是基于开源软件 K-9 Mail 库开发的 TO-DO 应用，它的特点在于其基于 E-Mail 协议，支持跨平台，无需注册即可实现任务的共享，即使没有安装 APP，也可以通过邮件来实现大部分功能。本篇为概览，介绍软件的实现的功能，系统架构，UI 及交互。&lt;br&gt;"><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 masukio
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+<script>
+  // 你可以自定义一些配置
+  //
+  // databaseProvider: 必须为 'wilddog' 或者 'firebase'
+  // databaseConfig: 请从你的数据库控制台复制过来。
+  // pageURL(可选): 默认为当前页面的 URL。
+  // pageTitle(可选): 默认为当前页面的 title。
+  // theme(可选): 'light'（默认）或者 'dark'。
+  // locale(可选): 'en'（默认）或者 'zh-CN'
+  // defaultAvatarURL(可选): 默认头像是一个可爱的消防员 :-D
+  var wildfireConfig = () => ({
+    databaseProvider: 'wilddog',
+    databaseConfig: {
+        siteId: "wd2882084211dpgrir"
+    },
+    theme: 'dark',
+    locale: 'zh-CN',
+    defaultAvatarURL: 'https://image.flaticon.com/icons/svg/621/621863.svg'
+  })
+</script>
+<script src="https://unpkg.com/wildfire/dist/wildfire.auto.js"></script>

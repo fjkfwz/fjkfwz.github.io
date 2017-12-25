@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="摘要：通过将 Hexo 同时部署到 Github 和 GitCafe，使用 Dnspod 对来自国内外的流量分别 DNS 解析至 GitCafe 及 Github 从而优化博客的访问速度，本篇文章包括（1）修改 hexo deployer 配置，Dnspod 做定向解析（2）Hexo 2.x 升至3.x(3)备份关键配置到 Github/GitCafe Backup 分支（4）关于主题及多说评论框">
+<meta name="keywords" content="hexo,github,gitcafe,随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo Multiple deployer 托管 Github 和 GitCafe 博客">
+<meta property="og:url" content="https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/index.html">
+<meta property="og:site_name" content="Sapientia et Virtus">
+<meta property="og:description" content="摘要：通过将 Hexo 同时部署到 Github 和 GitCafe，使用 Dnspod 对来自国内外的流量分别 DNS 解析至 GitCafe 及 Github 从而优化博客的访问速度，本篇文章包括（1）修改 hexo deployer 配置，Dnspod 做定向解析（2）Hexo 2.x 升至3.x(3)备份关键配置到 Github/GitCafe Backup 分支（4）关于主题及多说评论框">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/domain.PNG">
+<meta property="og:updated_time" content="2017-12-25T14:28:22.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo Multiple deployer 托管 Github 和 GitCafe 博客">
+<meta name="twitter:description" content="摘要：通过将 Hexo 同时部署到 Github 和 GitCafe，使用 Dnspod 对来自国内外的流量分别 DNS 解析至 GitCafe 及 Github 从而优化博客的访问速度，本篇文章包括（1）修改 hexo deployer 配置，Dnspod 做定向解析（2）Hexo 2.x 升至3.x(3)备份关键配置到 Github/GitCafe Backup 分支（4）关于主题及多说评论框">
+<meta name="twitter:image" content="http://picture-lotors.qiniudn.com/domain.PNG">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Hexo Multiple deployer 托管 Github 和 GitCafe 博客</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="Sapientia et Virtus" type="application/atom+xml">
+    
+</head>
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')" style="display:none"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/12/04/Chrome-APP-Bar/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle()" onmouseout="$('#i-prev').toggle()"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/12/04/Reservoir-Sampling/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="$('#share').toggle();return false"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none">Previous post</span>
+      <span id="i-next" class="info" style="display:none">Next post</span>
+      <span id="i-top" class="info" style="display:none">Back to top</span>
+      <span id="i-share" class="info" style="display:none">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&text=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&is_video=false&description=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Hexo Multiple deployer 托管 Github 和 GitCafe 博客&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-get-pocket" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-reddit" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-stumbleupon" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-digg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&name=Hexo Multiple deployer 托管 Github 和 GitCafe 博客&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：通过将 Hexo 同时部署到 Github 和 GitCafe，使用 Dnspod 对来自国内外的流量分别 DNS 解析至 GitCafe 及 Github 从而优化博客的访问速度，本篇文章包括（1）修改 hexo deployer 配置，Dnspod 做定向解析（2）Hexo 2.x 升至3.x(3)备份关键配置到 Github/GitCafe Backup 分支（4）关于主题及多说评论框样式及 USER ANGENT（6）添加文章目录及版权信息&lt;br&gt;"><i class="fa fa-tumblr" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#使用-Github-和-GitCafe-同时托管博客"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x4F7F;&#x7528;-Github-&#x548C;-GitCafe-&#x540C;&#x65F6;&#x6258;&#x7BA1;&#x535A;&#x5BA2;" class="headerlink" title="&#x4F7F;&#x7528; Github &#x548C; GitCafe &#x540C;&#x65F6;&#x6258;&#x7BA1;&#x535A;&#x5BA2;"></a>&#x4F7F;&#x7528; Github &#x548C; GitCafe &#x540C;&#x65F6;&#x6258;&#x7BA1;&#x535A;&#x5BA2;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#修改部署配置文件"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x4FEE;&#x6539;&#x90E8;&#x7F72;&#x914D;&#x7F6E;&#x6587;&#x4EF6;" class="headerlink" title="&#x4FEE;&#x6539;&#x90E8;&#x7F72;&#x914D;&#x7F6E;&#x6587;&#x4EF6;"></a>&#x4FEE;&#x6539;&#x90E8;&#x7F72;&#x914D;&#x7F6E;&#x6587;&#x4EF6;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dnspod-做定向-DNS-解析"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#Dnspod-&#x505A;&#x5B9A;&#x5411;-DNS-&#x89E3;&#x6790;" class="headerlink" title="Dnspod &#x505A;&#x5B9A;&#x5411; DNS &#x89E3;&#x6790;"></a>Dnspod &#x505A;&#x5B9A;&#x5411; DNS &#x89E3;&#x6790;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Hexo-2-x-升至3-x"><span class="toc-number">2.</span> <span class="toc-text"><a href="#Hexo-2-x-&#x5347;&#x81F3;3-x" class="headerlink" title="Hexo 2.x &#x5347;&#x81F3;3.x"></a>Hexo 2.x &#x5347;&#x81F3;3.x</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hexo-3-x-将至2-x"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#Hexo-3-x-&#x5C06;&#x81F3;2-x" class="headerlink" title="Hexo 3.x &#x5C06;&#x81F3;2.x"></a>Hexo 3.x &#x5C06;&#x81F3;2.x</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#备份关键配置"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x5907;&#x4EFD;&#x5173;&#x952E;&#x914D;&#x7F6E;" class="headerlink" title="&#x5907;&#x4EFD;&#x5173;&#x952E;&#x914D;&#x7F6E;"></a>&#x5907;&#x4EFD;&#x5173;&#x952E;&#x914D;&#x7F6E;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#主题及多说评论框样式及-USER-ANGENT"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x4E3B;&#x9898;&#x53CA;&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;&#x53CA;-USER-ANGENT" class="headerlink" title="&#x4E3B;&#x9898;&#x53CA;&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;&#x53CA; USER ANGENT"></a>&#x4E3B;&#x9898;&#x53CA;&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;&#x53CA; USER ANGENT</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#yilia-主题"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#yilia-&#x4E3B;&#x9898;" class="headerlink" title="yilia &#x4E3B;&#x9898;"></a>yilia &#x4E3B;&#x9898;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多说评论框样式"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;" class="headerlink" title="&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;"></a>&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多说评论框-UA-显示-博主标记"><span class="toc-number">4.3.</span> <span class="toc-text"><a href="#&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;-UA-&#x663E;&#x793A;-&#x535A;&#x4E3B;&#x6807;&#x8BB0;" class="headerlink" title="&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0;"></a>&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#embed-js-多说核心库本地化"><span class="toc-number">4.3.1.</span> <span class="toc-text"><a href="#embed-js-&#x591A;&#x8BF4;&#x6838;&#x5FC3;&#x5E93;&#x672C;&#x5730;&#x5316;" class="headerlink" title="embed.js &#x591A;&#x8BF4;&#x6838;&#x5FC3;&#x5E93;&#x672C;&#x5730;&#x5316;"></a>embed.js &#x591A;&#x8BF4;&#x6838;&#x5FC3;&#x5E93;&#x672C;&#x5730;&#x5316;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#应用本地-embed-js-文件"><span class="toc-number">4.3.2.</span> <span class="toc-text"><a href="#&#x5E94;&#x7528;&#x672C;&#x5730;-embed-js-&#x6587;&#x4EF6;" class="headerlink" title="&#x5E94;&#x7528;&#x672C;&#x5730; embed.js &#x6587;&#x4EF6;"></a>&#x5E94;&#x7528;&#x672C;&#x5730; embed.js &#x6587;&#x4EF6;</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#添加文章目录及版权信息"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;" class="headerlink" title="&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;"></a>&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#添加文章目录及版权信息结构"><span class="toc-number">5.1.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x7ED3;&#x6784;" class="headerlink" title="&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x7ED3;&#x6784;"></a>&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x7ED3;&#x6784;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加版权信息模块"><span class="toc-number">5.2.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x6A21;&#x5757;" class="headerlink" title="&#x6DFB;&#x52A0;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x6A21;&#x5757;"></a>&#x6DFB;&#x52A0;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x6A21;&#x5757;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加文件样式-CSS"><span class="toc-number">5.3.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x6587;&#x4EF6;&#x6837;&#x5F0F;-CSS" class="headerlink" title="&#x6DFB;&#x52A0;&#x6587;&#x4EF6;&#x6837;&#x5F0F; CSS"></a>&#x6DFB;&#x52A0;&#x6587;&#x4EF6;&#x6837;&#x5F0F; CSS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加变量"><span class="toc-number">5.4.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x53D8;&#x91CF;" class="headerlink" title="&#x6DFB;&#x52A0;&#x53D8;&#x91CF;"></a>&#x6DFB;&#x52A0;&#x53D8;&#x91CF;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#附录"><span class="toc-number">6.</span> <span class="toc-text"><a href="#&#x9644;&#x5F55;" class="headerlink" title="&#x9644;&#x5F55;"></a>&#x9644;&#x5F55;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#多说评论框-UA-显示-博主标记-javascript"><span class="toc-number">6.1.</span> <span class="toc-text"><a href="#&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;-UA-&#x663E;&#x793A;-&#x535A;&#x4E3B;&#x6807;&#x8BB0;-javascript" class="headerlink" title="&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0; javascript"></a>&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0; javascript</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改多说样式"><span class="toc-number">6.2.</span> <span class="toc-text"><a href="#&#x4FEE;&#x6539;&#x591A;&#x8BF4;&#x6837;&#x5F0F;" class="headerlink" title="&#x4FEE;&#x6539;&#x591A;&#x8BF4;&#x6837;&#x5F0F;"></a>&#x4FEE;&#x6539;&#x591A;&#x8BF4;&#x6837;&#x5F0F;</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 class="posttitle" itemprop="name headline">
+        Hexo Multiple deployer 托管 Github 和 GitCafe 博客
+    </h1>
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Sapientia et Virtus</span>
+      </span>
+      <div class="postdate">
+        <time datetime="2014-12-04T00:00:00.000Z" itemprop="datePublished">Dec 4 2014</time>
+    </div>
+      <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/gitcafe/">gitcafe</a>, <a class="tag-link" href="/tags/github/">github</a>, <a class="tag-link" href="/tags/hexo/">hexo</a>, <a class="tag-link" href="/tags/随笔/">随笔</a>
+    </div>
+    </div>
+  </header>
+  
+  <div class="content" itemprop="articleBody">
+    <p><strong>摘要</strong>：通过将 Hexo 同时部署到 Github 和 GitCafe，使用 Dnspod 对来自国内外的流量分别 DNS 解析至 GitCafe 及 Github 从而优化博客的访问速度，本篇文章包括（1）修改 hexo deployer 配置，Dnspod 做定向解析（2）Hexo 2.x 升至3.x(3)备份关键配置到 Github/GitCafe Backup 分支（4）关于主题及多说评论框样式及 USER ANGENT（6）添加文章目录及版权信息<br><a id="more"></a><br>写这篇文章时已经距离上篇文章已经过去快半年了，健壮的拖延君死而复生把刚刚在襁褓中的勤奋君给赶跑了（其实就是懒，写写废话我还是很乐意的嘛），主要是因为每篇文章的学习量太大，每做完一个项目做一个总结难免会照成数据的丢失，所以我放弃以前每篇文章一个项目，转向由一个时间窗口一个主题，把每天所学习到的一切知识随时记录随时使用，以前觉得建一个知识仓库把每天看的信息堆积到脑海里总会越积越多的，但是事实却正好相反，虽然往一个水潭中加水可以增加它的体谅，但是所吸收的信息就好像水面上的涟漪，如果一股脑的掀翻它或与能够卷起一阵海啸，但是随着水面的涟漪越来越多，最后其产生波相互叠加最终由趋于水平，不懂得思考和事件的知识就好像累加的音乐最终却成了噪音，在脑子里没有发酵成为可口的泡菜却成了坨屎。<br>所以既然发粪涂墙，就必须利其器，把博客改造一番还是必要的，至少被 Jonathan 的 Flattened Design 强奸了一番眼球后就再也看不惯以前 Landscape 主题的拟物的光线和阴影了，另外之前的博客托管在 Github，利用全球的 CDN 自然能够加速不少，当然这是在没有墙的前提下，在加上 Github 上敏感的信息越来越多，受到特别关照也不可避免（<a href="http://www.jianshu.com/p/21b2d751444e" target="_blank" rel="noopener">中国 GFW 可能是使 GitHub 瘫痪的 DDoS 攻击源</a>），所以为了加快在国内的访问速度以及避免某些原因 Github 无法访问，所以决定将博客托管一份至 GitCafe 上。<br>同时在 Github 和 GitCafe 部署 Hexo 的主要优势如下：</p>
+<blockquote>
+<p>1.利用 Dnspod A 记录将国内流量导向 Gitcafe 地址，而国外流量默认走 Github 地址从而加快国内访问的速度。<br>2.起到对称备份的作用，以免一方托管方发生奔溃时，另一方可以接替访问。<br>3.Github 和 GitCafe 均支持自定义域名，A 记录支持两条记录，因此两边的托管使用同一个域名地址，不过 CName 只能支持一条记录。<br>4.国内访问路线短速度快，可以不需要 CDN。</p>
+</blockquote>
+<h1 id="使用-Github-和-GitCafe-同时托管博客"><a href="#使用-Github-和-GitCafe-同时托管博客" class="headerlink" title="使用 Github 和 GitCafe 同时托管博客"></a>使用 Github 和 GitCafe 同时托管博客</h1><h2 id="修改部署配置文件"><a href="#修改部署配置文件" class="headerlink" title="修改部署配置文件"></a>修改部署配置文件</h2><blockquote>
+<p>假设你已经在 Github 和 GitCafe 创建了博客的 repo，Github 项目名为<code>User.github.io</code>使用 master 分子,GitCafe 就直接使用你的用户名作为你的项目名使用 gitcafe-pages 分支。</p>
+</blockquote>
+<p>要使 Hexo 支持同时发布到多个 git 仓库中。需要修 hexo 根目录下的改<code>_config.yml</code>。<br>原来的配置:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">type: github</span><br><span class="line">repo: github: https://github.com/&lt;username&gt;/&lt;username&gt;.github.io.git</span><br><span class="line">branch: master</span><br></pre></td></tr></table></figure></p>
+<p>改成</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">   type: git</span><br><span class="line">   repo: </span><br><span class="line">      github: https://github.com/&lt;username&gt;/&lt;username&gt;.github.io.git,master</span><br><span class="line">      gitcafe: https://gitcafe.com/&lt;username&gt;/&lt;username&gt;.git,gitcafe-pages</span><br></pre></td></tr></table></figure>
+<p>或者按照 Hexo Document 的参考可以支持不同 type 类型的 deploy   <code>Available Types:
+  git, github, heroku, openshift, rsync</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">You can use multiple deployers. Hexo will execute each deployer in sequence.</span><br><span class="line"></span><br><span class="line">deployer:</span><br><span class="line">- type: git</span><br><span class="line">  repo:</span><br><span class="line">- type: heroku</span><br><span class="line">  repo:</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>关于部署的相关说明可以参考 Hexo 的官方文档  <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment | Hexo</a></p>
+</blockquote>
+<p>之后运行<code>hexo d -g</code>分别输入 GitHub 和 GitCafe 的用户名和密码即可完成部署工作，GitCafe 上更新内容需要一段时间。</p>
+<h2 id="Dnspod-做定向-DNS-解析"><a href="#Dnspod-做定向-DNS-解析" class="headerlink" title="Dnspod 做定向 DNS 解析"></a>Dnspod 做定向 DNS 解析</h2><p>在<a href="https://www.dnspod.com" target="_blank" rel="noopener">Dnspod 国际版</a>中选择自己的域名，添加两条 A 记录，国内路线使用 GitCafe（A 地址：207.226.141.135 CName:gitcafe.io）国外走 Github 线路（A 地址192.30.252.153及192.30.252.154）</p>
+<p><img src="http://picture-lotors.qiniudn.com/domain.PNG" alt="Dnspod 配置"></p>
+<blockquote>
+<p>Github 绑定域名需要 Hexo init 根目录下 source 目录下的 CNAME 文件中我写入了 lotors.me，也就是说 CNAME 应该在子目录 source 下，而不是在 Hexo init 根目录下。Github 不支持多域名绑定，只能写入一个，如需多个其实是可以在域名解析处自己设定的(显式 URL 等)。Gitcafe 则可以绑定多个域名(<a href="https://gitcafe.com/GitCafe/Help/wiki/Pages-%E7%9B%B8%E5%85%B3%E5%B8%AE%E5%8A%A9" target="_blank" rel="noopener">参考 Gitcafe 的 Pages 帮助</a>)，在博客项目页面下<code>项目管理-&gt;Pages 服务-&gt;添加自定义域名</code>添加自己的域名。</p>
+</blockquote>
+<h1 id="Hexo-2-x-升至3-x"><a href="#Hexo-2-x-升至3-x" class="headerlink" title="Hexo 2.x 升至3.x"></a>Hexo 2.x 升至3.x</h1><p>半年多没关注 hexo，今天逛 Github 发现已近更新到3.1Released 了，身为一个升级狂魔怎么能忍受 low version 呢，于是果断开始折腾更新至3.x 版本，由于该版本将不同的内核组件拆分出来(<a href="https://github.com/hexojs/hexo/wiki/Breaking-Changes-in-Hexo-3.0" target="_blank" rel="noopener">Breaking Changes in Hexo 3.0</a>)，于是无法直接<code>npm update hexo</code>只好进行重新安装，根据 Github 上的 Wiki(<a href="https://github.com/hexojs/hexo/wiki/Migrating-from-2.x-to-3.0" target="_blank" rel="noopener">Migrating from 2.x to 3.0</a>)成功更新。<br>首先修改 hexo 根目录下的<code>package.json</code>，添加以下字段</p>
+<pre><code>{
++  &quot;hexo&quot;: {
++    &quot;version&quot;: &quot;&quot;
++  }
+}
+</code></pre><p>执行以下升级命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># Clean cache</span><br><span class="line">hexo clean</span><br><span class="line"># Install hexo-cli 安装命令行界面</span><br><span class="line">npm install hexo-cli -g</span><br><span class="line"># Install Hexo 安装 hexo</span><br><span class="line">npm install hexo --save</span><br><span class="line"># Install generators 安装服务器</span><br><span class="line">npm install hexo-generator-index --save</span><br><span class="line">npm install hexo-generator-archive --save</span><br><span class="line">npm install hexo-generator-category --save</span><br><span class="line">npm install hexo-generator-tag --save</span><br><span class="line"># Install server 安装服务器</span><br><span class="line">npm install hexo-server --save</span><br><span class="line"># Install deployers 安装部署器</span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line">npm install hexo-deployer-heroku --save</span><br><span class="line">npm install hexo-deployer-rsync --save</span><br><span class="line">npm install hexo-deployer-openshift --save</span><br><span class="line"># Update plugins 更新插件</span><br><span class="line">npm install hexo-renderer-marked@0.2 --save</span><br><span class="line">npm install hexo-renderer-stylus@0.2 --save</span><br><span class="line">npm install hexo-generator-feed@1 --save</span><br><span class="line">npm install hexo-generator-sitemap@1 --save</span><br></pre></td></tr></table></figure></p>
+<h2 id="Hexo-3-x-将至2-x"><a href="#Hexo-3-x-将至2-x" class="headerlink" title="Hexo 3.x 将至2.x"></a>Hexo 3.x 将至2.x</h2><h1 id="备份关键配置"><a href="#备份关键配置" class="headerlink" title="备份关键配置"></a>备份关键配置</h1><p>由于 hexo 是在本地生成静态文件后上传到 repo 中，所以定期的备份本地 hexo 的关键配置，主题以及博文 Markdown 文件就十分必要，可以将文件备份到 Github 的一个 branch,这里我备份资源路径<code>source/</code>，模板文件<code>scaffolds/</code>,主题路径<code>themes/</code>,hexo 配置文件<code>_config.yml</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 启动 git</span><br><span class="line">git init</span><br><span class="line"># 创建并切换一个备份分支</span><br><span class="line">git checkout -b backup</span><br><span class="line"># 添加跟踪文件</span><br><span class="line">git add source/ scaffolds/ themes/ _config.yml</span><br><span class="line"># 第一次提交</span><br><span class="line">git commit -m &quot;first backup&quot;</span><br><span class="line"># 添加远程版本库</span><br><span class="line">git add origin https://github.com/fjkfwz/fjkfwz.github.io.git</span><br><span class="line"># push 到 Github 的 backup 分支</span><br><span class="line">git push origin backup</span><br></pre></td></tr></table></figure></p>
+<h1 id="主题及多说评论框样式及-USER-ANGENT"><a href="#主题及多说评论框样式及-USER-ANGENT" class="headerlink" title="主题及多说评论框样式及 USER ANGENT"></a>主题及多说评论框样式及 USER ANGENT</h1><h2 id="yilia-主题"><a href="#yilia-主题" class="headerlink" title="yilia 主题"></a>yilia 主题</h2><p>现在这款主题模板叫做<code>yilia</code>，Github 上的开源项目<a href="https://github.com/litten/hexo-theme-yilia" target="_blank" rel="noopener">yilia</a>，或者使用我修改过的<a href="https://github.com/fjkfwz/fjkfwz.github.io/tree/dev" target="_blank" rel="noopener">主题文件</a><br>修改<code>_config.yml</code>为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">theme: yilia</span><br></pre></td></tr></table></figure></p>
+<h2 id="多说评论框样式"><a href="#多说评论框样式" class="headerlink" title="多说评论框样式"></a>多说评论框样式</h2><h2 id="多说评论框-UA-显示-博主标记"><a href="#多说评论框-UA-显示-博主标记" class="headerlink" title="多说评论框 UA 显示/博主标记"></a>多说评论框 UA 显示/博主标记</h2><h3 id="embed-js-多说核心库本地化"><a href="#embed-js-多说核心库本地化" class="headerlink" title="embed.js 多说核心库本地化"></a>embed.js 多说核心库本地化</h3><p>多说社会化评论框核心脚本 embed.js 文件是个多说官方提供的公用文件，如果官方渠道过于拥挤，或者服务器故障，就可能导致页面加载过慢或者完全无法加载，如果我们将其下载下来，放到我们自己的空间，就会使加载速度有一定的提升，同时也可以对多说评论框做一些个性化调整，因为我们使用的多说评论框主体代码全部都在这里面。下载我修改过的 embed.js 文件放在主题目录的<code>source\js</code>中。</p>
+<p></p><p><a class="dl" href="http://picture-lotors.qiniudn.com/embed.js" target="_blank" rel="nofollow">embed.js 下载</a><br></p>
+<blockquote>
+<p>需要修改 e.user_id == 你的多说的 ID<br>多看 ID 可以在多说-&gt;个人资料-&gt;点击用户名转到个人主页<br><code>url http://duoshuo.com/profile/3731202/ 3731202为你的多说 ID</code></p>
+</blockquote>
+<h3 id="应用本地-embed-js-文件"><a href="#应用本地-embed-js-文件" class="headerlink" title="应用本地 embed.js 文件"></a>应用本地 embed.js 文件</h3><p>修改主题目录下<code>layout_partical\post\duosuo.ejs 中的 ds.src</code>为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ds.src = (document.location.protocol == &apos;https:&apos; ? &apos;https:&apos; : &apos;http:&apos;) + &apos;/js/embed.js&apos;;</span><br></pre></td></tr></table></figure>
+<h1 id="添加文章目录及版权信息"><a href="#添加文章目录及版权信息" class="headerlink" title="添加文章目录及版权信息"></a>添加文章目录及版权信息</h1><h2 id="添加文章目录及版权信息结构"><a href="#添加文章目录及版权信息结构" class="headerlink" title="添加文章目录及版权信息结构"></a>添加文章目录及版权信息结构</h2><p>打开 <code>\themes\your-theme\layout_partial\post</code> 目录下的 <code>article.ejs</code> 文件</p>
+<pre><code>/-----------\theme\your-theme\layout_partial\post\article.ejs---------/
+&lt;!-- 文章内容 --&gt;
+&lt;div class=&quot;article-entry&quot; itemprop=&quot;articleBody&quot;&gt;
+  &lt;% if (post.excerpt &amp;&amp; index){ %&gt;
+    &lt;%- post.excerpt %&gt;
+    &lt;% if (theme.excerpt_link){ %&gt;
+      &lt;p class=&quot;article-more-link&quot;&gt;
+        &lt;a href=&quot;&lt;%- config.root %&gt;&lt;%- post.path %&gt;# more&quot;&gt;&lt;%= __(&apos;excerpt_link&apos;) %&gt;&lt;/a&gt;
+      &lt;/p&gt;
+    &lt;% } %&gt;
+  &lt;% } else { %&gt;
++    &lt;!-- 文章目录开始 --&gt;
++    &lt;% if (!index){ %&gt;
++        &lt;div id=&quot;toc&quot; class=&quot;toc-article&quot;&gt;
++            &lt;strong class=&quot;toc-title&quot;&gt;&lt;%= __(&apos;contents&apos;) %&gt;&lt;/strong&gt;
++        &lt;%- toc(page.content) %&gt;
++        &lt;/div&gt;
++    &lt;% } %&gt;
++    &lt;!-- 文章目录结束 --&gt;
+    &lt;%- post.content %&gt;
++    &lt;!--版权信息开始--&gt;
++    &lt;%- partial(&apos;post/copyright&apos;) %&gt;
++    &lt;!--版权信息结束--&gt;
+  &lt;% } %&gt;
+&lt;/div&gt;
+</code></pre><h2 id="添加版权信息模块"><a href="#添加版权信息模块" class="headerlink" title="添加版权信息模块"></a>添加版权信息模块</h2><p>在<code>\themes\your-theme\layout_partial\post</code>下建立版权模块<code>copyright.ejs</code>,将<code>lotors.me</code>替换为你的域名</p>
+<pre><code>/-----------\theme\your-theme\layout_partial\post\copyright.ejs---------/
+&lt;div class=&quot;copyright&quot;&gt;
+  &lt;span class=&quot;claim&quot;&gt;版权声明：自由转载-非商用-无演绎-保持署名 @ lotors.me&lt;/span&gt;
+  &lt;span class=&quot;from-link&quot;&gt;
+    &lt;em&gt;本文链接地址:&lt;/em&gt;
+    &lt;a href=&quot;&lt;%- url_for(path) %&gt;&quot;&gt;
+      http://lotors.me&lt;%- url_for(path) %&gt;
+    &lt;/a&gt;
+  &lt;/span&gt;
+&lt;/div&gt;
+</code></pre><h2 id="添加文件样式-CSS"><a href="#添加文件样式-CSS" class="headerlink" title="添加文件样式 CSS"></a>添加文件样式 CSS</h2><p>在<code>\themes\your-theme\source\css_partial</code> 目录下的 <code>article.styl</code> 文件<br>在最后加入以下样式</p>
+<pre><code>/--------\themes\your-theme\source\css_partial\article.styl------/
+
+//版权信息 CSS
+.copyright {
+  display: block;
+  padding: 10px 20px;
+  margin: 35px 0 25px;
+  line-height: 24px;
+  font-size: 14px;
+  background-color: # FFFF33;
+}
+.copyright .claim {
+  font-size: 15px;
+  font-weight: 600;
+  zoom: 1;
+}
+.copyright .claim:before,
+.copyright .claim:after {
+  content: &quot;&quot;;
+  display: table;
+}
+.copyright .claim:after {
+  clear: both;
+}
+.copyright em,
+.post-nav em {
+  font-style: normal;
+  color: # 808080;
+}
+.copyright a:hover,
+.post-nav a:hover {
+  color: # c40000;
+  text-decoration: none;
+}    
+
+//目录 CSS
+.toc-article
+  background color-toc-bg
+  margin 2em 0 0 0.5em
+  padding 1em
+  strong
+    padding 0.3em 0
+
+# toc
+  line-height 1em
+  font-size 1.0em
+  float right // 如果想在左边，则把这里改成 left 即可
+  .toc
+    padding 0
+    li
+      list-style-type none
+
+  .toc-child 
+    padding-left 0.7em
+</code></pre><h2 id="添加变量"><a href="#添加变量" class="headerlink" title="添加变量"></a>添加变量</h2><p>打开 <code>\themes\your-theme\source\css 目录下的</code>_variables.styl``文件<br>任意一个位置添加以下颜色变量</p>
+<pre><code>color-toc-bg = # eee
+</code></pre><h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="多说评论框-UA-显示-博主标记-javascript"><a href="#多说评论框-UA-显示-博主标记-javascript" class="headerlink" title="多说评论框 UA 显示/博主标记 javascript"></a>多说评论框 UA 显示/博主标记 javascript</h2><pre><code>//判断是否为博主
+function sskadmin(e) {
+    var ssk = &apos;&apos;;
+    if(e.user_id==【你的多说 id】){
+        ssk = &apos;&lt;span class=&quot;sskadmin&quot;&gt;博主【此处可以自定义文字】&apos;
+    }
+    return ssk+&quot;&lt;/span&gt; &quot;;
+}
+//显 UA 开始
+function ua(e) {
+        var r = new Array;
+        var outputer = &apos;&apos;;
+        if (r = e.match(/MSIE\s([^\s|;]+)/gi)) {
+            outputer = &apos;&lt;span class=&quot;ua_ie&quot;&gt;Internet Explorer&apos; + &apos;|&apos; + r[0]/*.replace(&apos;MSIE&apos;, &apos;&apos;).split(&apos;.&apos;)[0]*/
+        } else if (r = e.match(/FireFox\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_firefox&quot;&gt;Mozilla FireFox&apos; + &apos;|&apos; + r1[1]
+        } else if (r = e.match(/Maxthon([\d]*)\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_maxthon&quot;&gt;Maxthon&apos;
+        } else if (r = e.match(/UBrowser([\d]*)\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_ucweb&quot;&gt;UCBrowser&apos; + &apos;|&apos; + r1[1]
+        } else if (r = e.match(/MetaSr/ig)) {
+            outputer = &apos;&lt;span class=&quot;ua_sogou&quot;&gt;搜狗浏览器&apos;
+        } else if (r = e.match(/2345Explorer/ig)) {
+            outputer = &apos;&lt;span class=&quot;ua_2345explorer&quot;&gt;2345王牌浏览器&apos;
+        } else if (r = e.match(/2345chrome/ig)) {
+            outputer = &apos;&lt;span class=&quot;ua_2345chrome&quot;&gt;2345加速浏览器&apos;
+        } else if (r = e.match(/LBBROWSER/ig)) {
+            outputer = &apos;&lt;span class=&quot;ua_lbbrowser&quot;&gt;猎豹安全浏览器&apos;
+        } else if (r = e.match(/MicroMessenger\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_qq&quot;&gt;微信&apos; + &apos;|&apos; + r1[1]/*.split(&apos;/&apos;)[0]*/
+        } else if (r = e.match(/QQBrowser\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_qq&quot;&gt;QQ 浏览器&apos; + &apos;|&apos; + r1[1]/*.split(&apos;/&apos;)[0]*/
+        } else if (r = e.match(/QQ\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_qq&quot;&gt;QQ 浏览器&apos; + &apos;|&apos; + r1[1]/*.split(&apos;/&apos;)[0]*/
+        } else if (r = e.match(/MiuiBrowser\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_mi&quot;&gt;Miui 浏览器&apos; + &apos;|&apos; + r1[1]/*.split(&apos;/&apos;)[0]*/
+        } else if (r = e.match(/Chrome([\d]*)\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_chrome&quot;&gt;Chrome&apos; + &apos;|&apos; + r1[1]/*.split(&apos;.&apos;)[0]*/
+        } else if (r = e.match(/safari\/([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_apple&quot;&gt;Apple Safari&apos; + &apos;|&apos; + r1[1]
+        } else if (r = e.match(/Opera[\s|\/]([^\s]+)/ig)) {
+            var r1 = r[0].split(&quot;/&quot;);
+            outputer = &apos;&lt;span class=&quot;ua_opera&quot;&gt;Opera&apos; + &apos;|&apos; + r[1]
+        } else if (r = e.match(/Trident\/7.0/gi)) {
+            outputer = &apos;&lt;span class=&quot;ua_ie&quot;&gt;Internet Explorer 11&apos;
+        } else {
+            outputer = &apos;&lt;span class=&quot;ua_other&quot;&gt;其它浏览器&apos;
+        }
+        return outputer+&quot;&lt;/span&gt; &quot;;
+    }
+    function os(e) {
+        var os = &apos;&apos;;
+        if (e.match(/win/ig)) {
+            if (e.match(/nt 5.1/ig)) {
+                os = &apos;&lt;span class=&quot;os_xp&quot;&gt;Windows XP&apos;
+            } else if (e.match(/nt 6.1/ig)) {
+                os = &apos;&lt;span class=&quot;os_7&quot;&gt;Windows 7&apos;
+            } else if (e.match(/nt 6.2/ig)) {
+                os = &apos;&lt;span class=&quot;os_8&quot;&gt;Windows 8&apos;
+            } else if (e.match(/nt 6.3/ig)) {
+                os = &apos;&lt;span class=&quot;os_8_1&quot;&gt;Windows 8.1&apos;
+            } else if (e.match(/nt 10.0/ig)) {
+                os = &apos;&lt;span class=&quot;os_8_1&quot;&gt;Windows 10&apos;
+            } else if (e.match(/nt 6.0/ig)) {
+                os = &apos;&lt;span class=&quot;os_vista&quot;&gt;Windows Vista&apos;
+            } else if (e.match(/nt 5/ig)) {
+                os = &apos;&lt;span class=&quot;os_2000&quot;&gt;Windows 2000&apos;
+            } else {
+                os = &apos;&lt;span class=&quot;os_windows&quot;&gt;Windows&apos;
+            }
+        } else if (e.match(/android/ig)) {
+            os = &apos;&lt;span class=&quot;os_android&quot;&gt;Android&apos;
+        } else if (e.match(/ubuntu/ig)) {
+            os = &apos;&lt;span class=&quot;os_ubuntu&quot;&gt;Ubuntu&apos;
+        } else if (e.match(/linux/ig)) {
+            os = &apos;&lt;span class=&quot;os_linux&quot;&gt;Linux&apos;
+        } else if (e.match(/mac/ig)) {
+            os = &apos;&lt;span class=&quot;os_mac&quot;&gt;Mac OS X&apos;
+        } else if (e.match(/unix/ig)) {
+            os = &apos;&lt;span class=&quot;os_unix&quot;&gt;Unix&apos;
+        } else if (e.match(/symbian/ig)) {
+            os = &apos;&lt;span class=&quot;os_nokia&quot;&gt;Nokia SymbianOS&apos;
+        } else {
+            os = &apos;&lt;span class=&quot;os_other&quot;&gt;其它操作系统&apos;
+        }
+        return os+&quot;&lt;/span&gt;&quot; ;
+    }
+//显 UA 结束
+</code></pre><h2 id="修改多说样式"><a href="#修改多说样式" class="headerlink" title="修改多说样式"></a>修改多说样式</h2><blockquote>
+<p>远程：在多说控制中心—&gt;设置-&gt;自定义 CSS 修改<br>本地：在主题目录<code>source\css_partial\artical.styl</code>中添加</p>
+</blockquote>
+<pre><code>/*
+ * 多说评论的 CSS 样式；
+ * 作者：MinonHeart &lt; http://me.hub.moe &gt;；
+ * 完成时间：2014-09-26；
+ * 最近更新：2015-03-30；
+ * 其他说明：基于 Pagecho &lt; http://www.v2ex.com/t/118650 &gt; 的 CSS 样式修改而来；
+**/
+
+# ds-thread # ds-reset .ds-powered-by, .ds-post-repost { display: none !important; }
+# ds-reset .ds-gradient-bg, # ds-thread # ds-reset .ds-textarea-wrapper { background: none !important; }
+# ds-reset .ds-like-thread-button, .ds-rounded{
+    background: rgba(255,255,255,1) !important;
+    box-shadow: 0 0 1px rgba(0,0,0,0.1) !important;
+    border: 1px solid # ddd !important;
+}
+# ds-reset .ds-sync { display: none !important; } /* 隐藏评论框底部分享 */
+# ds-thread # ds-reset .ds-post-button {
+    background: # fff !important;
+    box-shadow: none !important;
+    border: 1px solid # ddd !important;
+    left: auto !important; /* 不必要的语句 */
+    color: # 888 !important;
+    font-weight: normal !important;
+    outline: none;
+}
+# ds-thread # ds-reset .ds-post-button:hover { color: # 333 !important; }
+# ds-thread # ds-reset .ds-textarea-wrapper textarea { height: 54px !important; }
+# ds-thread # ds-reset li.ds-tab a, # ds-thread # ds-reset # ds-bubble, # ds-reset .ds-avatar img { border-radius: 1px !important; }
+# ds-thread # ds-reset li.ds-tab a:hover { background: # fff !important; }
+# ds-thread # ds-reset li.ds-tab a.ds-current {
+    background: # fff !important;
+    border: none !important;
+}
+# ds-thread # ds-reset .ds-post-self {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+}
+# ds-reset .ds-avatar img {
+    box-shadow: none !important;
+    border: 1px solid # ddd !important;
+    padding: 1px !important;
+    border-radius: 2px !important;
+}
+# ds-reset .ds-replybox .ds-avatar img {
+    width: 50px !important;
+    height: 50px !important;
+}
+# ds-thread # ds-reset # ds-bubble {
+    border: 1px solid # ddd !important;
+    box-shadow: none !important;
+}
+# ds-thread # ds-reset .ds-replybox { padding-left: 70px !important; }
+# ds-thread # ds-reset .ds-post-self { padding-left: 0 !important; }
+# ds-thread # ds-reset .ds-inline-replybox {
+    margin-top: 27px !important;
+    margin-left: 0 !important;
+}
+# ds-thread # ds-reset a.ds-comment-context {
+    border: 1px solid # E3EDF3 !important;
+    background: # F7FAFB !important;
+    padding: 2px 0 1px 3px !important;
+    color: # 555 !important;
+    margin-right: 5px !important;
+    border-radius: 1px !important;
+}
+# ds-thread # ds-reset li.ds-post-placeholder { padding: 20px 0 !important; }
+
+body # ds-smilies-tooltip ul.ds-smilies-tabs li a {
+    background-image: -webkit-gradient(linear,left 0,left 100%,from(# fff),to(# fff));
+    background-image: -webkit-linear-gradient(top,# fff 0,# fff 100%);
+    background-image: -moz-linear-gradient(top,# fff 0,# fff 100%);
+    background-image: linear-gradient(to bottom,# fff 0,# fff 100%);
+    border-bottom: 1px solid # e9e9e9;
+}
+body # ds-smilies-tooltip {
+    border: 0 !important;
+    margin-bottom: 1em !important;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15) !important;
+}
+# ds-smilies-tooltip .ds-smilies-container { height: 180px !important; }
+# ds-smilies-tooltip ul.ds-smilies-tabs { height: 180px !important; }
+# ds-reset ul.ds-children .ds-avatar img {
+    width: 35px !important;
+    height: 35px !important;
+}
+# ds-thread # ds-reset .ds-comment-body p { margin: 10px !important; }
+# ds-reset button {
+    background: # fff !important;
+    box-shadow: 0 0 1px rgba(0,0,0,0.2) !important;
+    border: 1px solid # ddd !important;
+}
+# ds-reset button:hover {
+    background: # ddd !important;
+    box-shadow: 0 0 1px rgba(0,0,0,0.2) !important;
+    border: 1px solid # ddd !important;
+}
+# ds-thread # ds-reset .ds-user-name { color: # 0c94de !important; }
+# ds-thread # ds-reset .ds-comment-header { margin-left: 10px !important; }
+# ds-thread # ds-reset .ds-login-buttons .ds-more-services { color: # 777 !important; }
+# ds-thread # ds-reset .ds-login-buttons .ds-more-services:hover { color: # 333 !important; }
+# ds-thread # ds-reset ul.ds-comments-tabs .ds-highlight { margin: 0 3px 0 0 !important; }
+# ds-thread # ds-reset .ds-time { margin-left: 10px !important; }
+# ds-thread.ds-narrow # ds-reset .ds-comments .ds-avatar img {
+    width: 35px !important;
+    height: 35px !important;
+}
+
+# ds-thread # ds-reset .ds-comment-body img { max-width: 50px !important; } /* 复写语句，max-width 的值要与下一句的 width 和 height 的值相同 */
+# ds-thread # ds-reset .ds-inline-replybox .ds-avatar img {
+    width: 50px !important;
+    height: 50px !important;
+}
+
+# ds-thread.ds-narrow # ds-reset .ds-comments .ds-inline-replybox .ds-avatar img {
+    width: 50px !important;
+    height: 50px !important;
+}
+# ds-thread # ds-reset .ds-textarea-wrapper {
+    border: 1px solid # ddd !important;
+    border-bottom: none !important;
+}
+# ds-thread # ds-reset .ds-post-options {
+    border: 1px solid # ddd !important;
+    border-right: none !important;
+}
+# ds-reset .ds-rounded-top { border-radius: 1px 1px 0 0 !important; }
+# ds-notify { border-radius: 2px !important; }
+# ds-thread # ds-reset # ds-hot-posts { padding: 0 12px; }
+# ds-thread # ds-reset .ds-header { padding: 0; } /* 复写语句，放在后面 */
+/*多说 UA 开始*/
+span.ua{
+    margin: 0 1px!important;
+    color:# FFFFFF!important;
+    /*text-transform: Capitalize!important;
+    float: right!important;
+    line-height: 18px!important;*/
+}
+.ua_other.os_other{
+    background-color: # ccc!important;
+    color: # fff;
+    border: 1px solid # BBB!important;
+    border-radius: 4px;
+}
+.ua_ie{
+    background-color: # 428bca!important;
+    border-color: # 357ebd!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_firefox{
+    background-color: # f0ad4e!important;
+    border-color: # eea236!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_maxthon{
+    background-color: # 7373B9!important;
+    border-color: # 7373B9!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_ucweb{
+    background-color: # FF740F!important;
+    border-color: # d43f3a!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_sogou{
+    background-color: # 78ACE9!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_2345explorer{
+    background-color: # 2478B8!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_2345chrome{
+    background-color: # F9D024!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_mi{
+    background-color: # FF4A00!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_lbbrowser{
+    background-color: # FC9D2E!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_chrome{
+    background-color: # EE6252!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_qq{
+    background-color: # 3D88A8!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_apple{
+    background-color: # E95620!important;
+    border-color: # 4cae4c!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.ua_opera{
+    background-color: # d9534f!important;
+    border-color: # d43f3a!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+
+
+.os_vista,.os_2000,.os_windows,.os_xp,.os_7,.os_8,.os_8_1 {
+    background-color: # 39b3d7!important;
+    border-color: # 46b8da!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+
+.os_android {
+    background-color: # 98C13D!important;
+    border-color: # 01B171!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.os_ubuntu{
+    background-color: # DD4814!important;
+    border-color: # 01B171!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.os_linux {
+    background-color: # 3A3A3A!important;
+    border-color: # 1F1F1F!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.os_mac{
+    background-color: # 666666!important;
+    border-color: # 1F1F1F!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.os_unix{
+    background-color: # 006600!important;
+    border-color: # 1F1F1F!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.os_nokia{
+    background-color: # 014485!important;
+    border-color: # 1F1F1F!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+}
+.sskadmin{
+background-color: # 00a67c!important;
+    border-color: # 01B171!important;
+    border-radius: 4px;
+    padding: 0 5px!important;
+
+}
+/*多说 UA 结束*/
+</code></pre>
+  </div>
+</article>
+<div class="blog-post-comments">
+	<div class="wildfire_thread"></div>
+</div>
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#使用-Github-和-GitCafe-同时托管博客"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x4F7F;&#x7528;-Github-&#x548C;-GitCafe-&#x540C;&#x65F6;&#x6258;&#x7BA1;&#x535A;&#x5BA2;" class="headerlink" title="&#x4F7F;&#x7528; Github &#x548C; GitCafe &#x540C;&#x65F6;&#x6258;&#x7BA1;&#x535A;&#x5BA2;"></a>&#x4F7F;&#x7528; Github &#x548C; GitCafe &#x540C;&#x65F6;&#x6258;&#x7BA1;&#x535A;&#x5BA2;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#修改部署配置文件"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x4FEE;&#x6539;&#x90E8;&#x7F72;&#x914D;&#x7F6E;&#x6587;&#x4EF6;" class="headerlink" title="&#x4FEE;&#x6539;&#x90E8;&#x7F72;&#x914D;&#x7F6E;&#x6587;&#x4EF6;"></a>&#x4FEE;&#x6539;&#x90E8;&#x7F72;&#x914D;&#x7F6E;&#x6587;&#x4EF6;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dnspod-做定向-DNS-解析"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#Dnspod-&#x505A;&#x5B9A;&#x5411;-DNS-&#x89E3;&#x6790;" class="headerlink" title="Dnspod &#x505A;&#x5B9A;&#x5411; DNS &#x89E3;&#x6790;"></a>Dnspod &#x505A;&#x5B9A;&#x5411; DNS &#x89E3;&#x6790;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Hexo-2-x-升至3-x"><span class="toc-number">2.</span> <span class="toc-text"><a href="#Hexo-2-x-&#x5347;&#x81F3;3-x" class="headerlink" title="Hexo 2.x &#x5347;&#x81F3;3.x"></a>Hexo 2.x &#x5347;&#x81F3;3.x</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hexo-3-x-将至2-x"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#Hexo-3-x-&#x5C06;&#x81F3;2-x" class="headerlink" title="Hexo 3.x &#x5C06;&#x81F3;2.x"></a>Hexo 3.x &#x5C06;&#x81F3;2.x</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#备份关键配置"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x5907;&#x4EFD;&#x5173;&#x952E;&#x914D;&#x7F6E;" class="headerlink" title="&#x5907;&#x4EFD;&#x5173;&#x952E;&#x914D;&#x7F6E;"></a>&#x5907;&#x4EFD;&#x5173;&#x952E;&#x914D;&#x7F6E;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#主题及多说评论框样式及-USER-ANGENT"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x4E3B;&#x9898;&#x53CA;&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;&#x53CA;-USER-ANGENT" class="headerlink" title="&#x4E3B;&#x9898;&#x53CA;&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;&#x53CA; USER ANGENT"></a>&#x4E3B;&#x9898;&#x53CA;&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;&#x53CA; USER ANGENT</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#yilia-主题"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#yilia-&#x4E3B;&#x9898;" class="headerlink" title="yilia &#x4E3B;&#x9898;"></a>yilia &#x4E3B;&#x9898;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多说评论框样式"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;" class="headerlink" title="&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;"></a>&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;&#x6837;&#x5F0F;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多说评论框-UA-显示-博主标记"><span class="toc-number">4.3.</span> <span class="toc-text"><a href="#&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;-UA-&#x663E;&#x793A;-&#x535A;&#x4E3B;&#x6807;&#x8BB0;" class="headerlink" title="&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0;"></a>&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#embed-js-多说核心库本地化"><span class="toc-number">4.3.1.</span> <span class="toc-text"><a href="#embed-js-&#x591A;&#x8BF4;&#x6838;&#x5FC3;&#x5E93;&#x672C;&#x5730;&#x5316;" class="headerlink" title="embed.js &#x591A;&#x8BF4;&#x6838;&#x5FC3;&#x5E93;&#x672C;&#x5730;&#x5316;"></a>embed.js &#x591A;&#x8BF4;&#x6838;&#x5FC3;&#x5E93;&#x672C;&#x5730;&#x5316;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#应用本地-embed-js-文件"><span class="toc-number">4.3.2.</span> <span class="toc-text"><a href="#&#x5E94;&#x7528;&#x672C;&#x5730;-embed-js-&#x6587;&#x4EF6;" class="headerlink" title="&#x5E94;&#x7528;&#x672C;&#x5730; embed.js &#x6587;&#x4EF6;"></a>&#x5E94;&#x7528;&#x672C;&#x5730; embed.js &#x6587;&#x4EF6;</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#添加文章目录及版权信息"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;" class="headerlink" title="&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;"></a>&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#添加文章目录及版权信息结构"><span class="toc-number">5.1.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x7ED3;&#x6784;" class="headerlink" title="&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x7ED3;&#x6784;"></a>&#x6DFB;&#x52A0;&#x6587;&#x7AE0;&#x76EE;&#x5F55;&#x53CA;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x7ED3;&#x6784;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加版权信息模块"><span class="toc-number">5.2.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x6A21;&#x5757;" class="headerlink" title="&#x6DFB;&#x52A0;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x6A21;&#x5757;"></a>&#x6DFB;&#x52A0;&#x7248;&#x6743;&#x4FE1;&#x606F;&#x6A21;&#x5757;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加文件样式-CSS"><span class="toc-number">5.3.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x6587;&#x4EF6;&#x6837;&#x5F0F;-CSS" class="headerlink" title="&#x6DFB;&#x52A0;&#x6587;&#x4EF6;&#x6837;&#x5F0F; CSS"></a>&#x6DFB;&#x52A0;&#x6587;&#x4EF6;&#x6837;&#x5F0F; CSS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加变量"><span class="toc-number">5.4.</span> <span class="toc-text"><a href="#&#x6DFB;&#x52A0;&#x53D8;&#x91CF;" class="headerlink" title="&#x6DFB;&#x52A0;&#x53D8;&#x91CF;"></a>&#x6DFB;&#x52A0;&#x53D8;&#x91CF;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#附录"><span class="toc-number">6.</span> <span class="toc-text"><a href="#&#x9644;&#x5F55;" class="headerlink" title="&#x9644;&#x5F55;"></a>&#x9644;&#x5F55;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#多说评论框-UA-显示-博主标记-javascript"><span class="toc-number">6.1.</span> <span class="toc-text"><a href="#&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846;-UA-&#x663E;&#x793A;-&#x535A;&#x4E3B;&#x6807;&#x8BB0;-javascript" class="headerlink" title="&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0; javascript"></a>&#x591A;&#x8BF4;&#x8BC4;&#x8BBA;&#x6846; UA &#x663E;&#x793A;/&#x535A;&#x4E3B;&#x6807;&#x8BB0; javascript</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改多说样式"><span class="toc-number">6.2.</span> <span class="toc-text"><a href="#&#x4FEE;&#x6539;&#x591A;&#x8BF4;&#x6837;&#x5F0F;" class="headerlink" title="&#x4FEE;&#x6539;&#x591A;&#x8BF4;&#x6837;&#x5F0F;"></a>&#x4FEE;&#x6539;&#x591A;&#x8BF4;&#x6837;&#x5F0F;</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&text=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&is_video=false&description=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Hexo Multiple deployer 托管 Github 和 GitCafe 博客&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&title=Hexo Multiple deployer 托管 Github 和 GitCafe 博客"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Multi-Deploying-With-Hexo/&name=Hexo Multiple deployer 托管 Github 和 GitCafe 博客&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：通过将 Hexo 同时部署到 Github 和 GitCafe，使用 Dnspod 对来自国内外的流量分别 DNS 解析至 GitCafe 及 Github 从而优化博客的访问速度，本篇文章包括（1）修改 hexo deployer 配置，Dnspod 做定向解析（2）Hexo 2.x 升至3.x(3)备份关键配置到 Github/GitCafe Backup 分支（4）关于主题及多说评论框样式及 USER ANGENT（6）添加文章目录及版权信息&lt;br&gt;"><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 masukio
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+<script>
+  // 你可以自定义一些配置
+  //
+  // databaseProvider: 必须为 'wilddog' 或者 'firebase'
+  // databaseConfig: 请从你的数据库控制台复制过来。
+  // pageURL(可选): 默认为当前页面的 URL。
+  // pageTitle(可选): 默认为当前页面的 title。
+  // theme(可选): 'light'（默认）或者 'dark'。
+  // locale(可选): 'en'（默认）或者 'zh-CN'
+  // defaultAvatarURL(可选): 默认头像是一个可爱的消防员 :-D
+  var wildfireConfig = () => ({
+    databaseProvider: 'wilddog',
+    databaseConfig: {
+        siteId: "wd2882084211dpgrir"
+    },
+    theme: 'dark',
+    locale: 'zh-CN',
+    defaultAvatarURL: 'https://image.flaticon.com/icons/svg/621/621863.svg'
+  })
+</script>
+<script src="https://unpkg.com/wildfire/dist/wildfire.auto.js"></script>

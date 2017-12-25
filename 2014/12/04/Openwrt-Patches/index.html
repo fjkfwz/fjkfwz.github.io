@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="摘要：Patch 是天才程序员、Perl 的发明者 Larry Wall 发明的，它应高效地交流程序源代码之需求而生，随着以 Linux 为代表的开发源代码运行的蓬勃发展，patch 这个概念已经成为开放源代码发起者、贡献者和参与者的集体无意识的一部分。patch 只包含了对源代码修改的部分，这对于开放源代码社区的协同开发模式具有重要意义，意味的软件新版本的 发布和对软件的缺陷或改进可以以更小的文">
+<meta name="keywords" content="Openwrt,Patch,Diff">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Openwrt Patch 制作及打补丁">
+<meta property="og:url" content="https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/index.html">
+<meta property="og:site_name" content="Sapientia et Virtus">
+<meta property="og:description" content="摘要：Patch 是天才程序员、Perl 的发明者 Larry Wall 发明的，它应高效地交流程序源代码之需求而生，随着以 Linux 为代表的开发源代码运行的蓬勃发展，patch 这个概念已经成为开放源代码发起者、贡献者和参与者的集体无意识的一部分。patch 只包含了对源代码修改的部分，这对于开放源代码社区的协同开发模式具有重要意义，意味的软件新版本的 发布和对软件的缺陷或改进可以以更小的文">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/path.png">
+<meta property="og:image" content="http://www.right.com.cn/forum/forum.php?mod=attachment&aid=NjAyNTR8MTMzZGU2MTV8MTQzNjUwODQ4OHwwfDEwMjgyMA%3D%3D&noupdate=yes">
+<meta property="og:updated_time" content="2017-12-25T14:28:22.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Openwrt Patch 制作及打补丁">
+<meta name="twitter:description" content="摘要：Patch 是天才程序员、Perl 的发明者 Larry Wall 发明的，它应高效地交流程序源代码之需求而生，随着以 Linux 为代表的开发源代码运行的蓬勃发展，patch 这个概念已经成为开放源代码发起者、贡献者和参与者的集体无意识的一部分。patch 只包含了对源代码修改的部分，这对于开放源代码社区的协同开发模式具有重要意义，意味的软件新版本的 发布和对软件的缺陷或改进可以以更小的文">
+<meta name="twitter:image" content="http://7nar5o.com1.z0.glb.clouddn.com/path.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Openwrt Patch 制作及打补丁</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="Sapientia et Virtus" type="application/atom+xml">
+    
+</head>
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')" style="display:none"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/12/04/Openwrt-New-Makefile/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle()" onmouseout="$('#i-prev').toggle()"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/12/04/Reading-System/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="$('#share').toggle();return false"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none">Previous post</span>
+      <span id="i-next" class="info" style="display:none">Next post</span>
+      <span id="i-top" class="info" style="display:none">Back to top</span>
+      <span id="i-share" class="info" style="display:none">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&text=Openwrt Patch 制作及打补丁"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&is_video=false&description=Openwrt Patch 制作及打补丁"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Openwrt Patch 制作及打补丁&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-get-pocket" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-reddit" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-stumbleupon" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-digg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&name=Openwrt Patch 制作及打补丁&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Patch 是天才程序员、Perl 的发明者 Larry Wall 发明的，它应高效地交流程序源代码之需求而生，随着以 Linux 为代表的开发源代码运行的蓬勃发展，patch 这个概念已经成为开放源代码发起者、贡献者和参与者的集体无意识的一部分。patch 只包含了对源代码修改的部分，这对于开放源代码社区的协同开发模式具有重要意义，意味的软件新版本的 发布和对软件的缺陷或改进可以以更小的文件发布，可以减少网络的传输量，方便软件维护者的管理工作。&lt;br&gt;"><i class="fa fa-tumblr" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#diff-和-patch-的用法"><span class="toc-number">1.</span> <span class="toc-text"><a href="#diff-&#x548C;-patch-&#x7684;&#x7528;&#x6CD5;" class="headerlink" title="diff &#x548C; patch &#x7684;&#x7528;&#x6CD5;"></a>diff &#x548C; patch &#x7684;&#x7528;&#x6CD5;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#diff-的用法"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#diff-&#x7684;&#x7528;&#x6CD5;" class="headerlink" title="diff &#x7684;&#x7528;&#x6CD5;"></a>diff &#x7684;&#x7528;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#diff-的语法"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#diff-&#x7684;&#x8BED;&#x6CD5;" class="headerlink" title="diff &#x7684;&#x8BED;&#x6CD5;"></a>diff &#x7684;&#x8BED;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#patch-的用法"><span class="toc-number">1.3.</span> <span class="toc-text"><a href="#patch-&#x7684;&#x7528;&#x6CD5;" class="headerlink" title="patch &#x7684;&#x7528;&#x6CD5;"></a>patch &#x7684;&#x7528;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注意"><span class="toc-number">1.4.</span> <span class="toc-text"><a href="#&#x6CE8;&#x610F;" class="headerlink" title="&#x6CE8;&#x610F;"></a>&#x6CE8;&#x610F;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#diff-pppd-patch"><span class="toc-number">2.</span> <span class="toc-text"><a href="#diff-pppd-patch" class="headerlink" title="diff pppd patch"></a>diff pppd patch</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#管理工具-quilt"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x7BA1;&#x7406;&#x5DE5;&#x5177;-quilt" class="headerlink" title="&#x7BA1;&#x7406;&#x5DE5;&#x5177; quilt"></a>&#x7BA1;&#x7406;&#x5DE5;&#x5177; quilt</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#package-的-patch-方法"><span class="toc-number">3.1.</span> <span class="toc-text"><a href="#package-&#x7684;-patch-&#x65B9;&#x6CD5;" class="headerlink" title="package &#x7684; patch &#x65B9;&#x6CD5;"></a>package &#x7684; patch &#x65B9;&#x6CD5;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pactch-生成步骤"><span class="toc-number">3.1.1.</span> <span class="toc-text"><a href="#pactch-&#x751F;&#x6210;&#x6B65;&#x9AA4;" class="headerlink" title="pactch &#x751F;&#x6210;&#x6B65;&#x9AA4;"></a>pactch &#x751F;&#x6210;&#x6B65;&#x9AA4;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#编辑已有-patch-文件"><span class="toc-number">3.1.2.</span> <span class="toc-text"><a href="#&#x7F16;&#x8F91;&#x5DF2;&#x6709;-patch-&#x6587;&#x4EF6;" class="headerlink" title="&#x7F16;&#x8F91;&#x5DF2;&#x6709; patch &#x6587;&#x4EF6;"></a>&#x7F16;&#x8F91;&#x5DF2;&#x6709; patch &#x6587;&#x4EF6;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#platform-patch-生成步骤"><span class="toc-number">3.2.</span> <span class="toc-text"><a href="#platform-patch-&#x751F;&#x6210;&#x6B65;&#x9AA4;" class="headerlink" title="platform patch &#x751F;&#x6210;&#x6B65;&#x9AA4;"></a>platform patch &#x751F;&#x6210;&#x6B65;&#x9AA4;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#generic-patch-生成步骤"><span class="toc-number">3.2.1.</span> <span class="toc-text"><a href="#generic-patch-&#x751F;&#x6210;&#x6B65;&#x9AA4;" class="headerlink" title="generic patch &#x751F;&#x6210;&#x6B65;&#x9AA4;"></a>generic patch &#x751F;&#x6210;&#x6B65;&#x9AA4;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#更新-patches"><span class="toc-number">3.2.2.</span> <span class="toc-text"><a href="#&#x66F4;&#x65B0;-patches" class="headerlink" title="&#x66F4;&#x65B0; patches"></a>&#x66F4;&#x65B0; patches</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#迭代修改-patch"><span class="toc-number">3.3.</span> <span class="toc-text"><a href="#&#x8FED;&#x4EE3;&#x4FEE;&#x6539;-patch" class="headerlink" title="&#x8FED;&#x4EE3;&#x4FEE;&#x6539; patch"></a>&#x8FED;&#x4EE3;&#x4FEE;&#x6539; patch</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Openwrt-新设备支持"><span class="toc-number">4.</span> <span class="toc-text"><a href="#Openwrt-&#x65B0;&#x8BBE;&#x5907;&#x652F;&#x6301;" class="headerlink" title="Openwrt &#x65B0;&#x8BBE;&#x5907;&#x652F;&#x6301;"></a>Openwrt &#x65B0;&#x8BBE;&#x5907;&#x652F;&#x6301;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#准备工作"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#&#x51C6;&#x5907;&#x5DE5;&#x4F5C;" class="headerlink" title="&#x51C6;&#x5907;&#x5DE5;&#x4F5C;"></a>&#x51C6;&#x5907;&#x5DE5;&#x4F5C;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 class="posttitle" itemprop="name headline">
+        Openwrt Patch 制作及打补丁
+    </h1>
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Sapientia et Virtus</span>
+      </span>
+      <div class="postdate">
+        <time datetime="2014-12-04T00:00:00.000Z" itemprop="datePublished">Dec 4 2014</time>
+    </div>
+      <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Diff/">Diff</a>, <a class="tag-link" href="/tags/Openwrt/">Openwrt</a>, <a class="tag-link" href="/tags/Patch/">Patch</a>
+    </div>
+    </div>
+  </header>
+  
+  <div class="content" itemprop="articleBody">
+    <p><strong>摘要</strong>：Patch 是天才程序员、Perl 的发明者 Larry Wall 发明的，它应高效地交流程序源代码之需求而生，随着以 Linux 为代表的开发源代码运行的蓬勃发展，patch 这个概念已经成为开放源代码发起者、贡献者和参与者的集体无意识的一部分。patch 只包含了对源代码修改的部分，这对于开放源代码社区的协同开发模式具有重要意义，意味的软件新版本的 发布和对软件的缺陷或改进可以以更小的文件发布，可以减少网络的传输量，方便软件维护者的管理工作。<br><a id="more"></a></p>
+<hr>
+<p>patch 是用来查找文件之间差异的 GNU diff 命令的一个接口；diff 有很多选项，但是该命令最常用的用途是用来生成一个文件，该文件中列出了内容发生改变的行，显示两个原始文件、修改过的行以及由于内容没有变化而忽略掉的行。patch 典型地用于把一个目录下的源代码文件更新到新的版本，从而就避免了下载整个新的源代码档案的必要。下载一个有效的 patch 仅仅需要下载发生变化的那些代码行就可以了。 patch 最初源自十年前，那时网络带宽的限制促进了 patch 的发展，然而和当时的很多 Unix 工具一样，直到现在，patch 还在广泛应用。</p>
+<p>在 Dr.Dobb 之旅的2月份的程序员杂志中，Larry Wall 对早期的 patch 做了一些很有趣的说明：</p>
+<blockquote>
+<p>DDJ:顺便问一下，patch 和 diff 哪个出现的早？<br>LW:从很长一段时间来说，diff 出现地比较早。我想 diff 大约比 patch 早10年出现，一回想起来，我就纳闷为什么没有人早些想到使用 patch 呢？ 但是我想我知道这中间的原因。这很大程度上是心理因素使然。当开发出 diff 时，程序员增加了一个 e 选项，我想就是这个选项的原因，该选项后来滋生为一个 ed 脚本，因此大家都会对自己说，”嗯，如果我想自动使用 diff，那么我就使用这个选项。”因此从来都没有人编写一个计算机程序来获取其它格式的输出并使用这些结果。或者是那些设计 diff 的人员，或者是那些使用 diff 格式而受益的人员太沉迷其中了，因为你可以对那些已经修改过的内容使用 diff 操作并让其正常工作都是很容易的。 </p>
+</blockquote>
+<hr>
+<h1 id="diff-和-patch-的用法"><a href="#diff-和-patch-的用法" class="headerlink" title="diff 和 patch 的用法"></a>diff 和 patch 的用法</h1><p>diff 和 patch 是一对工具，在数学上来说，diff 是对两个集合的差运算，patch 是对两个集合的和运算。 diff 比较两个文件或文件集合的差异，并记录下来，生成一个 diff 文件，这也是我们常说的 patch 文件，即补丁文件。 patch 能将 diff 文件运用于 原来的两个集合之一，从而得到另一个集合。举个例子来说文件 A 和文件 B,经过 diff 之后生成了补丁文件 C,那么着个过程相当于 <code>A-B=C</code>,那么 patch 的过程就是<code>B+C=A</code> 或<code>A-C=B</code>。因此我们只要能得到 A, B, C 三个文件中的任何两个，就能用 diff 和 patch 这对工具生成另外一个文件。<br>这就是 diff 和 patch 的妙处。下面分别介绍一下两个工具的用法:</p>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/path.png" alt="Path"></p>
+<h2 id="diff-的用法"><a href="#diff-的用法" class="headerlink" title="diff 的用法"></a>diff 的用法</h2><p>diff 后面可以接两个文件名或两个目录名。如果是一个目录名加一个文件名，那么只作用在那么个目录下的同名文件。<br>如果是两个目录的话，作用于该目录下的所有文件，不递归。如果我们希望递归执行，需要使用-r 参数。<br>命令<code>diff A B &gt; C</code>,一般 A 是原始文件，B 是修改后的文件，C 称为 A 的补丁文件。不加任何参数生成的 diff 文件格式是一种简单的格式，这种格式只标出了不一样的行数和内容。我们需要一种更详细的格式，可以标识出不同之处的上下文环境，这样更有利于提高 patch 命令的识别能力。这个时候可以用-c 开关。</p>
+<h2 id="diff-的语法"><a href="#diff-的语法" class="headerlink" title="diff 的语法"></a>diff 的语法</h2><p>1、diff</p>
+<pre><code>－－－－－－－－－－－－－－－－－－－－
+NAME
+       diff - find differences between two files
+SYNOPSIS
+       diff [options] from-file to-file
+－－－－－－－－－－－－－－－－－－－－
+</code></pre><p>语法格式：diff [选项] 源文件（夹） 目的文件（夹）<br>常用选项：<br>-r 是一个递归选项，设置了这个选项，diff 会将两个不同版本源代码目录中的所有对应文件全部都进行一次比较，包括子目录文件。<br>-N 选项确保补丁文件将正确地处理已经创建或删除文件的情况。<br>-u 选项以统一格式创建补丁文件，这种格式比缺省格式更紧凑些。</p>
+<h2 id="patch-的用法"><a href="#patch-的用法" class="headerlink" title="patch 的用法"></a>patch 的用法</h2><p>patch 用于根据原文件和补丁文件生成目标文件。还是拿上个例子来说<br>patch A C 就能得到 B, 这一步叫做对 A 打上了 B 的名字为 C 的补丁。<br>之一步之后，你的文件 A 就变成了文件 B。如果你打完补丁之后想恢复到 A 怎么办呢？<br>patch -R B C 就可以重新还原到 A 了。<br>所以不用担心会失去 A 的问题。<br>其实 patch 在具体使用的时候是不用指定原文件的，因为补丁文件中都已经记载了原文件的路径和名称。patch 足够聪明可以认出来。但是有时候会有点小问题。比如一般对两个目录 diff 的时候可能已经包含了原目录的名字，但是我们打补丁的时候会进入到目录中再使用 patch,着个时候就需要你告诉 patch 命令怎么处理补丁文件中的路径。可以利用-pn 开关，告诉 patch 命令忽略的路径分隔符的个数。举例如下：<br>A 文件在 DIR_A 下，修改后的 B 文件在 DIR_B 下，一般 DIR_A 和 DIR_B 在同一级目录。我们为了对整个目录下的所有文件一次性 diff,我们一般会到 DIR_A 和 DIR_B 的父目录下执行以下命令</p>
+<pre><code>diff -rc DIR_A DIR_B &gt; C
+</code></pre><p>这个时候补丁文件 C 中会记录了原始文件的路径为 DIR_A/A<br>现在另一个用户得到了 A 文件和 C 文件，其中 A 文件所在的目录也是 DIR_A。 一般，他会比较喜欢在 DIR_A 目录下面进行 patch 操作，它会执行<br><code>patch &lt; C</code><br>但是这个时候 patch 分析 C 文件中的记录，认为原始文件是./DIR_A/A，但实际上是./A，此时 patch 会找不到原始文件。为了避免这种情况我们可以使用-p1参数如下</p>
+<pre><code>patch -p1 &lt; C
+</code></pre><p>此时，patch 会忽略掉第1个”/”之前的内容，认为原始文件是 ./A，这样就正确了。使用 patch<br>patch 附带有一个很好的帮助，其中罗列了很多选项，但是99%的时间只要两个选项就能满足我们的需要：</p>
+<pre><code>patch -p1 &lt; [patchfile]
+patch -R &lt; [patchfile] (used to undo a patch)
+</code></pre><p>-p1选项代表 patchfile 中 文件名左边目录的层数，顶层目录在不同的机器上有所不同。要使用这个选项，就要把你的 patch 放在要被打补丁的目录下，然后在这个目录中运行<code>path -p1 &lt; [patchfile]</code>。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>最后有以下几点注意：<br>　　1.一次打多个 patch 的话，一般这些 patch 有先后顺序，得按次序打才行。<br>　　2.在 patch 之前不要对原文件进行任何修改<br>　　3.如果 patch 中记录的原始文件和你得到的原始文件版本不匹配(很容易出现)，那么你可以尝试使用 patch, 如果幸运的话，可以成功。大部分情况下，会有不匹配的情况，此时 patch 会生成 rej 文件，记录失败的地方，你可以手工修改。</p>
+<hr>
+<h1 id="diff-pppd-patch"><a href="#diff-pppd-patch" class="headerlink" title="diff pppd patch"></a>diff pppd patch</h1><p>目录为：<br>目录1 /trunk/build_dir/target-mips_r2_uClibc-0.9.33.2/ppp-default/<br>目录2 /trunk/package/ppp</p>
+<p>目录1需要进行一次编译后才会有，且不能运行 make clean，不然会被删除。至于为什么要编译之后再制作 patch 而不是直接用 ppp-2.4.5的源码，我是这样想的，在我们制作自己的 patch 之前，在目录2下面的 patch 文件夹已经有很多高手们制作的其他 patch，制作自己的 patch 要以他们的为基础，编译过一次的是已经打好了这些补丁的,如果直接用源码修改后制作 patch，就等于忽略了其他的 patch，这样可能导致自己的 patch 到后面把别的 patch 更改的内容给修改了，导致不必要的错误。</p>
+<p>步骤（在 Ubuntu12.04LTS 下）：<br>1.首先到目录1下将文件夹 ppp-2.4.5复制一份，命名为 ppp-2.4.5.old 不做任何修改。</p>
+<p>2.修改 ppp-2.4.5文件夹下该修改的地方，举个例子，比如431-syncppp.patch 里面有这样一段</p>
+<pre><code>--- ppp-2.4.5.0/pppd/chap-new.c  表示旧文件
++++ ppp-2.4.5/pppd/chap-new.c   表示修改了的新文件
+</code></pre><p><img src="http://www.right.com.cn/forum/forum.php?mod=attachment&amp;aid=NjAyNTR8MTMzZGU2MTV8MTQzNjUwODQ4OHwwfDEwMjgyMA%3D%3D&amp;noupdate=yes" alt="diff"><br>@@那一行的意思是在 ppp-2.4.5/pppd/chap-new.c 文件中从第37行开始算起的后六行中插入绿色的内容（绿色的加号表示要增加内容，同理，减号表示删除），如果该文件不是已经存在的文件，则会自动创建一个文件。当然每个人的 trunk 版本不同可能导致行数和和位置的不同，但需要增加的内容是一样的，这也是我们自己修改文件后自己生成 patch 的原因。</p>
+<p>修改好 ppp-2.4.5里面需要修改的内容就可以生成自己的 patch 了。</p>
+<p>3.生成 patch<br>调出终端，cd 到 ppp-2.4.5所在目录，运行下面的命令：</p>
+<pre><code>diff -Naur ppp-2.4.5.old/pppd/* ppp-2.4.5/pppd/* &gt;&gt; 600-syncppp.patch
+</code></pre><p>最终就得到了自己的 patch，patch 的名称无所谓，但要保证它要在其他 patch 执行完成后再执行，因此编号（即开头的数字比如600，789等等）要是所在 patches 文件夹下最大的才行。<br>最后来到目录2即/trunk/package/ppp 目录下，将得到的 patch 文件放入 patches 文件夹即可。<br>最后还要将<code>trunk/package/ppp</code>下的 Makefile 要将第37行(我的是37行）改为</p>
+<pre><code>DEPENDS:=+kmod-ppp +libpthread
+</code></pre><p>不然编译会出错。<br>   注意：执行 make clean 将会清空 <code>目录1  /trunk/build_dir/target-mips_r2_uClibc-0.9.33.2/</code>下的所有内容，生成 patch 后请及时转移到不会被误删文件夹下。</p>
+<h1 id="管理工具-quilt"><a href="#管理工具-quilt" class="headerlink" title="管理工具 quilt"></a>管理工具 quilt</h1><p>配置完 Openwrt 后，首次编译时会在编译过程中下载各种源码包，而且解压这些源码包并打上 patch。需要对源码进行修改时，可直接修改源码并重新编译，但 clean 后再次编译时会再次解压源码包，以至所做的修改全部丢失。</p>
+<p>安装 quilt 工具：</p>
+<pre><code>apt-get intall quilt
+</code></pre><p>为了让 quilt 创建适合 OpenWrt 格式的 patch，需要在本地 home 目录下创建 quilt 的配置文件.quiltrc，该配<br>置文件包含 diff 和 patch 的选项。使用如下命令可创建 quilt 的配置文件：</p>
+<pre><code>cat&gt; ~/.quiltrc &lt;&lt;EOF
+QUILT_DIFF_ARGS=&quot;--no-timestamps--no-index -pab --color=auto&quot;
+QUILT_REFRESH_ARGS=&quot;--no-timestamps--no-index -pab&quot;
+QUILT_PATCH_OPTS=&quot;--unified&quot;
+QUILT_DIFF_OPTS=&quot;-p&quot;
+EDITOR=&quot;vim&quot;
+EOF
+</code></pre><p>EDITOR 指定编辑时所用的编辑器，该处使用 vim。</p>
+<h2 id="package-的-patch-方法"><a href="#package-的-patch-方法" class="headerlink" title="package 的 patch 方法"></a>package 的 patch 方法</h2><p>package 的 patch 生成方法以修改 tftp-hpa 为例进行介绍，修改内容为在 tftp 的 main 函数中加入一条打印<br>信息。（进行该操作之前，需要在 make menuconfig 时选择 tftp-hpa 包）</p>
+<hr>
+<h3 id="pactch-生成步骤"><a href="#pactch-生成步骤" class="headerlink" title="pactch 生成步骤"></a>pactch 生成步骤</h3><p>1.准备 tftp-hpa 源码</p>
+<pre><code>make package/feeds/packages/tftp-hpa/{clean,prepare} V=s QUILT=1
+</code></pre><p>此命令会解压 tftp-hpa 的源码包并准备 patch 文件（如果有），通过打印信息可获取解压到的目录路径。</p>
+<p>2.进入 tftp-hpa 源码目录</p>
+<pre><code>cd build_dir/target-mips_r2_uClibc-0.9.33.2/tftp-hpa-0.48
+</code></pre><p>3.安装所有已有 patch</p>
+<pre><code>quilt push -a
+</code></pre><p>4.创建新 patch</p>
+<pre><code>quilt new 001-main_test.patch
+</code></pre><p>patch 文件名以数字开头，“-”后为 patch 的描述信息<br>开头的数字必须比已有 patch 的数字都大，使用命令 quilt series 查看已有 patch 的列表</p>
+<p>5.修改源码文件</p>
+<pre><code>quilt edit tftp/main.c
+</code></pre><p>该命令将使用在.quiltrc 中定义的编辑器打开 main.c 文件，在 main 函数中增加一条打印信息。<br>如果还有其他文件需要修改，可继续用此命令进行修改</p>
+<p>6.查看修改内容</p>
+<pre><code>quilt diff
+</code></pre><p>7.更新修改到 patch 文件</p>
+<pre><code>quilt refresh
+</code></pre><p>此命令会将更新的修改保存到当前目录的<code>patches/001-main_test</code>.patch(如果没有 patches 目录会自动创建)。</p>
+<p>8.返回到 buildroot 目录</p>
+<pre><code>cd ../../../
+</code></pre><p>9.保存 patch 文件到 buildroot</p>
+<pre><code>makepackage/feeds/packages/tftp-hpa/update V=s
+</code></pre><p>10.重新编译 tftp-hpa 包以测试修改</p>
+<pre><code>make package/feeds/packages/tftp-hpa/{clean,compile} package/index V=s
+</code></pre><p>11.如果有问题，需要编辑 patch 文件</p>
+<hr>
+<h3 id="编辑已有-patch-文件"><a href="#编辑已有-patch-文件" class="headerlink" title="编辑已有 patch 文件"></a>编辑已有 patch 文件</h3><p>当需要对 patch 进行修改时，可使用以下步骤：<br>1.准备 tftp-hpa 源码</p>
+<pre><code>make package/feeds/packages/tftp-hpa/{clean,prepare} V=s QUILT=1
+</code></pre><p>2.进入 tftp-hpa 源码目录</p>
+<pre><code>cd build_dir/ /target-mips_r2_uClibc-0.9.33.2/tftp-hpa-0.48
+</code></pre><p>3.列出可用的 patch</p>
+<pre><code>quilt series
+</code></pre><p>4.准备要修改的 patch</p>
+<pre><code>quilt push 001-main_test.patch
+</code></pre><p>此命令会按 patch 编号顺序打补丁，直到指定的 patch（包含）<br>如果当前应用的 patch 编号已经超过了指定的 patch 编号，将会按相反顺序移除 patch 直到指定的 patch</p>
+<p>5.编辑源码文件</p>
+<pre><code>quilt edit tftp/main.c
+</code></pre><p>6.检查 patch 中包含的所修改的文件</p>
+<pre><code>quilt files
+</code></pre><p>7.查看修改内容</p>
+<pre><code>quilt diff
+</code></pre><p>8.保存修改到 patch</p>
+<pre><code>quilt refresh
+</code></pre><p>9.返回 buildroot 目录</p>
+<pre><code>cd ../../../
+</code></pre><p>10.保存 patch 文件到 buildroot</p>
+<pre><code>make package/feeds/packages/tftp-hpa/update V=s
+</code></pre><p>11.重新编译 tftp-hpa 包以测试修改</p>
+<pre><code>make package/feeds/packages/tftp-hpa/{clean,compile} package/index V=s
+</code></pre><h2 id="platform-patch-生成步骤"><a href="#platform-patch-生成步骤" class="headerlink" title="platform patch 生成步骤"></a>platform patch 生成步骤</h2><p>platform 形式的 patch 生成步骤如下（源码修改 mach-ap121.c）:<br>1.准备内核源码树，使用如下命令</p>
+<pre><code>make target/linux/{clean,prepare} V=s QUILT=1
+</code></pre><p>2.进入 kernel 源码树目录</p>
+<pre><code>对 attitudead justment 版本，kernel 源码树所在目录为`build_dir/linux-*/linux-3.*`
+</code></pre><p>对本文使用的 trunk 版本，使用如下命令进入 kernel 源码树<br>    cd build_dir/target-mips_r2_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.10.10</p>
+<p>3.安装所有已有 patch</p>
+<pre><code>quilt push -a
+</code></pre><p>4.创建新 patch</p>
+<pre><code>quilt new platform/910-MIPS-ath79-ap121-reset-gpio-change.patch
+</code></pre><p>patch 文件名以数字开头，“-”后为 patch 的描述信息<br>开头的数字必须比已有 patch 的数字都大，使用命令 quilt series 查看已有 patch 的列表<br>新建 platform 的 patch 时需要在 patch 名前添加“platform/”前缀</p>
+<p>5.修改源码文件</p>
+<pre><code>quilt edit arch/mips/ath79/mach-ap121.c
+</code></pre><p>该命令将使用在.quiltrc 中定义的编辑器打开 mach-ap121.c 文件，修改对复位 GPIO 的定义。<br>如果还有其他文件需要修改，可继续用此命令进行修改</p>
+<p>6.查看修改内容</p>
+<pre><code>quilt diff
+</code></pre><p>7.更新修改到 patch 文件</p>
+<pre><code>quilt refresh
+</code></pre><p>此命令会将更新的修改保存到当前目录的<code>patches/platform/910-MIPS-ath79-ap121-reset-gpio-change.patch</code></p>
+<p>8.返回到 buildroot 目录</p>
+<p>cd ../../../../</p>
+<p>9.保存 patch 文件到 buildroot</p>
+<pre><code>make target/linux/update V=s
+</code></pre><p>此命令会将<code>910-MIPS-ath79-ap121-reset-gpio-change.patch</code>保存到<code>target/linux/ar71xx/patches-3.10/</code></p>
+<h3 id="generic-patch-生成步骤"><a href="#generic-patch-生成步骤" class="headerlink" title="generic patch 生成步骤"></a>generic patch 生成步骤</h3><p>generic 形式的 patch 生成步骤如下（源码修改 m25p80.c）:<br>1.准备内核源码树，使用如下命令</p>
+<pre><code>make target/linux/{clean,prepare} V=s QUILT=1
+</code></pre><p>2.进入 kernel 源码树目录<br>对 attitude adjustment 版本，kernel 源码树所在目录为<code>build_dir/linux-*/linux-3.*</code><br>对本文使用的 trunk 版本，使用如下命令进入 kernel 源码树</p>
+<pre><code>cd build_dir/target-mips_r2_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.10.10
+</code></pre><p>3.安装所有已有 patch</p>
+<pre><code>quilt push -a
+</code></pre><p>4.创建新 patch</p>
+<pre><code>quilt new 998-mtd-m25p80-add-support-for-spansion-s25fl164k1-flash.patch
+</code></pre><p>patch 文件名以数字开头，“-”后为 patch 的描述信息<br>开头的数字必须比已有 patch 的数字都大，使用命令 quilt series 查看已有 patch 的列表<br>新建 generic 的 patch 时需要在 patch 名前添加“generic/”前缀</p>
+<p>5.修改源码文件</p>
+<pre><code>quilt edit driver/mtd/devices/m25p80.c
+</code></pre><p>该命令将使用在.quiltrc 中定义的编辑器打开 m25p80.c 文件，增加对 s25fl164k1的声明。<br>如果还有其他文件需要修改，可继续用此命令进行修改</p>
+<p>6.查看修改内容</p>
+<pre><code>quilt diff
+</code></pre><p>7.更新修改到 patch 文件</p>
+<pre><code>quilt refresh
+</code></pre><p>此命令会将更新的修改保存到当前目录的 patches/generic/998-mtd-m25p80-add-support-for-spansion-s25fl164k1-flash.patch。</p>
+<p>8.返回到 buildroot 目录</p>
+<pre><code>cd ../../../../
+</code></pre><p>9.保存 patch 文件到 buildroot</p>
+<pre><code>make target/linux/update V=s
+</code></pre><p>此命令会将<code>998-mtd-m25p80-add-support-for-spansion-s25fl164k1-flash.patch</code>保存到<code>target/linux/generic/patches-3.10/</code></p>
+<h3 id="更新-patches"><a href="#更新-patches" class="headerlink" title="更新 patches"></a>更新 patches</h3><p>当已打补丁的 package（或者 kernel）更新到新版本时，patch 现有补丁时可能不会顺利，出现一些不确定性。<br>可以通过 make 的 refresh target 重建整个 patch。<br>对 package，使用类似如下的命令：</p>
+<pre><code>make package/feeds/packages/tftp-hpa/refresh V=s
+</code></pre><p>对 kernel，使用如下命令：</p>
+<pre><code>make target/linux/refresh V=s
+</code></pre><h2 id="迭代修改-patch"><a href="#迭代修改-patch" class="headerlink" title="迭代修改 patch"></a>迭代修改 patch</h2><p>进行新的修改时，可能会对 patch 进行多次修改。为了加快开发速度，可以在保持源码树的情况下进行修改操作。</p>
+<p>1.准备源码树<br>2.进入源码目录<br>3.应用所要打的 patch<br>4.编辑源码文件，更新 patch<br>5.应用所有 patch（quilt push -a）<br>6.返回 buildroot 目录，运行命令 make package/feeds/packages/tftp-hpa/{compile,install}或 make target/linux/{compile,install}（对 kernel）<br>7.测试固件<br>8.如果需要进一步修改，返回第二步<br>9,使用命令 make package/feeds/packages/tftp-hpa/update 或 make target/linux/update（对 kernel）将 patches 拷贝到 buildroot</p>
+<hr>
+<h1 id="Openwrt-新设备支持"><a href="#Openwrt-新设备支持" class="headerlink" title="Openwrt 新设备支持"></a>Openwrt 新设备支持</h1><p>以 TL-MR10U 为例,TL-MR10U 可直接刷 WR703N 固件, 不过 USB 不能供电,网络, LED 正常，所以需要修复下</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>编译过 bin, 有完整的<code>.config</code>和<code>toolchain</code><br>1.建立开发 branch</p>
+<pre><code>~/openwrt$ git checkout -b add-tl-mr10u-support
+</code></pre><p>2.清理 tmp 目录，直接删除</p>
+<pre><code>~/openwrt$ rm -rvf tmp/
+</code></pre><p>3.修改 OpenWrt 代码<br>进入设备硬件目录:</p>
+<pre><code>~/openwrt$ cd target/linux/ar71xx
+</code></pre><p>修改以下文件, 里面涉及到 TL-MR10U 固件中设备 ID 的部分, 是 0x00100101, 这个值从 tp-link 官方网站下载的固件中可以获得</p>
+<pre><code>base-files/etc/diag.sh
+base-files/etc/uci-defaults/02_network
+base-files/lib/ar71xx.sh
+base-files/lib/upgrade/platform.sh
+config-3.8
+generic/profiles/tp-link.mk
+image/Makefile
+新建文件: files/arch/mips/ath79/mach-tl-mr10u.c
+内容参考 TL-WR703N 设备的文件 mach-tl-wr703n.c, 修改所有出现 wr703n, WR703N 等等大小写混合的部分。
+</code></pre><p>4.添加 Linux patch<br>这里就完成了 OpenWrt 的设备支持代码，为了支持我们的设备, Linux 代码树的部分文件也需要做改动</p>
+<p>回退到根目录 <code>~/openwrt</code></p>
+<p>5.清理并准备 patch 树:</p>
+<pre><code>~/openwrt$ make target/linux/{clean,prepare}
+#  后面可加 V=s QUILT=1 参数, 表示静默无输出
+</code></pre><p>进入内核代码目录(其中版本号可能与你的不一致):</p>
+<pre><code>cd ~/openwrt$ cd build_dir/target-mips_r2_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.8.12/
+</code></pre><p>这里就是内核代码树了, 里面的代码是已经打过所有 patch 的, 可以用 quilt push 检查看是不是这样:</p>
+<pre><code>$ quilt push
+File series fully applied, ends at patch platform/902-unaligned_access_hacks.patch
+</code></pre><p>这条输入也告诉我们, 当前最顶的 patch 是 platform/902</p>
+<p>为 TL-MR10U 新建个 patch:</p>
+<pre><code>$ quilt new platform/920-add-tl-mr10u-support.patch
+</code></pre><p>选择的数字需要大于刚才的那个 902, 然后 quilt 会自动把这个 patch 设置为当前 patch,所有的改动都针对这个 patch</p>
+<p>6.然后就是增加代码了</p>
+<pre><code>$ quilt edit arch/mips/ath79/Kconfig
+$ quilt edit arch/mips/ath79/Makefile
+$ quilt edit arch/mips/ath79/machtypes.h
+</code></pre><p>参考这些文件里其他硬件的配置, 基本上说 copy TL-WR703N 的就可以了，保证不重不漏</p>
+<p>然后验证下修改的内容:</p>
+<pre><code>$ quilt diff #  查看 diff
+$ quilt refresh #  保存所有 diff 到 patch 文件
+</code></pre><p>这个时候我们的 patch 文件还在 build_dir 里, 大概位置是 patches/platform/ 下. 需要同步到 OpenWrt 代码树.</p>
+<p>7.退回到顶层工作目录, 执行:<br>~/openwrt$ make target/linux/update V=s<br>同步完成后, patch 文件会出现在 target/linux/ar71xx/patches-3.8/ 下.</p>
+<p>8.固件工具代码修改<br>OpenWrt 包含一个 TP-LINK 固件小工具, tools/firmware-utils/src/mktplinkfw.c , 里面包含 TP-LINK 固件 bin 文件的结构和 md5 hash 验证算法，修改内容参考 WR703N</p>
+<p>这里应该已经完成了所有操作. 可以编译了</p>
+<p>9.再次记得, 删除 tmp 目录</p>
+<pre><code>~/openwrt$ rm -rvf tmp/
+~/openwrt$ make menuconfig
+</code></pre><hr>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>-主要参考 OpenWrt 的官网对 patch 的相关开发说明<br>openwrt.org（Documentation-&gt;Developing-&gt;patches）。<br>-Linux 初学者 Patch 使用指南<br><a href="http://harrymao.bokee.com/3354544.html" target="_blank" rel="noopener">http://harrymao.bokee.com/3354544.html</a><br>-Add New Profile To OpenWrt<br><a href="http://andelf.diandian.com/post/2013-05-22/40050677370" target="_blank" rel="noopener">http://andelf.diandian.com/post/2013-05-22/40050677370</a></p>
+  </div>
+</article>
+<div class="blog-post-comments">
+	<div class="wildfire_thread"></div>
+</div>
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#diff-和-patch-的用法"><span class="toc-number">1.</span> <span class="toc-text"><a href="#diff-&#x548C;-patch-&#x7684;&#x7528;&#x6CD5;" class="headerlink" title="diff &#x548C; patch &#x7684;&#x7528;&#x6CD5;"></a>diff &#x548C; patch &#x7684;&#x7528;&#x6CD5;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#diff-的用法"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#diff-&#x7684;&#x7528;&#x6CD5;" class="headerlink" title="diff &#x7684;&#x7528;&#x6CD5;"></a>diff &#x7684;&#x7528;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#diff-的语法"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#diff-&#x7684;&#x8BED;&#x6CD5;" class="headerlink" title="diff &#x7684;&#x8BED;&#x6CD5;"></a>diff &#x7684;&#x8BED;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#patch-的用法"><span class="toc-number">1.3.</span> <span class="toc-text"><a href="#patch-&#x7684;&#x7528;&#x6CD5;" class="headerlink" title="patch &#x7684;&#x7528;&#x6CD5;"></a>patch &#x7684;&#x7528;&#x6CD5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注意"><span class="toc-number">1.4.</span> <span class="toc-text"><a href="#&#x6CE8;&#x610F;" class="headerlink" title="&#x6CE8;&#x610F;"></a>&#x6CE8;&#x610F;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#diff-pppd-patch"><span class="toc-number">2.</span> <span class="toc-text"><a href="#diff-pppd-patch" class="headerlink" title="diff pppd patch"></a>diff pppd patch</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#管理工具-quilt"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x7BA1;&#x7406;&#x5DE5;&#x5177;-quilt" class="headerlink" title="&#x7BA1;&#x7406;&#x5DE5;&#x5177; quilt"></a>&#x7BA1;&#x7406;&#x5DE5;&#x5177; quilt</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#package-的-patch-方法"><span class="toc-number">3.1.</span> <span class="toc-text"><a href="#package-&#x7684;-patch-&#x65B9;&#x6CD5;" class="headerlink" title="package &#x7684; patch &#x65B9;&#x6CD5;"></a>package &#x7684; patch &#x65B9;&#x6CD5;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pactch-生成步骤"><span class="toc-number">3.1.1.</span> <span class="toc-text"><a href="#pactch-&#x751F;&#x6210;&#x6B65;&#x9AA4;" class="headerlink" title="pactch &#x751F;&#x6210;&#x6B65;&#x9AA4;"></a>pactch &#x751F;&#x6210;&#x6B65;&#x9AA4;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#编辑已有-patch-文件"><span class="toc-number">3.1.2.</span> <span class="toc-text"><a href="#&#x7F16;&#x8F91;&#x5DF2;&#x6709;-patch-&#x6587;&#x4EF6;" class="headerlink" title="&#x7F16;&#x8F91;&#x5DF2;&#x6709; patch &#x6587;&#x4EF6;"></a>&#x7F16;&#x8F91;&#x5DF2;&#x6709; patch &#x6587;&#x4EF6;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#platform-patch-生成步骤"><span class="toc-number">3.2.</span> <span class="toc-text"><a href="#platform-patch-&#x751F;&#x6210;&#x6B65;&#x9AA4;" class="headerlink" title="platform patch &#x751F;&#x6210;&#x6B65;&#x9AA4;"></a>platform patch &#x751F;&#x6210;&#x6B65;&#x9AA4;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#generic-patch-生成步骤"><span class="toc-number">3.2.1.</span> <span class="toc-text"><a href="#generic-patch-&#x751F;&#x6210;&#x6B65;&#x9AA4;" class="headerlink" title="generic patch &#x751F;&#x6210;&#x6B65;&#x9AA4;"></a>generic patch &#x751F;&#x6210;&#x6B65;&#x9AA4;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#更新-patches"><span class="toc-number">3.2.2.</span> <span class="toc-text"><a href="#&#x66F4;&#x65B0;-patches" class="headerlink" title="&#x66F4;&#x65B0; patches"></a>&#x66F4;&#x65B0; patches</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#迭代修改-patch"><span class="toc-number">3.3.</span> <span class="toc-text"><a href="#&#x8FED;&#x4EE3;&#x4FEE;&#x6539;-patch" class="headerlink" title="&#x8FED;&#x4EE3;&#x4FEE;&#x6539; patch"></a>&#x8FED;&#x4EE3;&#x4FEE;&#x6539; patch</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Openwrt-新设备支持"><span class="toc-number">4.</span> <span class="toc-text"><a href="#Openwrt-&#x65B0;&#x8BBE;&#x5907;&#x652F;&#x6301;" class="headerlink" title="Openwrt &#x65B0;&#x8BBE;&#x5907;&#x652F;&#x6301;"></a>Openwrt &#x65B0;&#x8BBE;&#x5907;&#x652F;&#x6301;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#准备工作"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#&#x51C6;&#x5907;&#x5DE5;&#x4F5C;" class="headerlink" title="&#x51C6;&#x5907;&#x5DE5;&#x4F5C;"></a>&#x51C6;&#x5907;&#x5DE5;&#x4F5C;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&text=Openwrt Patch 制作及打补丁"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&is_video=false&description=Openwrt Patch 制作及打补丁"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Openwrt Patch 制作及打补丁&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&title=Openwrt Patch 制作及打补丁"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Openwrt-Patches/&name=Openwrt Patch 制作及打补丁&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Patch 是天才程序员、Perl 的发明者 Larry Wall 发明的，它应高效地交流程序源代码之需求而生，随着以 Linux 为代表的开发源代码运行的蓬勃发展，patch 这个概念已经成为开放源代码发起者、贡献者和参与者的集体无意识的一部分。patch 只包含了对源代码修改的部分，这对于开放源代码社区的协同开发模式具有重要意义，意味的软件新版本的 发布和对软件的缺陷或改进可以以更小的文件发布，可以减少网络的传输量，方便软件维护者的管理工作。&lt;br&gt;"><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 masukio
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+<script>
+  // 你可以自定义一些配置
+  //
+  // databaseProvider: 必须为 'wilddog' 或者 'firebase'
+  // databaseConfig: 请从你的数据库控制台复制过来。
+  // pageURL(可选): 默认为当前页面的 URL。
+  // pageTitle(可选): 默认为当前页面的 title。
+  // theme(可选): 'light'（默认）或者 'dark'。
+  // locale(可选): 'en'（默认）或者 'zh-CN'
+  // defaultAvatarURL(可选): 默认头像是一个可爱的消防员 :-D
+  var wildfireConfig = () => ({
+    databaseProvider: 'wilddog',
+    databaseConfig: {
+        siteId: "wd2882084211dpgrir"
+    },
+    theme: 'dark',
+    locale: 'zh-CN',
+    defaultAvatarURL: 'https://image.flaticon.com/icons/svg/621/621863.svg'
+  })
+</script>
+<script src="https://unpkg.com/wildfire/dist/wildfire.auto.js"></script>

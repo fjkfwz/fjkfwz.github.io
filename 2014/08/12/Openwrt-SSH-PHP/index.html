@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="摘要：这篇文章通过 PHP SSH2扩展实现远程控制 Openwrt，包括（1）安装 PHP SSH2扩展（2)实现远程 copy 文件(3) 执行远程服务器上的命令并取返回值">
+<meta name="keywords" content="Openwrt,PHP,SSH,远程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用 PHP SSH2扩展实现远程控制 Openwrt">
+<meta property="og:url" content="https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/index.html">
+<meta property="og:site_name" content="Sapientia et Virtus">
+<meta property="og:description" content="摘要：这篇文章通过 PHP SSH2扩展实现远程控制 Openwrt，包括（1）安装 PHP SSH2扩展（2)实现远程 copy 文件(3) 执行远程服务器上的命令并取返回值">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-25T14:28:22.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用 PHP SSH2扩展实现远程控制 Openwrt">
+<meta name="twitter:description" content="摘要：这篇文章通过 PHP SSH2扩展实现远程控制 Openwrt，包括（1）安装 PHP SSH2扩展（2)实现远程 copy 文件(3) 执行远程服务器上的命令并取返回值">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>利用 PHP SSH2扩展实现远程控制 Openwrt</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="Sapientia et Virtus" type="application/atom+xml">
+    
+</head>
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')" style="display:none"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/08/16/Openwrt-Compile-Pro/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle()" onmouseout="$('#i-prev').toggle()"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/08/08/Net-Law/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="$('#share').toggle();return false"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none">Previous post</span>
+      <span id="i-next" class="info" style="display:none">Next post</span>
+      <span id="i-top" class="info" style="display:none">Back to top</span>
+      <span id="i-share" class="info" style="display:none">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&text=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&is_video=false&description=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=利用 PHP SSH2扩展实现远程控制 Openwrt&body=Check out this article: https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-get-pocket" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-reddit" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-stumbleupon" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-digg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&name=利用 PHP SSH2扩展实现远程控制 Openwrt&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：这篇文章通过 PHP SSH2扩展实现远程控制 Openwrt，包括（1）安装 PHP SSH2扩展（2)实现远程 copy 文件(3) 执行远程服务器上的命令并取返回值&lt;br&gt;"><i class="fa fa-tumblr" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#安装-PHP-SSH2扩展"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x5B89;&#x88C5;-PHP-SSH2&#x6269;&#x5C55;" class="headerlink" title="&#x5B89;&#x88C5; PHP SSH2&#x6269;&#x5C55;"></a>&#x5B89;&#x88C5; PHP SSH2&#x6269;&#x5C55;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#在-Windows-环境下安装"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x5728;-Windows-&#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;" class="headerlink" title="&#x5728; Windows &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;"></a>&#x5728; Windows &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在-linux-环境下安装"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#&#x5728;-linux-&#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;" class="headerlink" title="&#x5728; linux &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;"></a>&#x5728; linux &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PHP-SSH2扩展需要的依赖库"><span class="toc-number">1.2.1.</span> <span class="toc-text"><a href="#PHP-SSH2&#x6269;&#x5C55;&#x9700;&#x8981;&#x7684;&#x4F9D;&#x8D56;&#x5E93;" class="headerlink" title="PHP SSH2&#x6269;&#x5C55;&#x9700;&#x8981;&#x7684;&#x4F9D;&#x8D56;&#x5E93;"></a>PHP SSH2&#x6269;&#x5C55;&#x9700;&#x8981;&#x7684;&#x4F9D;&#x8D56;&#x5E93;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装需要的扩展包"><span class="toc-number">1.2.2.</span> <span class="toc-text"><a href="#&#x5B89;&#x88C5;&#x9700;&#x8981;&#x7684;&#x6269;&#x5C55;&#x5305;" class="headerlink" title="&#x5B89;&#x88C5;&#x9700;&#x8981;&#x7684;&#x6269;&#x5C55;&#x5305;"></a>&#x5B89;&#x88C5;&#x9700;&#x8981;&#x7684;&#x6269;&#x5C55;&#x5305;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改-php-配置信息"><span class="toc-number">1.2.3.</span> <span class="toc-text"><a href="#&#x4FEE;&#x6539;-php-&#x914D;&#x7F6E;&#x4FE1;&#x606F;" class="headerlink" title="&#x4FEE;&#x6539; php &#x914D;&#x7F6E;&#x4FE1;&#x606F;"></a>&#x4FEE;&#x6539; php &#x914D;&#x7F6E;&#x4FE1;&#x606F;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重启-web-服务器"><span class="toc-number">1.2.4.</span> <span class="toc-text"><a href="#&#x91CD;&#x542F;-web-&#x670D;&#x52A1;&#x5668;" class="headerlink" title="&#x91CD;&#x542F; web &#x670D;&#x52A1;&#x5668;"></a>&#x91CD;&#x542F; web &#x670D;&#x52A1;&#x5668;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查看是否加载了-ssh2"><span class="toc-number">1.2.5.</span> <span class="toc-text"><a href="#&#x67E5;&#x770B;&#x662F;&#x5426;&#x52A0;&#x8F7D;&#x4E86;-ssh2" class="headerlink" title="&#x67E5;&#x770B;&#x662F;&#x5426;&#x52A0;&#x8F7D;&#x4E86; ssh2"></a>&#x67E5;&#x770B;&#x662F;&#x5426;&#x52A0;&#x8F7D;&#x4E86; ssh2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSH2模块的连接应用"><span class="toc-number">2.</span> <span class="toc-text"><a href="#SSH2&#x6A21;&#x5757;&#x7684;&#x8FDE;&#x63A5;&#x5E94;&#x7528;" class="headerlink" title="SSH2&#x6A21;&#x5757;&#x7684;&#x8FDE;&#x63A5;&#x5E94;&#x7528;"></a>SSH2&#x6A21;&#x5757;&#x7684;&#x8FDE;&#x63A5;&#x5E94;&#x7528;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#用户名与密码"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#&#x7528;&#x6237;&#x540D;&#x4E0E;&#x5BC6;&#x7801;" class="headerlink" title="&#x7528;&#x6237;&#x540D;&#x4E0E;&#x5BC6;&#x7801;"></a>&#x7528;&#x6237;&#x540D;&#x4E0E;&#x5BC6;&#x7801;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-密钥"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#SSH-&#x5BC6;&#x94A5;" class="headerlink" title="SSH &#x5BC6;&#x94A5;"></a>SSH &#x5BC6;&#x94A5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取服务器提供的验证方式"><span class="toc-number">2.3.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;&#x670D;&#x52A1;&#x5668;&#x63D0;&#x4F9B;&#x7684;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;" class="headerlink" title="&#x83B7;&#x53D6;&#x670D;&#x52A1;&#x5668;&#x63D0;&#x4F9B;&#x7684;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;"></a>&#x83B7;&#x53D6;&#x670D;&#x52A1;&#x5668;&#x63D0;&#x4F9B;&#x7684;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSH2模块具体功能"><span class="toc-number">3.</span> <span class="toc-text"><a href="#SSH2&#x6A21;&#x5757;&#x5177;&#x4F53;&#x529F;&#x80FD;" class="headerlink" title="SSH2&#x6A21;&#x5757;&#x5177;&#x4F53;&#x529F;&#x80FD;"></a>SSH2&#x6A21;&#x5757;&#x5177;&#x4F53;&#x529F;&#x80FD;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#实现远程复制文件"><span class="toc-number">3.1.</span> <span class="toc-text"><a href="#&#x5B9E;&#x73B0;&#x8FDC;&#x7A0B;&#x590D;&#x5236;&#x6587;&#x4EF6;" class="headerlink" title="&#x5B9E;&#x73B0;&#x8FDC;&#x7A0B;&#x590D;&#x5236;&#x6587;&#x4EF6;"></a>&#x5B9E;&#x73B0;&#x8FDC;&#x7A0B;&#x590D;&#x5236;&#x6587;&#x4EF6;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#远程服务器文件-copy-到本地"><span class="toc-number">3.1.1.</span> <span class="toc-text"><a href="#&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x6587;&#x4EF6;-copy-&#x5230;&#x672C;&#x5730;" class="headerlink" title="&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x6587;&#x4EF6; copy &#x5230;&#x672C;&#x5730;:"></a>&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x6587;&#x4EF6; copy &#x5230;&#x672C;&#x5730;:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地文件复制到远程服务器"><span class="toc-number">3.1.2.</span> <span class="toc-text"><a href="#&#x672C;&#x5730;&#x6587;&#x4EF6;&#x590D;&#x5236;&#x5230;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;" class="headerlink" title="&#x672C;&#x5730;&#x6587;&#x4EF6;&#x590D;&#x5236;&#x5230;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;"></a>&#x672C;&#x5730;&#x6587;&#x4EF6;&#x590D;&#x5236;&#x5230;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#执行远程服务器上的命令并取返回值"><span class="toc-number">3.2.</span> <span class="toc-text"><a href="#&#x6267;&#x884C;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x7684;&#x547D;&#x4EE4;&#x5E76;&#x53D6;&#x8FD4;&#x56DE;&#x503C;" class="headerlink" title="&#x6267;&#x884C;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x7684;&#x547D;&#x4EE4;&#x5E76;&#x53D6;&#x8FD4;&#x56DE;&#x503C;"></a>&#x6267;&#x884C;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x7684;&#x547D;&#x4EE4;&#x5E76;&#x53D6;&#x8FD4;&#x56DE;&#x503C;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Openwrt-基本命令"><span class="toc-number">3.3.</span> <span class="toc-text"><a href="#Openwrt-&#x57FA;&#x672C;&#x547D;&#x4EE4;" class="headerlink" title="Openwrt &#x57FA;&#x672C;&#x547D;&#x4EE4;"></a>Openwrt &#x57FA;&#x672C;&#x547D;&#x4EE4;</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 class="posttitle" itemprop="name headline">
+        利用 PHP SSH2扩展实现远程控制 Openwrt
+    </h1>
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Sapientia et Virtus</span>
+      </span>
+      <div class="postdate">
+        <time datetime="2014-08-12T00:00:00.000Z" itemprop="datePublished">Aug 12 2014</time>
+    </div>
+      <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Openwrt/">Openwrt</a>, <a class="tag-link" href="/tags/PHP/">PHP</a>, <a class="tag-link" href="/tags/SSH/">SSH</a>, <a class="tag-link" href="/tags/远程/">远程</a>
+    </div>
+    </div>
+  </header>
+  
+  <div class="content" itemprop="articleBody">
+    <p><strong>摘要</strong>：这篇文章通过 PHP SSH2扩展实现远程控制 Openwrt，包括（1）安装 PHP SSH2扩展（2)实现远程 copy 文件(3) 执行远程服务器上的命令并取返回值<br><a id="more"></a><br>最近在研究怎样才可以远程操控路由器，通过微信实现路由器 WIFI 的开关，远程重启路由器，查看 Aria2下载文件的情况，甚至可以远程安装应用和更新固件，在电脑上可以通过 SSH 软件方便的连接到 Openwrt，并对它进行操作，所以我在想 PHP 是否也有相应的扩展，这样就可以将它架设在服务器或者虚拟主机上，在任何地方都可以方便的控制路由器，甚至可以实现智能家居的控制，想想就很美好呢。<br>php 远程 copy 文件以及在远程服务器中执行命令时，所用到的模块是 ssh2，以后所有的操作都依据 ssh2连接句柄完成。</p>
+<h1 id="安装-PHP-SSH2扩展"><a href="#安装-PHP-SSH2扩展" class="headerlink" title="安装 PHP SSH2扩展"></a>安装 PHP SSH2扩展</h1><h2 id="在-Windows-环境下安装"><a href="#在-Windows-环境下安装" class="headerlink" title="在 Windows 环境下安装"></a>在 Windows 环境下安装</h2><pre><code>1. 下载 php extension ssh2
+下载地址 http://windows.php.net/downloads/pecl/releases/ssh2/0.12/
+根据自己 PHP 的版本去下载，我使用的 WAMPSERVER2.5（64bit),PHP 版本为5.5.12，是线程安全的，
+所以下载的是 php_ssh2-0.12-5.5-ts-vc11-x64.zip
+2. 解压完后，会有三个文件，libssh2.dll、php_ssh.dll、php_ssh2.pdb。
+3. 将 php_ssh.dll、php_ssh2.pdb 放到你的 php 扩展目录下 php/ext/ 下。
+4. 将 libssh2.dll 复制到 c:/windows/system32 和 c:/windows/syswow64 各一份
+5. php.ini 中加入 extension=php_ssh2.dll
+6. 重启 apache，即可使用 php 执行 ssh 连接操作了。
+查看 phpinfo()，是否有显示 php_ssh2扩展加载成功。
+</code></pre><h2 id="在-linux-环境下安装"><a href="#在-linux-环境下安装" class="headerlink" title="在 linux 环境下安装"></a>在 linux 环境下安装</h2><h3 id="PHP-SSH2扩展需要的依赖库"><a href="#PHP-SSH2扩展需要的依赖库" class="headerlink" title="PHP SSH2扩展需要的依赖库"></a>PHP SSH2扩展需要的依赖库</h3><pre><code>openssl： 加密算法集合，C 语言实现
+libssh2： ssh2协议库库，C 语言实现
+PECL/ssh2: libssh2的 php 扩展，允许 php 程序调用 libssh2中的函数
+依赖关系：PECL/ssh2 –&gt; libssh2 –&gt; openssl
+</code></pre><h3 id="安装需要的扩展包"><a href="#安装需要的扩展包" class="headerlink" title="安装需要的扩展包"></a>安装需要的扩展包</h3><pre><code>安装 libssh2
+wget  http://www.libssh2.org/download/libssh2-1.4.2.tar.gz  
+tar zxf libssh2-1.4.2.tar.gz  
+cd libssh2-1.4.2  
+./configure &amp;&amp; make &amp;&amp; make install  
+
+安装 PECL/ssh2
+wget  http://pecl.php.net/get/ssh2-0.11.3.tgz  
+cd ssh2-0.11.3  
+phpize   (如果报错命令没有找到，apt-get install php5-dev)  
+./configure —with-ssh2 &amp;&amp; make &amp;&amp; make install  
+</code></pre><h3 id="修改-php-配置信息"><a href="#修改-php-配置信息" class="headerlink" title="修改 php 配置信息"></a>修改 php 配置信息</h3><pre><code>cd  /etc/php5/cgi  
+vim  php.ini  
+添加项：extension=/usr/lib/php5/20090626/ssh2.so  
+     ssh2.so 是编译 ssh2时得到的模块，上面是模块的位置。  
+
+
+cd  /etc/php5/cli  
+vim  php.ini  
+添加项：extension=/usr/lib/php5/20090626/ssh2.so  
+     ssh2.so 是编译 ssh2时得到的模块，上面是模块的位置。  
+</code></pre><h3 id="重启-web-服务器"><a href="#重启-web-服务器" class="headerlink" title="重启 web 服务器"></a>重启 web 服务器</h3><pre><code>/etc/init.d/lighttpd restart  
+</code></pre><h3 id="查看是否加载了-ssh2"><a href="#查看是否加载了-ssh2" class="headerlink" title="查看是否加载了 ssh2"></a>查看是否加载了 ssh2</h3><pre><code>[root@localhost ~]php -m | grep s        
+</code></pre><h1 id="SSH2模块的连接应用"><a href="#SSH2模块的连接应用" class="headerlink" title="SSH2模块的连接应用"></a>SSH2模块的连接应用</h1><p>通过 PECL/ssh2相关 API 远程操作计算机时，首先需要获取链接，使用函数:</p>
+<pre><code>session ssh2_connect($host, $port)
+</code></pre><p>SSH2连接有两种方式，分别是用户名密码，ssh 密钥形式。<br>    public key : 通过公钥和密钥进行验证，需要使用 openssl 生成工密钥，然后将公钥上传到需要远程访问机器的指定目录。特点比较安全，但是不太方便。PECL/ssh2支持。<br>    password : 直接通过用户名和密码登录。特点是很方便，但是不安全，密码必须已明文的方式传给 ssh2的 api。PECL/ssh2支持。<br>    keyboard-interactive：需要用户手动输入密码，PECL/ssh2不支持。</p>
+<h2 id="用户名与密码"><a href="#用户名与密码" class="headerlink" title="用户名与密码"></a>用户名与密码</h2><p>通过用户名与密码连接函数<br>    bool ssh2_auth_password ( resource $session , string $username , string $password )<br>通过此方式连接 Openwrt，在局域网内，路由器 IP 地址：192.168.1.1，默认用户名：root，密码：admin。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	$ipadd = &quot;192.168.1.1&quot;;</span><br><span class="line">	$user = &quot;root&quot;;</span><br><span class="line">	$pass = &quot;admin&quot;;</span><br><span class="line">	$connection = ssh2_connect($ipadd,22);  </span><br><span class="line">	if (ssh2_auth_password($connection,$user,$pass))  </span><br><span class="line">	&#123;  </span><br><span class="line">	         echo &quot;Authentication Successful! &quot;;  </span><br><span class="line">	&#125;else&#123;  </span><br><span class="line">	         die(&quot;Authentication Failed...&quot;);  </span><br><span class="line">	&#125;  	    </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure></p>
+<p>连接结果<br>    <code>Authentication Successful!</code></p>
+<h2 id="SSH-密钥"><a href="#SSH-密钥" class="headerlink" title="SSH 密钥"></a>SSH 密钥</h2><p>通过 SSH 密钥连接函数</p>
+<pre><code>bool ssh2_auth_pubkey_file ( resource $session , string $username , string $pubkeyfile , string $privkeyfile [, string $passphrase ] )    
+</code></pre><p>SSH 使用密钥登录，不仅安全，而且更方便。sshd 在~/.ssh/authorized_keys 中加入公钥即可。<br>而 OpenWrt 使用 dropbear 作为服务端， ~/.ssh/authorized_keys 并不生效。其实，dropbear 的公钥存储文件是600权限的<code>/etc/dropbear/authorized_keys</code> 文件，只需将公钥加入此文件即可。至于其它，与 sshd 类似。<br>ssh key 可以由 secureCRT-&gt;Tools-&gt;Create Public Key 生成，加密算法选择 RSA，通行短语对应 ssh2_auth_pubkey_file()中的\$passphrase,可以不填写，\$pubkeyfile , \$privkeyfile 为公钥和私钥的存放位置，将$pubkeyfile 中的内容复制到 Openwrt 路径<code>/etc/dropbear/authorized_keys</code>中，并确保权限为0644。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	$connection = ssh2_connect(&apos;192.168.1.1&apos;, 22, array(&apos;hostkey&apos;=&gt;&apos;ssh-rsa&apos;));</span><br><span class="line"></span><br><span class="line">	if (ssh2_auth_pubkey_file($connection, &apos;root&apos;,</span><br><span class="line">	                          &apos;C:/Users/jz/Documents/Identity.pub&apos;,</span><br><span class="line">	                          &apos;C:/Users/jz/Documents/Identity&apos;,&apos;798789263&apos;)) &#123;</span><br><span class="line">	  echo &quot;Public Key Authentication Successful&quot;;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">	  die(&apos;Public Key Authentication Failed&apos;);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>返回结果：</p>
+<pre><code>Public Key Authentication Successful
+//Openwrt 系统日志
+Aug 12 13:40:53 PandoraBox authpriv.info dropbear[3197]: Child connection from 192.168.1.112:8005
+Aug 12 13:40:55 PandoraBox authpriv.notice dropbear[3197]: Pubkey auth succeeded for &apos;root&apos; with key md5 3d:77:45:b7:d7:7a:79:87:28:5a:5d:3a:76:d5:1f:57 from 192.168.1.112:8005
+Aug 12 13:40:55 PandoraBox authpriv.info dropbear[3197]: Exit (root): Disconnect received
+</code></pre><h2 id="获取服务器提供的验证方式"><a href="#获取服务器提供的验证方式" class="headerlink" title="获取服务器提供的验证方式"></a>获取服务器提供的验证方式</h2><pre><code>mixed ssh2_auth_none ( resource $session , string $username )
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$host=&apos;192.168.1.1&apos;;</span><br><span class="line">$user=&apos;root&apos;;</span><br><span class="line">$port = &apos;22&apos;</span><br><span class="line">// 链接远程服务器</span><br><span class="line">$connection = ssh2_connect($host,$port);</span><br><span class="line">if (!$connection) die(&apos;connection to &apos;.$host.&apos;:&apos;.$port.&apos;failed&apos;);</span><br><span class="line">echo &apos;connection OK&lt;br/&gt;&apos;;</span><br><span class="line">// 获取验证方式并打印</span><br><span class="line">$auth_methods = ssh2_auth_none($connection, $user);</span><br><span class="line">print_r($auth_methods);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>返回结果</p>
+<pre><code>connection OK
+Array ( [0] =&gt; publickey [1] =&gt; password )    //服务器支持用户名密码，ssh 密钥形式
+</code></pre><h1 id="SSH2模块具体功能"><a href="#SSH2模块具体功能" class="headerlink" title="SSH2模块具体功能"></a>SSH2模块具体功能</h1><h2 id="实现远程复制文件"><a href="#实现远程复制文件" class="headerlink" title="实现远程复制文件"></a>实现远程复制文件</h2><h3 id="远程服务器文件-copy-到本地"><a href="#远程服务器文件-copy-到本地" class="headerlink" title="远程服务器文件 copy 到本地:"></a>远程服务器文件 copy 到本地:</h3><pre><code>bool ssh2_scp_recv ( resource $session, string $remote_file, string $local_file )
+</code></pre><p>Ps: 接收文件时，后面文件名可以为空，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$connection = ssh2_connect(&apos;192.168.1.1&apos;, 22);</span><br><span class="line">ssh2_auth_password($connection, &apos;root&apos;, &apos;admin&apos;);</span><br><span class="line">ssh2_scp_recv($connection, &apos;/remote/filename&apos;, &apos;/local/filename&apos;);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="本地文件复制到远程服务器"><a href="#本地文件复制到远程服务器" class="headerlink" title="本地文件复制到远程服务器"></a>本地文件复制到远程服务器</h3><pre><code>bool ssh2_scp_send ( resource $session, string $local_file, string $remote_file [, int $create_mode] )
+</code></pre><p>Ps:发送文件时，后面的文件名不能为空，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$connection = ssh2_connect(&apos;192.168.1.1&apos;, 22);</span><br><span class="line">ssh2_auth_password($connection, &apos;root&apos;, &apos;admin&apos;);</span><br><span class="line">ssh2_scp_send($connection, &apos;/local/filename&apos;, &apos;/remote/filename&apos;, 0644);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="执行远程服务器上的命令并取返回值"><a href="#执行远程服务器上的命令并取返回值" class="headerlink" title="执行远程服务器上的命令并取返回值"></a>执行远程服务器上的命令并取返回值</h2><pre><code>resource ssh2_exec( resource $session, string $command [, string $pty [, array $env [, int $width [, int $height [, int $width_height_type]]]]] )
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	$connection = ssh2_connect(&apos;192.168.1.1&apos;, 22, array(&apos;hostkey&apos;=&gt;&apos;ssh-rsa&apos;));</span><br><span class="line"></span><br><span class="line">	if (ssh2_auth_pubkey_file($connection, &apos;root&apos;,</span><br><span class="line">	                          &apos;C:/Users/jz/Documents/Identity.pub&apos;,</span><br><span class="line">	                          &apos;C:/Users/jz/Documents/Identity&apos;,&apos;798789263&apos;)) &#123;</span><br><span class="line">	  echo &quot;Public Key Authentication Successful\n&quot;;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">	  die(&apos;Public Key Authentication Failed&apos;);</span><br><span class="line">&#125;</span><br><span class="line">	$stream = ssh2_exec($connection, &apos;ls /tmp&apos;);</span><br><span class="line">	stream_set_blocking($stream,true);  </span><br><span class="line">	echo stream_get_contents($stream); </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>返回结果</p>
+<pre><code>Public Key Authentication Successful
+RT2860.dat TZ dhcp.leases etc fstab hosts lib lock log luci-indexcache luci-sessions nmbd nwan_log nwandebug overlay resolv.conf resolv.conf.auto run state wifi_encryption_ra0.dat
+</code></pre><h2 id="Openwrt-基本命令"><a href="#Openwrt-基本命令" class="headerlink" title="Openwrt 基本命令"></a>Openwrt 基本命令</h2><pre><code>/etc/init.d/aria2 start # 开启 Aria2下载任务
+/etc/init.d/aria2 stop # 关闭 Aria2下载任务
+wifi down 2&gt;/dev/null # 关闭 wifi 
+wifi up 2&gt;/dev/null # 打开 wifi 
+/etc/init.d/samba stop # 关闭 SAMBA
+/etc/init.d/samba start # 开启 SAMBA    
+/ect/init.d/ccnu start # 连接校园网
+reboot -f # 重启路由器
+</code></pre>
+  </div>
+</article>
+<div class="blog-post-comments">
+	<div class="wildfire_thread"></div>
+</div>
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#安装-PHP-SSH2扩展"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x5B89;&#x88C5;-PHP-SSH2&#x6269;&#x5C55;" class="headerlink" title="&#x5B89;&#x88C5; PHP SSH2&#x6269;&#x5C55;"></a>&#x5B89;&#x88C5; PHP SSH2&#x6269;&#x5C55;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#在-Windows-环境下安装"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x5728;-Windows-&#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;" class="headerlink" title="&#x5728; Windows &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;"></a>&#x5728; Windows &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在-linux-环境下安装"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#&#x5728;-linux-&#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;" class="headerlink" title="&#x5728; linux &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;"></a>&#x5728; linux &#x73AF;&#x5883;&#x4E0B;&#x5B89;&#x88C5;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PHP-SSH2扩展需要的依赖库"><span class="toc-number">1.2.1.</span> <span class="toc-text"><a href="#PHP-SSH2&#x6269;&#x5C55;&#x9700;&#x8981;&#x7684;&#x4F9D;&#x8D56;&#x5E93;" class="headerlink" title="PHP SSH2&#x6269;&#x5C55;&#x9700;&#x8981;&#x7684;&#x4F9D;&#x8D56;&#x5E93;"></a>PHP SSH2&#x6269;&#x5C55;&#x9700;&#x8981;&#x7684;&#x4F9D;&#x8D56;&#x5E93;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装需要的扩展包"><span class="toc-number">1.2.2.</span> <span class="toc-text"><a href="#&#x5B89;&#x88C5;&#x9700;&#x8981;&#x7684;&#x6269;&#x5C55;&#x5305;" class="headerlink" title="&#x5B89;&#x88C5;&#x9700;&#x8981;&#x7684;&#x6269;&#x5C55;&#x5305;"></a>&#x5B89;&#x88C5;&#x9700;&#x8981;&#x7684;&#x6269;&#x5C55;&#x5305;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改-php-配置信息"><span class="toc-number">1.2.3.</span> <span class="toc-text"><a href="#&#x4FEE;&#x6539;-php-&#x914D;&#x7F6E;&#x4FE1;&#x606F;" class="headerlink" title="&#x4FEE;&#x6539; php &#x914D;&#x7F6E;&#x4FE1;&#x606F;"></a>&#x4FEE;&#x6539; php &#x914D;&#x7F6E;&#x4FE1;&#x606F;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重启-web-服务器"><span class="toc-number">1.2.4.</span> <span class="toc-text"><a href="#&#x91CD;&#x542F;-web-&#x670D;&#x52A1;&#x5668;" class="headerlink" title="&#x91CD;&#x542F; web &#x670D;&#x52A1;&#x5668;"></a>&#x91CD;&#x542F; web &#x670D;&#x52A1;&#x5668;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查看是否加载了-ssh2"><span class="toc-number">1.2.5.</span> <span class="toc-text"><a href="#&#x67E5;&#x770B;&#x662F;&#x5426;&#x52A0;&#x8F7D;&#x4E86;-ssh2" class="headerlink" title="&#x67E5;&#x770B;&#x662F;&#x5426;&#x52A0;&#x8F7D;&#x4E86; ssh2"></a>&#x67E5;&#x770B;&#x662F;&#x5426;&#x52A0;&#x8F7D;&#x4E86; ssh2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSH2模块的连接应用"><span class="toc-number">2.</span> <span class="toc-text"><a href="#SSH2&#x6A21;&#x5757;&#x7684;&#x8FDE;&#x63A5;&#x5E94;&#x7528;" class="headerlink" title="SSH2&#x6A21;&#x5757;&#x7684;&#x8FDE;&#x63A5;&#x5E94;&#x7528;"></a>SSH2&#x6A21;&#x5757;&#x7684;&#x8FDE;&#x63A5;&#x5E94;&#x7528;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#用户名与密码"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#&#x7528;&#x6237;&#x540D;&#x4E0E;&#x5BC6;&#x7801;" class="headerlink" title="&#x7528;&#x6237;&#x540D;&#x4E0E;&#x5BC6;&#x7801;"></a>&#x7528;&#x6237;&#x540D;&#x4E0E;&#x5BC6;&#x7801;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-密钥"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#SSH-&#x5BC6;&#x94A5;" class="headerlink" title="SSH &#x5BC6;&#x94A5;"></a>SSH &#x5BC6;&#x94A5;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取服务器提供的验证方式"><span class="toc-number">2.3.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;&#x670D;&#x52A1;&#x5668;&#x63D0;&#x4F9B;&#x7684;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;" class="headerlink" title="&#x83B7;&#x53D6;&#x670D;&#x52A1;&#x5668;&#x63D0;&#x4F9B;&#x7684;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;"></a>&#x83B7;&#x53D6;&#x670D;&#x52A1;&#x5668;&#x63D0;&#x4F9B;&#x7684;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSH2模块具体功能"><span class="toc-number">3.</span> <span class="toc-text"><a href="#SSH2&#x6A21;&#x5757;&#x5177;&#x4F53;&#x529F;&#x80FD;" class="headerlink" title="SSH2&#x6A21;&#x5757;&#x5177;&#x4F53;&#x529F;&#x80FD;"></a>SSH2&#x6A21;&#x5757;&#x5177;&#x4F53;&#x529F;&#x80FD;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#实现远程复制文件"><span class="toc-number">3.1.</span> <span class="toc-text"><a href="#&#x5B9E;&#x73B0;&#x8FDC;&#x7A0B;&#x590D;&#x5236;&#x6587;&#x4EF6;" class="headerlink" title="&#x5B9E;&#x73B0;&#x8FDC;&#x7A0B;&#x590D;&#x5236;&#x6587;&#x4EF6;"></a>&#x5B9E;&#x73B0;&#x8FDC;&#x7A0B;&#x590D;&#x5236;&#x6587;&#x4EF6;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#远程服务器文件-copy-到本地"><span class="toc-number">3.1.1.</span> <span class="toc-text"><a href="#&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x6587;&#x4EF6;-copy-&#x5230;&#x672C;&#x5730;" class="headerlink" title="&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x6587;&#x4EF6; copy &#x5230;&#x672C;&#x5730;:"></a>&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x6587;&#x4EF6; copy &#x5230;&#x672C;&#x5730;:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地文件复制到远程服务器"><span class="toc-number">3.1.2.</span> <span class="toc-text"><a href="#&#x672C;&#x5730;&#x6587;&#x4EF6;&#x590D;&#x5236;&#x5230;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;" class="headerlink" title="&#x672C;&#x5730;&#x6587;&#x4EF6;&#x590D;&#x5236;&#x5230;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;"></a>&#x672C;&#x5730;&#x6587;&#x4EF6;&#x590D;&#x5236;&#x5230;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#执行远程服务器上的命令并取返回值"><span class="toc-number">3.2.</span> <span class="toc-text"><a href="#&#x6267;&#x884C;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x7684;&#x547D;&#x4EE4;&#x5E76;&#x53D6;&#x8FD4;&#x56DE;&#x503C;" class="headerlink" title="&#x6267;&#x884C;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x7684;&#x547D;&#x4EE4;&#x5E76;&#x53D6;&#x8FD4;&#x56DE;&#x503C;"></a>&#x6267;&#x884C;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x7684;&#x547D;&#x4EE4;&#x5E76;&#x53D6;&#x8FD4;&#x56DE;&#x503C;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Openwrt-基本命令"><span class="toc-number">3.3.</span> <span class="toc-text"><a href="#Openwrt-&#x57FA;&#x672C;&#x547D;&#x4EE4;" class="headerlink" title="Openwrt &#x57FA;&#x672C;&#x547D;&#x4EE4;"></a>Openwrt &#x57FA;&#x672C;&#x547D;&#x4EE4;</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&text=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&is_video=false&description=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=利用 PHP SSH2扩展实现远程控制 Openwrt&body=Check out this article: https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&title=利用 PHP SSH2扩展实现远程控制 Openwrt"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/08/12/Openwrt-SSH-PHP/&name=利用 PHP SSH2扩展实现远程控制 Openwrt&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：这篇文章通过 PHP SSH2扩展实现远程控制 Openwrt，包括（1）安装 PHP SSH2扩展（2)实现远程 copy 文件(3) 执行远程服务器上的命令并取返回值&lt;br&gt;"><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 masukio
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+<script>
+  // 你可以自定义一些配置
+  //
+  // databaseProvider: 必须为 'wilddog' 或者 'firebase'
+  // databaseConfig: 请从你的数据库控制台复制过来。
+  // pageURL(可选): 默认为当前页面的 URL。
+  // pageTitle(可选): 默认为当前页面的 title。
+  // theme(可选): 'light'（默认）或者 'dark'。
+  // locale(可选): 'en'（默认）或者 'zh-CN'
+  // defaultAvatarURL(可选): 默认头像是一个可爱的消防员 :-D
+  var wildfireConfig = () => ({
+    databaseProvider: 'wilddog',
+    databaseConfig: {
+        siteId: "wd2882084211dpgrir"
+    },
+    theme: 'dark',
+    locale: 'zh-CN',
+    defaultAvatarURL: 'https://image.flaticon.com/icons/svg/621/621863.svg'
+  })
+</script>
+<script src="https://unpkg.com/wildfire/dist/wildfire.auto.js"></script>

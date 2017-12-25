@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face 插入特殊字体（3）中文在线@font-face——有字库（4）修改 hexo 主题字体">
+<meta name="keywords" content="字体,前端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在网页中插入特殊字体,浅谈@font-face">
+<meta property="og:url" content="https://fjkfwz.github.io/2014/07/26/@font-face/index.html">
+<meta property="og:site_name" content="Sapientia et Virtus">
+<meta property="og:description" content="本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face 插入特殊字体（3）中文在线@font-face——有字库（4）修改 hexo 主题字体">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/lotors%E6%8D%95%E8%8E%B7.JPG">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/lotorstransttf.JPG">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/lotorstransferfft.JPG">
+<meta property="og:image" content="http://i1368.photobucket.com/albums/ag185/Mckee_Andy/index_zps500bc614.jpg">
+<meta property="og:image" content="http://i1368.photobucket.com/albums/ag185/Mckee_Andy/fontresult_zpsb9fc4c31.jpg">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/lotorsfont2.JPG">
+<meta property="og:image" content="http://picture-lotors.qiniudn.com/lotorsresult.JPG">
+<meta property="og:image" content="http://i1368.photobucket.com/albums/ag185/Mckee_Andy/fontcop_zpsea3b8452.jpg">
+<meta property="og:updated_time" content="2017-12-25T14:28:22.318Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在网页中插入特殊字体,浅谈@font-face">
+<meta name="twitter:description" content="本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face 插入特殊字体（3）中文在线@font-face——有字库（4）修改 hexo 主题字体">
+<meta name="twitter:image" content="http://picture-lotors.qiniudn.com/lotors%E6%8D%95%E8%8E%B7.JPG">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>在网页中插入特殊字体,浅谈@font-face</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="Sapientia et Virtus" type="application/atom+xml">
+    
+</head>
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')" style="display:none"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/08/08/Net-Law/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle()" onmouseout="$('#i-prev').toggle()"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/07/25/Weixin-Library-BookSearch/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="$('#share').toggle();return false"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none">Previous post</span>
+      <span id="i-next" class="info" style="display:none">Next post</span>
+      <span id="i-top" class="info" style="display:none">Back to top</span>
+      <span id="i-share" class="info" style="display:none">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/07/26/@font-face/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/07/26/@font-face/&text=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/07/26/@font-face/&is_video=false&description=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=在网页中插入特殊字体,浅谈@font-face&body=Check out this article: https://fjkfwz.github.io/2014/07/26/@font-face/"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-get-pocket" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-reddit" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-stumbleupon" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-digg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/07/26/@font-face/&name=在网页中插入特殊字体,浅谈@font-face&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face 插入特殊字体（3）中文在线@font-face——有字库（4）修改 hexo 主题字体&lt;br&gt;"><i class="fa fa-tumblr" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#font-face-功能"><span class="toc-number">1.</span> <span class="toc-text"><a href="#font-face-&#x529F;&#x80FD;" class="headerlink" title="@font-face &#x529F;&#x80FD;"></a>@font-face &#x529F;&#x80FD;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#font-face-文件"><span class="toc-number">2.</span> <span class="toc-text"><a href="#font-face-&#x6587;&#x4EF6;" class="headerlink" title="@font-face &#x6587;&#x4EF6;"></a>@font-face &#x6587;&#x4EF6;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#font-face-声明字体"><span class="toc-number">3.</span> <span class="toc-text"><a href="#font-face-&#x58F0;&#x660E;&#x5B57;&#x4F53;" class="headerlink" title="@font-face &#x58F0;&#x660E;&#x5B57;&#x4F53;"></a>@font-face &#x58F0;&#x660E;&#x5B57;&#x4F53;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用-font-face-实现网页中插入特殊字体的过程"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x4F7F;&#x7528;-font-face-&#x5B9E;&#x73B0;&#x7F51;&#x9875;&#x4E2D;&#x63D2;&#x5165;&#x7279;&#x6B8A;&#x5B57;&#x4F53;&#x7684;&#x8FC7;&#x7A0B;" class="headerlink" title="&#x4F7F;&#x7528;@font-face &#x5B9E;&#x73B0;&#x7F51;&#x9875;&#x4E2D;&#x63D2;&#x5165;&#x7279;&#x6B8A;&#x5B57;&#x4F53;&#x7684;&#x8FC7;&#x7A0B;"></a>&#x4F7F;&#x7528;@font-face &#x5B9E;&#x73B0;&#x7F51;&#x9875;&#x4E2D;&#x63D2;&#x5165;&#x7279;&#x6B8A;&#x5B57;&#x4F53;&#x7684;&#x8FC7;&#x7A0B;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#获取特殊字体"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;&#x7279;&#x6B8A;&#x5B57;&#x4F53;" class="headerlink" title="&#x83B7;&#x53D6;&#x7279;&#x6B8A;&#x5B57;&#x4F53;"></a>&#x83B7;&#x53D6;&#x7279;&#x6B8A;&#x5B57;&#x4F53;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取-font-face-所需字体格式"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;-font-face-&#x6240;&#x9700;&#x5B57;&#x4F53;&#x683C;&#x5F0F;" class="headerlink" title="&#x83B7;&#x53D6;@font-face &#x6240;&#x9700;&#x5B57;&#x4F53;&#x683C;&#x5F0F;"></a>&#x83B7;&#x53D6;@font-face &#x6240;&#x9700;&#x5B57;&#x4F53;&#x683C;&#x5F0F;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用-font-face-到我们的项目中"><span class="toc-number">4.3.</span> <span class="toc-text"><a href="#&#x5E94;&#x7528;-font-face-&#x5230;&#x6211;&#x4EEC;&#x7684;&#x9879;&#x76EE;&#x4E2D;" class="headerlink" title="&#x5E94;&#x7528;@font-face &#x5230;&#x6211;&#x4EEC;&#x7684;&#x9879;&#x76EE;&#x4E2D;"></a>&#x5E94;&#x7528;@font-face &#x5230;&#x6211;&#x4EEC;&#x7684;&#x9879;&#x76EE;&#x4E2D;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更改-hexo-的-textlog-字体"><span class="toc-number">4.4.</span> <span class="toc-text"><a href="#&#x66F4;&#x6539;-hexo-&#x7684;-textlog-&#x5B57;&#x4F53;" class="headerlink" title="&#x66F4;&#x6539; hexo &#x7684; textlog &#x5B57;&#x4F53;"></a>&#x66F4;&#x6539; hexo &#x7684; textlog &#x5B57;&#x4F53;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#中文-font-face"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x4E2D;&#x6587;-font-face" class="headerlink" title="&#x4E2D;&#x6587;@font-face"></a>&#x4E2D;&#x6587;@font-face</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#有字库测试"><span class="toc-number">5.1.</span> <span class="toc-text"><a href="#&#x6709;&#x5B57;&#x5E93;&#x6D4B;&#x8BD5;" class="headerlink" title="&#x6709;&#x5B57;&#x5E93;&#x6D4B;&#x8BD5;"></a>&#x6709;&#x5B57;&#x5E93;&#x6D4B;&#x8BD5;</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 class="posttitle" itemprop="name headline">
+        在网页中插入特殊字体,浅谈@font-face
+    </h1>
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Sapientia et Virtus</span>
+      </span>
+      <div class="postdate">
+        <time datetime="2014-07-26T00:00:00.000Z" itemprop="datePublished">Jul 26 2014</time>
+    </div>
+      <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/前端/">前端</a>, <a class="tag-link" href="/tags/字体/">字体</a>
+    </div>
+    </div>
+  </header>
+  
+  <div class="content" itemprop="articleBody">
+    <p><strong>摘要</strong>：本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face 插入特殊字体（3）中文在线@font-face——有字库（4）修改 hexo 主题字体<br><a id="more"></a><br>自从在 hexo 上安装了 pacmen 主题之后，就一直对 pacman 主题<code>header</code>上的<code>textlogo</code>和<code>footer</code>上<code>intro_line</code>的字体很感兴趣，因为我的电脑和手机上并没有安装该字体，但是无论是在任何终端上，浏览的体验都是一致的，然后查找了一些资料，发现这是<code>CSS3</code>中的一个功能模块<code>@font-face</code>，主要用于实现网页字体多样性。</p>
+<h1 id="font-face-功能"><a href="#font-face-功能" class="headerlink" title="@font-face 功能"></a>@font-face 功能</h1><p>制作网站难免有些字体不是默认的，通过@font-face 可以加载自己特定的字体，来实现特定的文字效果。<br>@font-face 语句是 css 中的一个功能模块，用于实现网页字体多样性(设计者可随意指定字体，不需要考虑浏览者电脑上是否安装)。主要是把自己定义的 Web 字体嵌入到你的网页中，随着@font-face 模块的出现，我们在 Web 的开发中使用字体不怕只能使用 Web 安全字体，<br>@font-face 不能说他是什么新东西了，在 CSS2.0 规范中就有了这玩意儿，IE4.0 开始就已经出现，只是当时用的不是特别广泛，后来在 CSS2.1 草案中又被删掉。随着 web 的急速发展，@font-face 价值越来越凸显，然后再次被纳入 CSS3 草案中。@font-face 是个什么东西，本文不做过多说明，不太清楚的童鞋可以看这里</p>
+<blockquote>
+<p><a href="http://www.w3schools.com/css/css3_fonts.asp" target="_blank" rel="noopener">http://www.w3schools.com/css/css3_fonts.asp</a></p>
+</blockquote>
+<h1 id="font-face-文件"><a href="#font-face-文件" class="headerlink" title="@font-face 文件"></a>@font-face 文件</h1><p>而由于网页中使用的字体类型，也是各浏览器对字体类型有不同的支持规格。 字体格式类型主要有几个大分类：TrueType、Embedded Open Type 、OpenType、WOFF 、SVG。</p>
+<p>TrueType</p>
+<blockquote>
+<p>Windows 和 Mac 系统最常用的字体格式，其最大的特点就是它是由一种数学模式来进行定义的基于轮廓技术的字体，这使得它们比基于矢量的字体更容易处理，保证了屏幕与打印输出的一致性。同时，这类字体和矢量字体一样可以随意缩放、旋转而不必担心会出现锯齿。</p>
+</blockquote>
+<p>EOT– Embedded Open Type (.eot)</p>
+<blockquote>
+<p>EOT 是嵌入式字体，是微软开发的技术。允许 OpenType 字体用@font-face 嵌入到网页并下载至浏览器渲染，存储在临时安装文件夹下。</p>
+</blockquote>
+<p>OpenType(.otf)</p>
+<blockquote>
+<p>OpenType 是微软和 Adobe 共同开发的字体，微软的 IE 浏览器全部采用这种字体。致力于替代 TrueType 字体。</p>
+</blockquote>
+<p>WOFF–WebOpen Font Format (.woff)</p>
+<blockquote>
+<p>WOFF（Web 开发字体格式）是一种专门为了 Web 而设计的字体格式标准，实际上是对于 TrueType/OpenType 等字体格式的封装，每个字体文件中含有字体以及针对字体的元数据（Metadata），字体文件被压缩，以便于网络传输。</p>
+</blockquote>
+<p>SVG(Scalable Vector Graphics) Fonts (.svg)</p>
+<blockquote>
+<p>SVG 是由 W3C 制定的开放标准的图形格式。SVG 字体就是使用 SVG 技术来呈现字体，还有一种 gzip 压缩格式的 SVG 字体。</p>
+</blockquote>
+<table><tr><th>format 格式</th><th>Font 格式</th><th>后缀名</th></tr><tr><td>truetype</td><td>TrueType</td><td>.ttf</td></tr><tr><td>opentype</td><td>OpenType</td><td>.ttf, .oft</td></tr><tr><td>truetype-aat</td><td>TrueType with Apple Advanced Typography extensions</td><td>.ttf</td></tr><tr><td>embedded-opentype</td><td>Embedded OpenType</td><td>.eot</td></tr><tr><td>svg</td><td>SVG Font</td><td>.svg, .svgz</td></tr><br></table>
+
+<h1 id="font-face-声明字体"><a href="#font-face-声明字体" class="headerlink" title="@font-face 声明字体"></a>@font-face 声明字体</h1><p>由于每种浏览器对@font-face 的兼容性不同，不同的浏览器对字体的支持格式不同，这就意味着在@font-face 中我们至少需要.woff,.eot 两种格式字体，甚至还需要.svg 等字体达到更多种浏览版本的支持。</p>
+<table><tr><th>浏览器</th><th>支持类型</th></tr><tr><td>IE6,7,8</td><td>仅支持 Embedded OpenType(.eot) 格式。</td></tr><tr><td>Firefox 3.5</td><td>支持 TrueType、OpenType(.ttf, .otf) 格式。</td></tr><tr><td>Firefox 3.6</td><td>支持 TrueType、OpenType(.ttf, .otf) 及 WOFF 格式。</td></tr><tr><td>Chrome,Safari,Opera</td><td>支持 TrueType、OpenType(.ttf, .otf) 及 SVG Font(.svg) 格式。</td></tr></table>
+
+<p>为了使@font-face 达到更多的浏览器支持，Paul Irish 写了一个独特的@font-face 语法叫 Bulletproof @font-face:</p>
+<pre><code>@font-face {
+font-family: &apos;YourWebFontName&apos;;
+src: url(&apos;YourWebFontName.eot?&apos;) format(&apos;eot&apos;);/*IE*/
+src:url(&apos;YourWebFontName.woff&apos;) format(&apos;woff&apos;), url(&apos;YourWebFontName.ttf&apos;) format(&apos;truetype&apos;);/*non-IE*/
+}
+</code></pre><p>但为了让各多的浏览器支持，你也可以写成：</p>
+<pre><code>@font-face {
+font-family: &apos;YourWebFontName&apos;;
+src: url(&apos;YourWebFontName.eot&apos;); /* IE9 Compat Modes */
+src: url(&apos;YourWebFontName.eot?# iefix&apos;) format(&apos;embedded-opentype&apos;), /* IE6-IE8 */
+         url(&apos;YourWebFontName.woff&apos;) format(&apos;woff&apos;), /* Modern Browsers */
+         url(&apos;YourWebFontName.ttf&apos;)  format(&apos;truetype&apos;), /* Safari, Android, iOS */
+         url(&apos;YourWebFontName.svg# YourWebFontName&apos;) format(&apos;svg&apos;); /* Legacy iOS */
+}
+</code></pre><h1 id="使用-font-face-实现网页中插入特殊字体的过程"><a href="#使用-font-face-实现网页中插入特殊字体的过程" class="headerlink" title="使用@font-face 实现网页中插入特殊字体的过程"></a>使用@font-face 实现网页中插入特殊字体的过程</h1><h2 id="获取特殊字体"><a href="#获取特殊字体" class="headerlink" title="获取特殊字体"></a>获取特殊字体</h2><p>这里我们要用到的是 Single Malta 字体<br><img src="http://picture-lotors.qiniudn.com/lotors%E6%8D%95%E8%8E%B7.JPG" alt="Single Malta"><br>要得到 Single Malta 字体，不外乎两种途径，其一找到付费网站购买字体，其二就是到免费网站 DownLoad 字体。当然要给钱的这种傻事我想大家都不会做的，那我们就得到免费的地方下载，在哪有呢？我平时都是到 Google Web Fonts 和 Dafont.com 寻找自己需要的字体，当然网上也还有别的下载字体的地方，这个 Demo 使用的是 Dafont.com 的 Single Malta 字体，这样就可以到这里下载 Single Malta：</p>
+<blockquote>
+<p><a href="http://www.dafont.com/single-malta.font" target="_blank" rel="noopener">http://www.dafont.com/single-malta.font</a></p>
+</blockquote>
+<h2 id="获取-font-face-所需字体格式"><a href="#获取-font-face-所需字体格式" class="headerlink" title="获取@font-face 所需字体格式"></a>获取@font-face 所需字体格式</h2><p>由于不同浏览器支持的字体文件不同，我们需要想办法获得@font-face 所需的.eot,.woff,.ttf,.svg 字体格式，这里我们用到了一个网站 fontsquirrel，可以方便的帮助我们实现字体格式的转换</p>
+<blockquote>
+<p><a href="http://www.fontsquirrel.com/tools/webfont-generator" target="_blank" rel="noopener">http://www.fontsquirrel.com/tools/webfont-generator</a></p>
+</blockquote>
+<p><img src="http://picture-lotors.qiniudn.com/lotorstransttf.JPG" alt="fontsquirrel"><br>进入网站后点击<code>Add Fonts</code>按钮，上传我们刚刚下载好的字体文件（要先把 SingleMalta.ttf 从.zip 压缩包中解压出来），通常选择中间默认的<code>OPTIMAL</code>选项即可，然后勾选<code>Agreement</code>,点击<code>DOWNLOAD YOU KIT</code>，稍等片刻，即可下载我们所需要的字体文件。<br>解压压缩包包可以看到已经转换好的字体文件，如下图：<br><img src="http://picture-lotors.qiniudn.com/lotorstransferfft.JPG" alt=""><br>大家可以看到，解压缩出来的文件格式，里面除了@font-face 所需要的字体格式外，还带有一个 DEMO 文件，如果你不清楚的也可以参考下载下来的 DEMO 文件，我在这里不对 DEMO 说明问题，我主要是给大家介绍如何把下载下来的文件有价值的运用到我们的项目中。</p>
+<h2 id="应用-font-face-到我们的项目中"><a href="#应用-font-face-到我们的项目中" class="headerlink" title="应用@font-face 到我们的项目中"></a>应用@font-face 到我们的项目中</h2><p>这里我们新建一个 DOME 项目，目录包括一个 fonts 文件夹，里面存放的转换好的字体文件；一个 css 文件夹，用于存放 ccs 文件；和一个 index.html 入口文件。目录和 html 如下<br><img src="http://i1368.photobucket.com/albums/ag185/Mckee_Andy/index_zps500bc614.jpg" alt=""></p>
+<p>style.css 代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@font-face &#123;</span><br><span class="line">   font-family: &apos;SingleMaltaRegular&apos;;</span><br><span class="line">   src: url(&apos;../fonts/singlemalta-webfont.eot&apos;);</span><br><span class="line">   src: url(&apos;../fonts/singlemalta-webfont.eot?# iefix&apos;) format(&apos;embedded-opentype&apos;),</span><br><span class="line">        url(&apos;../fonts/singlemalta-webfont.woff&apos;) format(&apos;woff&apos;),</span><br><span class="line">    url(&apos;../fonts/singlemalta-webfont.ttf&apos;) format(&apos;truetype&apos;),</span><br><span class="line">    url(&apos;../fonts/singlemalta-webfont.svg# SingleMaltaRegular&apos;) format(&apos;svg&apos;);</span><br><span class="line">   font-weight: normal;</span><br><span class="line">   font-style: normal;</span><br><span class="line">&#125;</span><br><span class="line">   h1.SingleMalta&#123;</span><br><span class="line">  font-family: &apos;SingleMaltaRegular&apos;;</span><br><span class="line">&#125;</span><br><span class="line">body&#123;</span><br><span class="line"> background-color: rgb(123,234,234);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上传到服务器，效果如下<br><img src="http://i1368.photobucket.com/albums/ag185/Mckee_Andy/fontresult_zpsb9fc4c31.jpg" alt=""></p>
+<h2 id="更改-hexo-的-textlog-字体"><a href="#更改-hexo-的-textlog-字体" class="headerlink" title="更改 hexo 的 textlog 字体"></a>更改 hexo 的 textlog 字体</h2><p>pacman 的字体资源是储存在 pacman 主题文件夹下<code>source/font</code>之中的，关于@font-face 声明是储存在<code>source/css/_base/font.styl</code>配置文件之中，查看 pacman 的配置文件_config.yml 找到字体选项 Font 通过注释可以了解到，页面的字体配置是保存在<code>source/css/_base/variable.styl</code>之中，如下图所示</p>
+<p><img src="http://picture-lotors.qiniudn.com/lotorsfont2.JPG" alt=""></p>
+<p>首先将解压出来的.eot,.woff,.ttf,.svg 字体文件放入<code>font</code>文件夹中，找到<code>source/css/_base/font.styl</code>配置文件，可以看到 pacman 已经帮我们建立了一个通用的声明，所以我们无需修改声明，只需要在<code>variable.styl</code>中修改页面字体配置即可，将<code>font-custom-family``font-custom-filename</code>改成我们的字体名和文件名即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">font-custom-family = &quot;SingleMaltaRegular&quot;（随意）</span><br><span class="line">font-custom-filename = singlemalta-webfont</span><br></pre></td></tr></table></figure></p>
+<p>刷新页面即可看到效果，如下图：<br><img src="http://picture-lotors.qiniudn.com/lotorsresult.JPG" alt=""></p>
+<h1 id="中文-font-face"><a href="#中文-font-face" class="headerlink" title="中文@font-face"></a>中文@font-face</h1><p>上面的这些@font-face 转换网站都不支持中文字体的转换，中文字体文件相对于英文显得过于庞大，很长一段时间都被认为是不适合嵌入网页的。</p>
+<p>直到几年前，这个问题终于被一个日本网站解决了，他用的技术就是截取法，在前端置入一个 js 脚本，脚本自动根据网页内容适时生成一个小字库（只包含当前网页内容的小字库）然后自动转换成.ttf、.eot、.woff、.svg 等格式嵌入网页中，从页实现@font-face 效果。体验和英文@font-face 差不多，效果非常漂亮。但日文@font-face 网站对于中文网页还无法支持。</p>
+<p>如果是你想在你的网页上使用中文简体@font-face 服务，也不是不可能，推荐一个中文@font-face 网站——“有字库”。</p>
+<p>使用时，只需要引用一段 js 脚本代码或者一段 css 代码，网站就会自动帮你截取网页需要的小字库并生成.ttf、.eot、.woff、.svg 等格式文件，你可以将各文件下载下来，也可以托管在这个网站上，非常方便。去试试吧</p>
+<h2 id="有字库测试"><a href="#有字库测试" class="headerlink" title="有字库测试"></a>有字库测试</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">	&lt;head&gt;</span><br><span class="line">	&lt;title&gt;font test&lt;/title&gt;</span><br><span class="line">    &lt;meta http-equiv=&quot;content-type&quot; charset=&quot;utf-8&quot;  content=&quot;text/html&quot;</span><br><span class="line">	&lt;/head&gt;</span><br><span class="line">	&lt;body&gt;</span><br><span class="line">	&lt;h1 class=&quot;SiYuanRegular&quot;&gt;中国文字之美&lt;/h1&gt;</span><br><span class="line">    &lt;p class=&quot;SiYuanRegular&quot;&gt;思源黑体测试&lt;/p&gt;</span><br><span class="line">	&lt;h1 &gt;中国文字之美&lt;/h1&gt;</span><br><span class="line">    &lt;p &gt;思源黑体测试&lt;/p&gt;</span><br><span class="line">	&lt;/body&gt;	//有字库生成的 JS 脚本插入&lt;/body&gt;和&lt;/html&gt;之间</span><br><span class="line">    &lt;script type=&quot;text/javascript&quot; src=&quot;http://www.youziku.com/UserDownFile/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot; src=&quot;http://www.youziku.com/UserDownFile/jquery.md5.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt; </span><br><span class="line">    function youziku46827() &#123;</span><br><span class="line">        var resultStr = $(&quot;.SiYuanRegular&quot;).text();</span><br><span class="line">        var md5 = &quot;&quot;;</span><br><span class="line">        resultStr = Trim(resultStr);</span><br><span class="line">        resultStr = SelectWord(resultStr);</span><br><span class="line">        md5 = $.md5(&quot;08d5ae7dc2e04646b67b8f08909cc995&quot;+&quot;SiYuanRegular&quot; + resultStr);</span><br><span class="line">        $.getJSON(&quot;http://www.youziku.com/webfont/CSSPOST?jsoncallback=?&quot;, &#123; &quot;id&quot;: md5, &quot;guid&quot;: &quot;08d5ae7dc2e04646b67b8f08909cc995&quot;, &quot;type&quot;: &quot;5&quot; &#125;, function (json) &#123;</span><br><span class="line">            if (json.result == 0) &#123;/*alert(&quot;需要生成&quot;);*/</span><br><span class="line">                $.post(&quot;http://www.youziku.com/webfont/PostCorsCreateFont&quot;, &#123; &quot;name&quot;: &quot;SiYuanRegular&quot;, &quot;gid&quot;: &quot;08d5ae7dc2e04646b67b8f08909cc995&quot;, &quot;type&quot;: &quot;5&quot;, &quot;text&quot;: resultStr &#125;, function (json) &#123;</span><br><span class="line">                if (json == &quot;0&quot;) &#123; /*alert(&quot;参数不对&quot;);*/</span><br><span class="line">                &#125; else if (json == &quot;2&quot;) &#123;/*alert(&quot;超过每日生成字体数的上限&quot;);*/</span><br><span class="line">                &#125; else if (json == &quot;3&quot;) &#123; /*alert(&quot;当前正在生成请稍后&quot;);*/</span><br><span class="line">                &#125; else &#123;/*alert(&quot;正在生成&quot;);*/</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">            else &#123;/*alert(&quot;下载 css 文件&quot;);*/</span><br><span class="line">                loadExtentFile(&quot;http://www.youziku.com/webfont/css?id=&quot; + md5 + &quot;&amp;guid=&quot; + &quot;08d5ae7dc2e04646b67b8f08909cc995&quot; + &quot;&amp;type=5&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    (function youziku() &#123;</span><br><span class="line">    if (window.location.href.toString().substring(0, 7) == &quot;file://&quot;) &#123;</span><br><span class="line">            alert(&quot;你当前是通过双击打开 html 文件，进行本地测试的，这样看不到字体效果，一定要通过本地建立的虚拟网站或发布到外网进行测试。详见有字库的使用说明。&quot;);</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">        youziku46827();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)()</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>测试效果<br><img src="http://i1368.photobucket.com/albums/ag185/Mckee_Andy/fontcop_zpsea3b8452.jpg" alt="有字库测试"></p>
+  </div>
+</article>
+<div class="blog-post-comments">
+	<div class="wildfire_thread"></div>
+</div>
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#font-face-功能"><span class="toc-number">1.</span> <span class="toc-text"><a href="#font-face-&#x529F;&#x80FD;" class="headerlink" title="@font-face &#x529F;&#x80FD;"></a>@font-face &#x529F;&#x80FD;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#font-face-文件"><span class="toc-number">2.</span> <span class="toc-text"><a href="#font-face-&#x6587;&#x4EF6;" class="headerlink" title="@font-face &#x6587;&#x4EF6;"></a>@font-face &#x6587;&#x4EF6;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#font-face-声明字体"><span class="toc-number">3.</span> <span class="toc-text"><a href="#font-face-&#x58F0;&#x660E;&#x5B57;&#x4F53;" class="headerlink" title="@font-face &#x58F0;&#x660E;&#x5B57;&#x4F53;"></a>@font-face &#x58F0;&#x660E;&#x5B57;&#x4F53;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用-font-face-实现网页中插入特殊字体的过程"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x4F7F;&#x7528;-font-face-&#x5B9E;&#x73B0;&#x7F51;&#x9875;&#x4E2D;&#x63D2;&#x5165;&#x7279;&#x6B8A;&#x5B57;&#x4F53;&#x7684;&#x8FC7;&#x7A0B;" class="headerlink" title="&#x4F7F;&#x7528;@font-face &#x5B9E;&#x73B0;&#x7F51;&#x9875;&#x4E2D;&#x63D2;&#x5165;&#x7279;&#x6B8A;&#x5B57;&#x4F53;&#x7684;&#x8FC7;&#x7A0B;"></a>&#x4F7F;&#x7528;@font-face &#x5B9E;&#x73B0;&#x7F51;&#x9875;&#x4E2D;&#x63D2;&#x5165;&#x7279;&#x6B8A;&#x5B57;&#x4F53;&#x7684;&#x8FC7;&#x7A0B;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#获取特殊字体"><span class="toc-number">4.1.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;&#x7279;&#x6B8A;&#x5B57;&#x4F53;" class="headerlink" title="&#x83B7;&#x53D6;&#x7279;&#x6B8A;&#x5B57;&#x4F53;"></a>&#x83B7;&#x53D6;&#x7279;&#x6B8A;&#x5B57;&#x4F53;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取-font-face-所需字体格式"><span class="toc-number">4.2.</span> <span class="toc-text"><a href="#&#x83B7;&#x53D6;-font-face-&#x6240;&#x9700;&#x5B57;&#x4F53;&#x683C;&#x5F0F;" class="headerlink" title="&#x83B7;&#x53D6;@font-face &#x6240;&#x9700;&#x5B57;&#x4F53;&#x683C;&#x5F0F;"></a>&#x83B7;&#x53D6;@font-face &#x6240;&#x9700;&#x5B57;&#x4F53;&#x683C;&#x5F0F;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用-font-face-到我们的项目中"><span class="toc-number">4.3.</span> <span class="toc-text"><a href="#&#x5E94;&#x7528;-font-face-&#x5230;&#x6211;&#x4EEC;&#x7684;&#x9879;&#x76EE;&#x4E2D;" class="headerlink" title="&#x5E94;&#x7528;@font-face &#x5230;&#x6211;&#x4EEC;&#x7684;&#x9879;&#x76EE;&#x4E2D;"></a>&#x5E94;&#x7528;@font-face &#x5230;&#x6211;&#x4EEC;&#x7684;&#x9879;&#x76EE;&#x4E2D;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更改-hexo-的-textlog-字体"><span class="toc-number">4.4.</span> <span class="toc-text"><a href="#&#x66F4;&#x6539;-hexo-&#x7684;-textlog-&#x5B57;&#x4F53;" class="headerlink" title="&#x66F4;&#x6539; hexo &#x7684; textlog &#x5B57;&#x4F53;"></a>&#x66F4;&#x6539; hexo &#x7684; textlog &#x5B57;&#x4F53;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#中文-font-face"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x4E2D;&#x6587;-font-face" class="headerlink" title="&#x4E2D;&#x6587;@font-face"></a>&#x4E2D;&#x6587;@font-face</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#有字库测试"><span class="toc-number">5.1.</span> <span class="toc-text"><a href="#&#x6709;&#x5B57;&#x5E93;&#x6D4B;&#x8BD5;" class="headerlink" title="&#x6709;&#x5B57;&#x5E93;&#x6D4B;&#x8BD5;"></a>&#x6709;&#x5B57;&#x5E93;&#x6D4B;&#x8BD5;</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/07/26/@font-face/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/07/26/@font-face/&text=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/07/26/@font-face/&is_video=false&description=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=在网页中插入特殊字体,浅谈@font-face&body=Check out this article: https://fjkfwz.github.io/2014/07/26/@font-face/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/07/26/@font-face/&title=在网页中插入特殊字体,浅谈@font-face"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/07/26/@font-face/&name=在网页中插入特殊字体,浅谈@font-face&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：本篇文章包括（1）介绍@font-face（2）如何在网页中使用@font-face 插入特殊字体（3）中文在线@font-face——有字库（4）修改 hexo 主题字体&lt;br&gt;"><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 masukio
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+<script>
+  // 你可以自定义一些配置
+  //
+  // databaseProvider: 必须为 'wilddog' 或者 'firebase'
+  // databaseConfig: 请从你的数据库控制台复制过来。
+  // pageURL(可选): 默认为当前页面的 URL。
+  // pageTitle(可选): 默认为当前页面的 title。
+  // theme(可选): 'light'（默认）或者 'dark'。
+  // locale(可选): 'en'（默认）或者 'zh-CN'
+  // defaultAvatarURL(可选): 默认头像是一个可爱的消防员 :-D
+  var wildfireConfig = () => ({
+    databaseProvider: 'wilddog',
+    databaseConfig: {
+        siteId: "wd2882084211dpgrir"
+    },
+    theme: 'dark',
+    locale: 'zh-CN',
+    defaultAvatarURL: 'https://image.flaticon.com/icons/svg/621/621863.svg'
+  })
+</script>
+<script src="https://unpkg.com/wildfire/dist/wildfire.auto.js"></script>

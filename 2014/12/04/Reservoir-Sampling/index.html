@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="摘要：Reservoir Sampling 是一系列的随机算法，其目的在于从包含 n 个项目的集合 S 中选取 k 个样本，其中 n 为一很大或未知的数量，尤其适用于不能把所有 n 个项目都存放到主内存的情况，Reservoir Sampling 使用固定长度的链表，从而保证内存大小的可控化。">
+<meta name="keywords" content="算法,抽样">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Algorithms# 001：Reservoir Sampling">
+<meta property="og:url" content="https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/index.html">
+<meta property="og:site_name" content="Sapientia et Virtus">
+<meta property="og:description" content="摘要：Reservoir Sampling 是一系列的随机算法，其目的在于从包含 n 个项目的集合 S 中选取 k 个样本，其中 n 为一很大或未知的数量，尤其适用于不能把所有 n 个项目都存放到主内存的情况，Reservoir Sampling 使用固定长度的链表，从而保证内存大小的可控化。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://7nar5o.com1.z0.glb.clouddn.com/Reservoir%20Sampling.png">
+<meta property="og:updated_time" content="2017-12-25T14:28:22.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Algorithms# 001：Reservoir Sampling">
+<meta name="twitter:description" content="摘要：Reservoir Sampling 是一系列的随机算法，其目的在于从包含 n 个项目的集合 S 中选取 k 个样本，其中 n 为一很大或未知的数量，尤其适用于不能把所有 n 个项目都存放到主内存的情况，Reservoir Sampling 使用固定长度的链表，从而保证内存大小的可控化。">
+<meta name="twitter:image" content="http://7nar5o.com1.z0.glb.clouddn.com/Reservoir%20Sampling.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Algorithms# 001：Reservoir Sampling</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="Sapientia et Virtus" type="application/atom+xml">
+    
+</head>
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')" style="display:none"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/12/04/Multi-Deploying-With-Hexo/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle()" onmouseout="$('#i-prev').toggle()"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/12/04/Android-Lasted-Technology/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="$('#share').toggle();return false"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none">Previous post</span>
+      <span id="i-next" class="info" style="display:none">Next post</span>
+      <span id="i-top" class="info" style="display:none">Back to top</span>
+      <span id="i-share" class="info" style="display:none">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&text=Algorithms# 001：Reservoir Sampling"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&is_video=false&description=Algorithms# 001：Reservoir Sampling"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Algorithms# 001：Reservoir Sampling&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-get-pocket" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-reddit" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-stumbleupon" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-digg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&name=Algorithms# 001：Reservoir Sampling&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Reservoir Sampling 是一系列的随机算法，其目的在于从包含 n 个项目的集合 S 中选取 k 个样本，其中 n 为一很大或未知的数量，尤其适用于不能把所有 n 个项目都存放到主内存的情况，Reservoir Sampling 使用固定长度的链表，从而保证内存大小的可控化。&lt;br&gt;"><i class="fa fa-tumblr" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Google-面试题"><span class="toc-number">1.</span> <span class="toc-text"><a href="#Google-&#x9762;&#x8BD5;&#x9898;" class="headerlink" title="Google &#x9762;&#x8BD5;&#x9898;"></a>Google &#x9762;&#x8BD5;&#x9898;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Introduction"><span class="toc-number">2.</span> <span class="toc-text"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Java-代码实现"><span class="toc-number">3.</span> <span class="toc-text"><a href="#Java-&#x4EE3;&#x7801;&#x5B9E;&#x73B0;" class="headerlink" title="Java &#x4EE3;&#x7801;&#x5B9E;&#x73B0;"></a>Java &#x4EE3;&#x7801;&#x5B9E;&#x73B0;</span></a></li></ol>
+    </div>
+  </span>
+</div>
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 class="posttitle" itemprop="name headline">
+        Algorithms# 001：Reservoir Sampling
+    </h1>
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Sapientia et Virtus</span>
+      </span>
+      <div class="postdate">
+        <time datetime="2014-12-04T00:00:00.000Z" itemprop="datePublished">Dec 4 2014</time>
+    </div>
+      <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/抽样/">抽样</a>, <a class="tag-link" href="/tags/算法/">算法</a>
+    </div>
+    </div>
+  </header>
+  
+  <div class="content" itemprop="articleBody">
+    <p><strong>摘要</strong>：Reservoir Sampling 是一系列的随机算法，其目的在于从包含 n 个项目的集合 S 中选取 k 个样本，其中 n 为一很大或未知的数量，尤其适用于不能把所有 n 个项目都存放到主内存的情况，Reservoir Sampling 使用固定长度的链表，从而保证内存大小的可控化。<br><a id="more"></a></p>
+<p>试想一下如何从一个大海中装起一杯水，而整个大海中的所有水分子都有相同的概率被装进这个杯子里，当然你可以把整个大海搅浑后从中舀出一杯，然而问题是我们并没有这么大型的搅拌机，那么我们还能够怎么做？</p>
+<p>一个行之有效的办法就是让海水中的每一个水分子一粒一粒都装入装入水杯中，同时由于杯子的容量是有限的，每进入一个水分子就会溢出一个水分子，溢出的水分子将被浪费掉，假设杯中的每一滴水都有相同的概率被挤出杯外，那么当海洋中的每一滴水都进入杯子后，我们就能够获得一杯集成大海精华的海水，而这时需要的只是一个杯子大小的搅拌机</p>
+<hr>
+<h1 id="Google-面试题"><a href="#Google-面试题" class="headerlink" title="Google 面试题"></a>Google 面试题</h1><p>Google 曾经有一道面试题，十分有趣：</p>
+<blockquote>
+<p>I have a linked list of numbers of length N. N is very large and I don’t know in advance the exact value of N.<br>How can I most efficiently write a function that will return k completely random numbers from the list</p>
+</blockquote>
+<p>题目非常简单：有 N 个元素的链表，事先不知道有多长，写一个函数可以高效地从其中取出 k 个随机数。</p>
+<hr>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>在知道文件行数的情况下，我们可以很容易的用 C 运行库的 rand 函数随机的获得一个行数，从而随机的取出一行，但是，当前的情况是不知道行数，这样如何求呢？我们需要一个概念来帮助我们做出猜想，来使得对每一行取出的概率相等，也即随机，水塘抽样就是这么一个概念,Wikipedia 上对水潭抽样是这么介绍的：</p>
+<blockquote>
+<p>水塘抽样是一系列的随机算法，其目的在于从包含 n 个项目的集合 S 中选取 k 个样本，其中 n 为一很大或未知的数量，尤其适用于不能把所有 n 个项目都存放到主内存的情况。</p>
+</blockquote>
+<p><img src="http://7nar5o.com1.z0.glb.clouddn.com/Reservoir%20Sampling.png" alt=""></p>
+<p>最常见例子为 Jeffrey Vitter 在其论文 Random Sampling with a Reservoir 中所提及的算法 R。</p>
+<p>参照 Dictionary of Algorithms and Data Structures 所载的 O(n)算法，包含以下步骤（假设阵列 S 以0开始标示）：</p>
+<pre><code>1.从 S 中抽取首 k 项放入「水塘」中
+2.對於每一個 S[j]項（j ≥ k）：
+3.隨機產生一個範圍從0到 j 的整數 r
+4.若 r &lt; k 則把水塘中的第 r 項換成 S[j]項
+</code></pre><p>即在0-j 项中生成随机数 r，被挑中的 r 就被丢弃掉，同时后边的队列补充一个 j 进来,因为我们 array R[k]类似一个 reservoir 水库（蓄水池）,所以该算法取名为水塘抽样</p>
+<blockquote>
+<p>The algorithm creates a “reservoir” array of size k and populates it with the first k items of S. It then iterates through the remaining elements of S until Sis exhausted. At the $i^{th}$ element of S, the algorithm generates a random number j between 1 and i. If j is less than k, the $j^{th}$ element of the reservoir array is replaced with the ith element of S. In effect, for all i, the $i^{th}$ element of S is chosen to be included in the reservoir with probability $k/i$. Similarly, at each iteration the $j^{th}$ element of the reservoir array is chosen to be replaced with probability ${j/k}*{k/i}$, which simplifies to ${j/i}$. It can be shown that when the algorithm has finished executing, each item in S has equal probability (i.e. k/length(S)) of being chosen for the reservoir.</p>
+</blockquote>
+<h1 id="Java-代码实现"><a href="#Java-代码实现" class="headerlink" title="Java 代码实现"></a>Java 代码实现</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">final int SAMPLE_COUNT = 10;</span><br><span class="line">int index = 0;</span><br><span class="line"></span><br><span class="line">Object[] samples = new Object[SAMPLE_COUNT];</span><br><span class="line">Random rnd = new Random();</span><br><span class="line">for (Object element in stream) &#123;</span><br><span class="line">    if (index &lt; SAMPLE_COUNT) &#123;</span><br><span class="line">        samples[index] = element;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        int r = rnd.nextInt(0, index);</span><br><span class="line">        if (r &lt; SAMPLE_COUNT) &#123;</span><br><span class="line">            samples[r] = element;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    index++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+<div class="blog-post-comments">
+	<div class="wildfire_thread"></div>
+</div>
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Google-面试题"><span class="toc-number">1.</span> <span class="toc-text"><a href="#Google-&#x9762;&#x8BD5;&#x9898;" class="headerlink" title="Google &#x9762;&#x8BD5;&#x9898;"></a>Google &#x9762;&#x8BD5;&#x9898;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Introduction"><span class="toc-number">2.</span> <span class="toc-text"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Java-代码实现"><span class="toc-number">3.</span> <span class="toc-text"><a href="#Java-&#x4EE3;&#x7801;&#x5B9E;&#x73B0;" class="headerlink" title="Java &#x4EE3;&#x7801;&#x5B9E;&#x73B0;"></a>Java &#x4EE3;&#x7801;&#x5B9E;&#x73B0;</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&text=Algorithms# 001：Reservoir Sampling"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&is_video=false&description=Algorithms# 001：Reservoir Sampling"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Algorithms# 001：Reservoir Sampling&body=Check out this article: https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&title=Algorithms# 001：Reservoir Sampling"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://fjkfwz.github.io/2014/12/04/Reservoir-Sampling/&name=Algorithms# 001：Reservoir Sampling&description=&lt;p&gt;&lt;strong&gt;摘要&lt;/strong&gt;：Reservoir Sampling 是一系列的随机算法，其目的在于从包含 n 个项目的集合 S 中选取 k 个样本，其中 n 为一很大或未知的数量，尤其适用于不能把所有 n 个项目都存放到主内存的情况，Reservoir Sampling 使用固定长度的链表，从而保证内存大小的可控化。&lt;br&gt;"><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast')"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 masukio
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="http://github.com/fjkfwz">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
+<script>
+  // 你可以自定义一些配置
+  //
+  // databaseProvider: 必须为 'wilddog' 或者 'firebase'
+  // databaseConfig: 请从你的数据库控制台复制过来。
+  // pageURL(可选): 默认为当前页面的 URL。
+  // pageTitle(可选): 默认为当前页面的 title。
+  // theme(可选): 'light'（默认）或者 'dark'。
+  // locale(可选): 'en'（默认）或者 'zh-CN'
+  // defaultAvatarURL(可选): 默认头像是一个可爱的消防员 :-D
+  var wildfireConfig = () => ({
+    databaseProvider: 'wilddog',
+    databaseConfig: {
+        siteId: "wd2882084211dpgrir"
+    },
+    theme: 'dark',
+    locale: 'zh-CN',
+    defaultAvatarURL: 'https://image.flaticon.com/icons/svg/621/621863.svg'
+  })
+</script>
+<script src="https://unpkg.com/wildfire/dist/wildfire.auto.js"></script>
