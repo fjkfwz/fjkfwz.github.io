@@ -427,23 +427,23 @@ A = 0x01234567 B = 0x89abcedf C = 0xfedcba98 D = 0x76543210
 
 以第一组的16个4字节 M 组为例，做第一轮变换，变换步骤如下：
 
-![第一轮变换](http://images.cnitblog.com/blog/613080/201501/161741191513568.png)
+![](http://makeblaze.qiniudn.com/FkAtPtd28_C9WbiYZ-jMbLIF08hX.png)
 
 第二轮变换步骤如下：
 
-![第二轮变换](http://images.cnitblog.com/blog/613080/201501/161741195895167.png)
+![](http://makeblaze.qiniudn.com/FuCF1LHpq3Rb6Vb8l1qYBz7F3GTz.png)
 
 第三轮变换步骤如下：
 
-![第三轮变换](http://images.cnitblog.com/blog/613080/201501/161741200736483.png)
+![](http://makeblaze.qiniudn.com/FsJDaMBxDXeE2HB3vQWveITfdrUR.png)
 
 第四轮变换步骤如下：
 
-![第四轮变换](http://images.cnitblog.com/blog/613080/201501/161741210424412.png)
+![](http://makeblaze.qiniudn.com/FoUXUWal4OdWUBQtOB6u-SobTV2o.png)
 
 最后做合并操作如下：
 
-![第五轮变换](http://images.cnitblog.com/blog/613080/201501/161741224796885.png)
+![](http://makeblaze.qiniudn.com/FuAEVJ4cZPKEx0lIZkQyS6oR3mLd.png)
 
 在以第一组得到了 AA，BB，CC，DD 内容（请注意 AA 不是指 A 与 A 连接，它只是个变量名称而已），以 DD'CC'BB'AA 的顺序连接起来，输出的则为第一组的结果内容，显然长度为32bit×4=128bit。以上部分递归细节由于网络上有些不清楚，我自己重新写了一些，细节上可能不同，但是意思本质是一样的。
 
