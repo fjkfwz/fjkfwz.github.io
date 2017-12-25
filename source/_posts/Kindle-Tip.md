@@ -16,6 +16,7 @@ description:
 
 # Kindle 推送服务
 >需要添加推送邮箱至 Amazon 中 kindle-Personal Documents Settings 邮件列表中
+
 中国账户：https://www.amazon.cn/myk
 国际账户：https://www.amazon.com/myk
 
@@ -33,7 +34,7 @@ description:
 注：如果您要求不高，自定义 RSS 推送功能能应付一般应用，如果要求排版和完美，可以参照 books 目录下的文件自己增加一个文件， 在您懂 python 的前提下，您可以完全的操控网页，可以生成您需要的最完美的 MOBI 文件。
 
 ## Kindle Ear 部署步骤
->1.申请 GAE 账号并创建一个 application。 https://appengine.google.com/
+1.申请 GAE 账号并创建一个 application。 https://appengine.google.com/
 2.下载 GAE SDK。 https://developers.google.com/appengine/downloads?hl=zh-CN
 3.安装 Python 2.7 如果已经安装了，跳过此步骤
 4.下载本应用的所有文件，放到一个特定的目录
