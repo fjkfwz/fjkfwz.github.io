@@ -1,5 +1,5 @@
 title: Openwrt Patch 制作及打补丁
-date: { { date } }
+date: 2014-12-4
 categories: Openwrt 开发笔记
 tags: [Openwrt,Patch,Diff]
 description:

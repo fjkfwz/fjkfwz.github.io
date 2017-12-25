@@ -1,5 +1,5 @@
 title: 利用 Image Builder 编译 Openwrt 固件
-date: { { date } }
+date: 2014-12-4
 categories: Openwrt 开发笔记
 tags: [Openwrt,Image Builder]
 description:

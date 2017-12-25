@@ -1,5 +1,5 @@
 title: kindle 折腾指南
-date: { { date } }
+date: 2014-12-4
 categories: kindle 指南
 tags: [kindle,多看,kindle ear]
 description:

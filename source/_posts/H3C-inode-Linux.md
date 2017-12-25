@@ -1,5 +1,5 @@
 title: 民间 H3C inode 客户端黑历史
-date: { { date } }
+date: 2014-12-4
 categories: Openwrt 开发笔记
 tags: [Openwrt,编译，H3C inode]
 description:

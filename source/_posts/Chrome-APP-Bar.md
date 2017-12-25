@@ -1,5 +1,5 @@
 title: 定制 Android 5.x 下 Chrome 的 App Bar 颜色
-date: { { date } }
+date: 2014-12-4
 categories: 前端设计
 tags: [App Bar,Color]
 description:

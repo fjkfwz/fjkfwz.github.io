@@ -1,5 +1,5 @@
 title: Project Cicada# 001：Introduction
-date: { { date } }
+date: 2014-12-4
 categories: Cicada
 tags: [Android,交互,架构]
 description:

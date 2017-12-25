@@ -1,5 +1,5 @@
 title: Hexo Multiple deployer 托管 Github 和 GitCafe 博客
-date: { { date } }
+date: 2014-12-4
 categories: hexo 笔记
 tags: [hexo,github,gitcafe,随笔]
 description: 

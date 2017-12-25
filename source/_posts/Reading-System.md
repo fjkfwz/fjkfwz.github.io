@@ -1,5 +1,5 @@
 title: 搭建高效的碎片化阅读系统
-date: { { date } }
+date: 2014-12-4
 categories: kindle 指南
 tags: [kindle,press,feedly,pocket,rss]
 description:

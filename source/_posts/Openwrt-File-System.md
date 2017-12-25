@@ -1,5 +1,5 @@
 title: Openwrt 文件系统
-date: { { date } }
+date: 2014-12-4
 categories: Openwrt 开发笔记
 tags: [文件系统，Openwrt]
 description:

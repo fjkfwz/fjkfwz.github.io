@@ -1,5 +1,5 @@
 title: 是谁捏造了生命的形状
-date: { { date } }
+date: 2014-12-4
 categories: 生物迷云
 tags: [生物,形状,发育,分型]
 description:

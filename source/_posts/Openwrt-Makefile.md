@@ -1,5 +1,5 @@
 title: Openwrt 编译过程
-date: { { date } }
+date: 2014-12-4
 categories: Openwrt 开发笔记
 tags: [Openwrt,Makefile]
 description:

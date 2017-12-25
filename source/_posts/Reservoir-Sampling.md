@@ -1,5 +1,5 @@
 title: Algorithms# 001：Reservoir Sampling
-date: { { date } }
+date: 2014-12-4
 categories: Algorithms
 tags: [算法,抽样]
 description:

@@ -1,5 +1,5 @@
 title: Android 开发新技能
-date: { { date } }
+date: 2014-12-4
 categories: Android 学习笔记
 tags:
 description:

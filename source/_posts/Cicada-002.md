@@ -1,5 +1,5 @@
 title: Project Cicada# 002：K-9 Mail 源码分析
-date: { { date } }
+date: 2014-12-4
 categories: Cicada
 tags: [K-9 Mail,Android]
 description:
